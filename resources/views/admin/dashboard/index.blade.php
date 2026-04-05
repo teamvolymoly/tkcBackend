@@ -19,7 +19,7 @@
     <section class="rounded-[12px] px-3 py-1 text-[#1d241d]">
         <div class="flex items-start justify-between gap-4">
             <div>
-                <h1 class="text-[22px] font-normal tracking-[-0.03em] text-[#1e2620] md:text-[40px]">Good morning, {{ $adminFirstName }} !</h1>
+                <h1 class="text-[22px] font-normal tracking-[-0.03em] text-[#1e2620] md:text-[40px]">Good night, {{ $adminFirstName }} !</h1>
 
                 <p class="mt-1 text-[14px] text-[#52604f]">Track and analyze your monthly online store's performance with detailed breakdown.</p>
             </div>

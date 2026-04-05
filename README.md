@@ -68,3 +68,7 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 ssh -p 22 kirayaca1@103.86.176.233
 qZ2(Hs&5OVN1
+
+
+ssh server key:
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPQksabpGs4CnH2jbqzEDj8qyF/q28x0MTZ4dWO4UDLW teamvolymoly@gmail.com

@@ -1,0 +1,600 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R] /Count 9 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 2186 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm (# TheKawaCompany API Documentation) Tj
+1 0 0 1 45 777 Tm ( ) Tj
+1 0 0 1 45 764 Tm (## Base URL) Tj
+1 0 0 1 45 751 Tm (- Local: `http://127.0.0.1:8000`) Tj
+1 0 0 1 45 738 Tm (- API Prefix: `/api`) Tj
+1 0 0 1 45 725 Tm ( ) Tj
+1 0 0 1 45 712 Tm (## Authentication) Tj
+1 0 0 1 45 699 Tm (- Customer token: `Bearer {{token}}`) Tj
+1 0 0 1 45 686 Tm (- Admin token: `Bearer {{admin_token}}`) Tj
+1 0 0 1 45 673 Tm (- Token type: Laravel Sanctum) Tj
+1 0 0 1 45 660 Tm ( ) Tj
+1 0 0 1 45 647 Tm (## Standard Response Shape) Tj
+1 0 0 1 45 634 Tm (- Success:) Tj
+1 0 0 1 45 621 Tm (```json) Tj
+1 0 0 1 45 608 Tm ({) Tj
+1 0 0 1 45 595 Tm (  "status": true,) Tj
+1 0 0 1 45 582 Tm (  "message": "...",) Tj
+1 0 0 1 45 569 Tm (  "data": {}) Tj
+1 0 0 1 45 556 Tm (}) Tj
+1 0 0 1 45 543 Tm (```) Tj
+1 0 0 1 45 530 Tm (- Validation Error:) Tj
+1 0 0 1 45 517 Tm (```json) Tj
+1 0 0 1 45 504 Tm ({) Tj
+1 0 0 1 45 491 Tm (  "status": false,) Tj
+1 0 0 1 45 478 Tm (  "errors": {) Tj
+1 0 0 1 45 465 Tm (    "field": ["error message"]) Tj
+1 0 0 1 45 452 Tm (  }) Tj
+1 0 0 1 45 439 Tm (}) Tj
+1 0 0 1 45 426 Tm (```) Tj
+1 0 0 1 45 413 Tm ( ) Tj
+1 0 0 1 45 400 Tm (## 1\) Auth APIs) Tj
+1 0 0 1 45 387 Tm (### POST `/api/auth/register`) Tj
+1 0 0 1 45 374 Tm (Auth: Public  ) Tj
+1 0 0 1 45 361 Tm (Body:) Tj
+1 0 0 1 45 348 Tm (```json) Tj
+1 0 0 1 45 335 Tm ({) Tj
+1 0 0 1 45 322 Tm (  "name": "Test Customer",) Tj
+1 0 0 1 45 309 Tm (  "email": "customer@example.com",) Tj
+1 0 0 1 45 296 Tm (  "phone": "9999999999",) Tj
+1 0 0 1 45 283 Tm (  "password": "password",) Tj
+1 0 0 1 45 270 Tm (  "password_confirmation": "password") Tj
+1 0 0 1 45 257 Tm (}) Tj
+1 0 0 1 45 244 Tm (```) Tj
+1 0 0 1 45 231 Tm ( ) Tj
+1 0 0 1 45 218 Tm (### POST `/api/auth/login`) Tj
+1 0 0 1 45 205 Tm (Auth: Public  ) Tj
+1 0 0 1 45 192 Tm (Body:) Tj
+1 0 0 1 45 179 Tm (```json) Tj
+1 0 0 1 45 166 Tm ({) Tj
+1 0 0 1 45 153 Tm (  "email": "customer@example.com",) Tj
+1 0 0 1 45 140 Tm (  "password": "password") Tj
+1 0 0 1 45 127 Tm (}) Tj
+1 0 0 1 45 114 Tm (```) Tj
+1 0 0 1 45 101 Tm ( ) Tj
+1 0 0 1 45 88 Tm (### POST `/api/auth/logout`) Tj
+1 0 0 1 45 75 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 62 Tm ( ) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 2403 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm (### POST `/api/auth/refresh`) Tj
+1 0 0 1 45 777 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 764 Tm ( ) Tj
+1 0 0 1 45 751 Tm (### GET `/api/auth/profile`) Tj
+1 0 0 1 45 738 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 725 Tm ( ) Tj
+1 0 0 1 45 712 Tm (### PUT `/api/auth/profile`) Tj
+1 0 0 1 45 699 Tm (Auth: Customer/Admin token  ) Tj
+1 0 0 1 45 686 Tm (Body \(any\):) Tj
+1 0 0 1 45 673 Tm (```json) Tj
+1 0 0 1 45 660 Tm ({) Tj
+1 0 0 1 45 647 Tm (  "name": "Updated Name",) Tj
+1 0 0 1 45 634 Tm (  "email": "updated@example.com",) Tj
+1 0 0 1 45 621 Tm (  "phone": "8888888888") Tj
+1 0 0 1 45 608 Tm (}) Tj
+1 0 0 1 45 595 Tm (```) Tj
+1 0 0 1 45 582 Tm ( ) Tj
+1 0 0 1 45 569 Tm (### POST `/api/auth/change-password`) Tj
+1 0 0 1 45 556 Tm (Auth: Customer/Admin token  ) Tj
+1 0 0 1 45 543 Tm (Body:) Tj
+1 0 0 1 45 530 Tm (```json) Tj
+1 0 0 1 45 517 Tm ({) Tj
+1 0 0 1 45 504 Tm (  "current_password": "password",) Tj
+1 0 0 1 45 491 Tm (  "password": "newpassword",) Tj
+1 0 0 1 45 478 Tm (  "password_confirmation": "newpassword") Tj
+1 0 0 1 45 465 Tm (}) Tj
+1 0 0 1 45 452 Tm (```) Tj
+1 0 0 1 45 439 Tm ( ) Tj
+1 0 0 1 45 426 Tm (## 2\) Address APIs) Tj
+1 0 0 1 45 413 Tm (### POST `/api/addresses`) Tj
+1 0 0 1 45 400 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 387 Tm ( ) Tj
+1 0 0 1 45 374 Tm (### GET `/api/addresses`) Tj
+1 0 0 1 45 361 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 348 Tm ( ) Tj
+1 0 0 1 45 335 Tm (### GET `/api/addresses/{id}`) Tj
+1 0 0 1 45 322 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 309 Tm ( ) Tj
+1 0 0 1 45 296 Tm (### PUT `/api/addresses/{id}`) Tj
+1 0 0 1 45 283 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 270 Tm ( ) Tj
+1 0 0 1 45 257 Tm (### DELETE `/api/addresses/{id}`) Tj
+1 0 0 1 45 244 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 231 Tm ( ) Tj
+1 0 0 1 45 218 Tm (### POST `/api/addresses/{id}/set-default`) Tj
+1 0 0 1 45 205 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 192 Tm ( ) Tj
+1 0 0 1 45 179 Tm (Create/Update body example:) Tj
+1 0 0 1 45 166 Tm (```json) Tj
+1 0 0 1 45 153 Tm ({) Tj
+1 0 0 1 45 140 Tm (  "address_line1": "221B Baker Street",) Tj
+1 0 0 1 45 127 Tm (  "address_line2": "Near Market",) Tj
+1 0 0 1 45 114 Tm (  "city": "Delhi",) Tj
+1 0 0 1 45 101 Tm (  "state": "Delhi",) Tj
+1 0 0 1 45 88 Tm (  "pincode": "110001",) Tj
+1 0 0 1 45 75 Tm (  "country": "India",) Tj
+1 0 0 1 45 62 Tm (  "is_default": true) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 2258 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm (}) Tj
+1 0 0 1 45 777 Tm (```) Tj
+1 0 0 1 45 764 Tm ( ) Tj
+1 0 0 1 45 751 Tm (## 3\) Category APIs) Tj
+1 0 0 1 45 738 Tm (### GET `/api/categories`) Tj
+1 0 0 1 45 725 Tm (Auth: Public) Tj
+1 0 0 1 45 712 Tm ( ) Tj
+1 0 0 1 45 699 Tm (### GET `/api/categories/{category}`) Tj
+1 0 0 1 45 686 Tm (Auth: Public) Tj
+1 0 0 1 45 673 Tm ( ) Tj
+1 0 0 1 45 660 Tm (### GET `/api/categories/{category}/subcategories`) Tj
+1 0 0 1 45 647 Tm (Auth: Public) Tj
+1 0 0 1 45 634 Tm ( ) Tj
+1 0 0 1 45 621 Tm (### POST `/api/categories`) Tj
+1 0 0 1 45 608 Tm (Auth: Admin token) Tj
+1 0 0 1 45 595 Tm ( ) Tj
+1 0 0 1 45 582 Tm (### PUT `/api/categories/{category}`) Tj
+1 0 0 1 45 569 Tm (Auth: Admin token) Tj
+1 0 0 1 45 556 Tm ( ) Tj
+1 0 0 1 45 543 Tm (### DELETE `/api/categories/{category}`) Tj
+1 0 0 1 45 530 Tm (Auth: Admin token) Tj
+1 0 0 1 45 517 Tm ( ) Tj
+1 0 0 1 45 504 Tm (Body example:) Tj
+1 0 0 1 45 491 Tm (```json) Tj
+1 0 0 1 45 478 Tm ({) Tj
+1 0 0 1 45 465 Tm (  "name": "Green Tea",) Tj
+1 0 0 1 45 452 Tm (  "description": "Healthy tea",) Tj
+1 0 0 1 45 439 Tm (  "parent_id": null,) Tj
+1 0 0 1 45 426 Tm (  "status": true) Tj
+1 0 0 1 45 413 Tm (}) Tj
+1 0 0 1 45 400 Tm (```) Tj
+1 0 0 1 45 387 Tm ( ) Tj
+1 0 0 1 45 374 Tm (## 4\) Product APIs) Tj
+1 0 0 1 45 361 Tm (### GET `/api/products`) Tj
+1 0 0 1 45 348 Tm (Auth: Public) Tj
+1 0 0 1 45 335 Tm ( ) Tj
+1 0 0 1 45 322 Tm (### GET `/api/products/{slug}`) Tj
+1 0 0 1 45 309 Tm (Auth: Public) Tj
+1 0 0 1 45 296 Tm ( ) Tj
+1 0 0 1 45 283 Tm (### POST `/api/products`) Tj
+1 0 0 1 45 270 Tm (Auth: Admin token) Tj
+1 0 0 1 45 257 Tm ( ) Tj
+1 0 0 1 45 244 Tm (### PUT `/api/products/{id}`) Tj
+1 0 0 1 45 231 Tm (Auth: Admin token) Tj
+1 0 0 1 45 218 Tm ( ) Tj
+1 0 0 1 45 205 Tm (### DELETE `/api/products/{id}`) Tj
+1 0 0 1 45 192 Tm (Auth: Admin token) Tj
+1 0 0 1 45 179 Tm ( ) Tj
+1 0 0 1 45 166 Tm (Body example:) Tj
+1 0 0 1 45 153 Tm (```json) Tj
+1 0 0 1 45 140 Tm ({) Tj
+1 0 0 1 45 127 Tm (  "category_id": 1,) Tj
+1 0 0 1 45 114 Tm (  "subcategory_id": null,) Tj
+1 0 0 1 45 101 Tm (  "name": "Chamomile Bliss Tea",) Tj
+1 0 0 1 45 88 Tm (  "short_description": "Relaxing herbal tea",) Tj
+1 0 0 1 45 75 Tm (  "allergic_information": "None",) Tj
+1 0 0 1 45 62 Tm (  "tea_type": "Herbal",) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 2366 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm (  "disclaimer": "Consult physician if pregnant",) Tj
+1 0 0 1 45 777 Tm (  "description": "Full product description",) Tj
+1 0 0 1 45 764 Tm (  "ingredients": "Chamomile, Lemongrass",) Tj
+1 0 0 1 45 751 Tm (  "features": [{"icon":"leaf","text":"Organic"}],) Tj
+1 0 0 1 45 738 Tm (  "status": true) Tj
+1 0 0 1 45 725 Tm (}) Tj
+1 0 0 1 45 712 Tm (```) Tj
+1 0 0 1 45 699 Tm ( ) Tj
+1 0 0 1 45 686 Tm (## 5\) Product Variant APIs) Tj
+1 0 0 1 45 673 Tm (### GET `/api/products/{id}/variants`) Tj
+1 0 0 1 45 660 Tm (Auth: Public) Tj
+1 0 0 1 45 647 Tm ( ) Tj
+1 0 0 1 45 634 Tm (### POST `/api/variants`) Tj
+1 0 0 1 45 621 Tm (Auth: Admin token) Tj
+1 0 0 1 45 608 Tm ( ) Tj
+1 0 0 1 45 595 Tm (### PUT `/api/variants/{id}`) Tj
+1 0 0 1 45 582 Tm (Auth: Admin token) Tj
+1 0 0 1 45 569 Tm ( ) Tj
+1 0 0 1 45 556 Tm (### DELETE `/api/variants/{id}`) Tj
+1 0 0 1 45 543 Tm (Auth: Admin token) Tj
+1 0 0 1 45 530 Tm ( ) Tj
+1 0 0 1 45 517 Tm (Body example:) Tj
+1 0 0 1 45 504 Tm (```json) Tj
+1 0 0 1 45 491 Tm ({) Tj
+1 0 0 1 45 478 Tm (  "product_id": 1,) Tj
+1 0 0 1 45 465 Tm (  "variant_name": "100g Pack",) Tj
+1 0 0 1 45 452 Tm (  "sku": "CHAM-100G",) Tj
+1 0 0 1 45 439 Tm (  "price": 399,) Tj
+1 0 0 1 45 426 Tm (  "stock": 50,) Tj
+1 0 0 1 45 413 Tm (  "weight": 0.1,) Tj
+1 0 0 1 45 400 Tm (  "dimensions": "10x5x3",) Tj
+1 0 0 1 45 387 Tm (  "net_weight": "100g",) Tj
+1 0 0 1 45 374 Tm (  "tags": ["best-seller"],) Tj
+1 0 0 1 45 361 Tm (  "brewing_rituals": [{"icon":"cup","text":"Brew 3 min"}],) Tj
+1 0 0 1 45 348 Tm (  "status": true) Tj
+1 0 0 1 45 335 Tm (}) Tj
+1 0 0 1 45 322 Tm (```) Tj
+1 0 0 1 45 309 Tm ( ) Tj
+1 0 0 1 45 296 Tm (## 6\) Product Image APIs) Tj
+1 0 0 1 45 283 Tm (### GET `/api/products/{id}/images`) Tj
+1 0 0 1 45 270 Tm (Auth: Public) Tj
+1 0 0 1 45 257 Tm ( ) Tj
+1 0 0 1 45 244 Tm (### POST `/api/product-images`) Tj
+1 0 0 1 45 231 Tm (Auth: Admin token) Tj
+1 0 0 1 45 218 Tm ( ) Tj
+1 0 0 1 45 205 Tm (### DELETE `/api/product-images/{id}`) Tj
+1 0 0 1 45 192 Tm (Auth: Admin token) Tj
+1 0 0 1 45 179 Tm ( ) Tj
+1 0 0 1 45 166 Tm (Body:) Tj
+1 0 0 1 45 153 Tm (```json) Tj
+1 0 0 1 45 140 Tm ({) Tj
+1 0 0 1 45 127 Tm (  "product_id": 1,) Tj
+1 0 0 1 45 114 Tm (  "image_url": "https://example.com/images/tea.png",) Tj
+1 0 0 1 45 101 Tm (  "sort_order": 1) Tj
+1 0 0 1 45 88 Tm (}) Tj
+1 0 0 1 45 75 Tm (```) Tj
+1 0 0 1 45 62 Tm ( ) Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 12 0 R >>
+endobj
+12 0 obj
+<< /Length 2162 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm (## 7\) Ingredient APIs) Tj
+1 0 0 1 45 777 Tm (### GET `/api/products/{id}/ingredients`) Tj
+1 0 0 1 45 764 Tm (Auth: Public) Tj
+1 0 0 1 45 751 Tm ( ) Tj
+1 0 0 1 45 738 Tm (### POST `/api/products/{id}/ingredients`) Tj
+1 0 0 1 45 725 Tm (Auth: Admin token) Tj
+1 0 0 1 45 712 Tm ( ) Tj
+1 0 0 1 45 699 Tm (### DELETE `/api/ingredients/{id}`) Tj
+1 0 0 1 45 686 Tm (Auth: Admin token) Tj
+1 0 0 1 45 673 Tm ( ) Tj
+1 0 0 1 45 660 Tm (Body:) Tj
+1 0 0 1 45 647 Tm (```json) Tj
+1 0 0 1 45 634 Tm ({) Tj
+1 0 0 1 45 621 Tm (  "name": "Chamomile",) Tj
+1 0 0 1 45 608 Tm (  "value": "50%",) Tj
+1 0 0 1 45 595 Tm (  "sort_order": 1) Tj
+1 0 0 1 45 582 Tm (}) Tj
+1 0 0 1 45 569 Tm (```) Tj
+1 0 0 1 45 556 Tm ( ) Tj
+1 0 0 1 45 543 Tm (## 8\) Nutrition APIs) Tj
+1 0 0 1 45 530 Tm (### GET `/api/products/{id}/nutrition`) Tj
+1 0 0 1 45 517 Tm (Auth: Public) Tj
+1 0 0 1 45 504 Tm ( ) Tj
+1 0 0 1 45 491 Tm (### POST `/api/products/{id}/nutrition`) Tj
+1 0 0 1 45 478 Tm (Auth: Admin token) Tj
+1 0 0 1 45 465 Tm ( ) Tj
+1 0 0 1 45 452 Tm (Body:) Tj
+1 0 0 1 45 439 Tm (```json) Tj
+1 0 0 1 45 426 Tm ({) Tj
+1 0 0 1 45 413 Tm (  "nutrient": "Calories",) Tj
+1 0 0 1 45 400 Tm (  "value": "5",) Tj
+1 0 0 1 45 387 Tm (  "unit": "kcal") Tj
+1 0 0 1 45 374 Tm (}) Tj
+1 0 0 1 45 361 Tm (```) Tj
+1 0 0 1 45 348 Tm ( ) Tj
+1 0 0 1 45 335 Tm (## 9\) Cart APIs) Tj
+1 0 0 1 45 322 Tm (### GET `/api/cart`) Tj
+1 0 0 1 45 309 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 296 Tm ( ) Tj
+1 0 0 1 45 283 Tm (### POST `/api/cart`) Tj
+1 0 0 1 45 270 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 257 Tm ( ) Tj
+1 0 0 1 45 244 Tm (### PUT `/api/cart/{id}`) Tj
+1 0 0 1 45 231 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 218 Tm ( ) Tj
+1 0 0 1 45 205 Tm (### DELETE `/api/cart/{id}`) Tj
+1 0 0 1 45 192 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 179 Tm ( ) Tj
+1 0 0 1 45 166 Tm (### DELETE `/api/cart`) Tj
+1 0 0 1 45 153 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 140 Tm ( ) Tj
+1 0 0 1 45 127 Tm (Body examples:) Tj
+1 0 0 1 45 114 Tm (```json) Tj
+1 0 0 1 45 101 Tm ({) Tj
+1 0 0 1 45 88 Tm (  "variant_id": 1,) Tj
+1 0 0 1 45 75 Tm (  "quantity": 2) Tj
+1 0 0 1 45 62 Tm (}) Tj
+ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 14 0 R >>
+endobj
+14 0 obj
+<< /Length 2179 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm (```) Tj
+1 0 0 1 45 777 Tm ( ) Tj
+1 0 0 1 45 764 Tm (```json) Tj
+1 0 0 1 45 751 Tm ({) Tj
+1 0 0 1 45 738 Tm (  "quantity": 3) Tj
+1 0 0 1 45 725 Tm (}) Tj
+1 0 0 1 45 712 Tm (```) Tj
+1 0 0 1 45 699 Tm ( ) Tj
+1 0 0 1 45 686 Tm (## 10\) Wishlist APIs) Tj
+1 0 0 1 45 673 Tm (### POST `/api/wishlist`) Tj
+1 0 0 1 45 660 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 647 Tm ( ) Tj
+1 0 0 1 45 634 Tm (### GET `/api/wishlist`) Tj
+1 0 0 1 45 621 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 608 Tm ( ) Tj
+1 0 0 1 45 595 Tm (### DELETE `/api/wishlist/{id}`) Tj
+1 0 0 1 45 582 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 569 Tm ( ) Tj
+1 0 0 1 45 556 Tm (Body:) Tj
+1 0 0 1 45 543 Tm (```json) Tj
+1 0 0 1 45 530 Tm ({) Tj
+1 0 0 1 45 517 Tm (  "product_id": 1) Tj
+1 0 0 1 45 504 Tm (}) Tj
+1 0 0 1 45 491 Tm (```) Tj
+1 0 0 1 45 478 Tm ( ) Tj
+1 0 0 1 45 465 Tm (## 11\) Order APIs) Tj
+1 0 0 1 45 452 Tm (### POST `/api/orders`) Tj
+1 0 0 1 45 439 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 426 Tm ( ) Tj
+1 0 0 1 45 413 Tm (### GET `/api/orders`) Tj
+1 0 0 1 45 400 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 387 Tm ( ) Tj
+1 0 0 1 45 374 Tm (### GET `/api/orders/{id}`) Tj
+1 0 0 1 45 361 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 348 Tm ( ) Tj
+1 0 0 1 45 335 Tm (### POST `/api/orders/{id}/cancel`) Tj
+1 0 0 1 45 322 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 309 Tm ( ) Tj
+1 0 0 1 45 296 Tm (### GET `/api/orders/{id}/track`) Tj
+1 0 0 1 45 283 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 270 Tm ( ) Tj
+1 0 0 1 45 257 Tm (Create body example:) Tj
+1 0 0 1 45 244 Tm (```json) Tj
+1 0 0 1 45 231 Tm ({) Tj
+1 0 0 1 45 218 Tm (  "address_id": 1,) Tj
+1 0 0 1 45 205 Tm (  "coupon_code": "WELCOME10",) Tj
+1 0 0 1 45 192 Tm (  "shipping_method_code": "STANDARD",) Tj
+1 0 0 1 45 179 Tm (  "notes": "Please deliver fast") Tj
+1 0 0 1 45 166 Tm (}) Tj
+1 0 0 1 45 153 Tm (```) Tj
+1 0 0 1 45 140 Tm ( ) Tj
+1 0 0 1 45 127 Tm (## 12\) Payment APIs) Tj
+1 0 0 1 45 114 Tm (### POST `/api/payments`) Tj
+1 0 0 1 45 101 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 88 Tm ( ) Tj
+1 0 0 1 45 75 Tm (### POST `/api/payments/webhook`) Tj
+1 0 0 1 45 62 Tm (Auth: Public) Tj
+ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 16 0 R >>
+endobj
+16 0 obj
+<< /Length 2123 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm ( ) Tj
+1 0 0 1 45 777 Tm (### GET `/api/payments/{order_id}`) Tj
+1 0 0 1 45 764 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 751 Tm ( ) Tj
+1 0 0 1 45 738 Tm (Create payment body:) Tj
+1 0 0 1 45 725 Tm (```json) Tj
+1 0 0 1 45 712 Tm ({) Tj
+1 0 0 1 45 699 Tm (  "order_id": 1,) Tj
+1 0 0 1 45 686 Tm (  "payment_method": "razorpay",) Tj
+1 0 0 1 45 673 Tm (  "transaction_id": "TXN123456",) Tj
+1 0 0 1 45 660 Tm (  "status": "success",) Tj
+1 0 0 1 45 647 Tm (  "gateway_payload": {"source": "postman"}) Tj
+1 0 0 1 45 634 Tm (}) Tj
+1 0 0 1 45 621 Tm (```) Tj
+1 0 0 1 45 608 Tm ( ) Tj
+1 0 0 1 45 595 Tm (Webhook body:) Tj
+1 0 0 1 45 582 Tm (```json) Tj
+1 0 0 1 45 569 Tm ({) Tj
+1 0 0 1 45 556 Tm (  "transaction_id": "TXN123456",) Tj
+1 0 0 1 45 543 Tm (  "status": "success") Tj
+1 0 0 1 45 530 Tm (}) Tj
+1 0 0 1 45 517 Tm (```) Tj
+1 0 0 1 45 504 Tm ( ) Tj
+1 0 0 1 45 491 Tm (## 13\) Coupon APIs) Tj
+1 0 0 1 45 478 Tm (### GET `/api/coupons`) Tj
+1 0 0 1 45 465 Tm (Auth: Public) Tj
+1 0 0 1 45 452 Tm ( ) Tj
+1 0 0 1 45 439 Tm (### POST `/api/coupons/apply`) Tj
+1 0 0 1 45 426 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 413 Tm ( ) Tj
+1 0 0 1 45 400 Tm (Body:) Tj
+1 0 0 1 45 387 Tm (```json) Tj
+1 0 0 1 45 374 Tm ({) Tj
+1 0 0 1 45 361 Tm (  "code": "WELCOME10",) Tj
+1 0 0 1 45 348 Tm (  "amount": 1000) Tj
+1 0 0 1 45 335 Tm (}) Tj
+1 0 0 1 45 322 Tm (```) Tj
+1 0 0 1 45 309 Tm ( ) Tj
+1 0 0 1 45 296 Tm (## 14\) Review APIs) Tj
+1 0 0 1 45 283 Tm (### POST `/api/reviews`) Tj
+1 0 0 1 45 270 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 257 Tm ( ) Tj
+1 0 0 1 45 244 Tm (### GET `/api/products/{id}/reviews`) Tj
+1 0 0 1 45 231 Tm (Auth: Public) Tj
+1 0 0 1 45 218 Tm ( ) Tj
+1 0 0 1 45 205 Tm (### DELETE `/api/reviews/{id}`) Tj
+1 0 0 1 45 192 Tm (Auth: Customer/Admin token) Tj
+1 0 0 1 45 179 Tm ( ) Tj
+1 0 0 1 45 166 Tm (Body:) Tj
+1 0 0 1 45 153 Tm (```json) Tj
+1 0 0 1 45 140 Tm ({) Tj
+1 0 0 1 45 127 Tm (  "product_id": 1,) Tj
+1 0 0 1 45 114 Tm (  "rating": 5,) Tj
+1 0 0 1 45 101 Tm (  "review": "Great taste and aroma") Tj
+1 0 0 1 45 88 Tm (}) Tj
+1 0 0 1 45 75 Tm (```) Tj
+1 0 0 1 45 62 Tm ( ) Tj
+ET
+endstream
+endobj
+17 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 18 0 R >>
+endobj
+18 0 obj
+<< /Length 2103 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm (## 15\) Inventory APIs) Tj
+1 0 0 1 45 777 Tm (### GET `/api/inventory`) Tj
+1 0 0 1 45 764 Tm (Auth: Admin token) Tj
+1 0 0 1 45 751 Tm ( ) Tj
+1 0 0 1 45 738 Tm (### PUT `/api/inventory/{variant_id}`) Tj
+1 0 0 1 45 725 Tm (Auth: Admin token) Tj
+1 0 0 1 45 712 Tm ( ) Tj
+1 0 0 1 45 699 Tm (Body:) Tj
+1 0 0 1 45 686 Tm (```json) Tj
+1 0 0 1 45 673 Tm ({) Tj
+1 0 0 1 45 660 Tm (  "stock": 70,) Tj
+1 0 0 1 45 647 Tm (  "reserved_stock": 5,) Tj
+1 0 0 1 45 634 Tm (  "warehouse": "WH-01") Tj
+1 0 0 1 45 621 Tm (}) Tj
+1 0 0 1 45 608 Tm (```) Tj
+1 0 0 1 45 595 Tm ( ) Tj
+1 0 0 1 45 582 Tm (## 16\) Admin APIs) Tj
+1 0 0 1 45 569 Tm (### GET `/api/admin/dashboard`) Tj
+1 0 0 1 45 556 Tm (Auth: Admin token) Tj
+1 0 0 1 45 543 Tm ( ) Tj
+1 0 0 1 45 530 Tm (### GET `/api/admin/customers`) Tj
+1 0 0 1 45 517 Tm (Auth: Admin token) Tj
+1 0 0 1 45 504 Tm ( ) Tj
+1 0 0 1 45 491 Tm (### GET `/api/admin/orders`) Tj
+1 0 0 1 45 478 Tm (Auth: Admin token) Tj
+1 0 0 1 45 465 Tm ( ) Tj
+1 0 0 1 45 452 Tm (### PUT `/api/admin/orders/{id}/status`) Tj
+1 0 0 1 45 439 Tm (Auth: Admin token) Tj
+1 0 0 1 45 426 Tm ( ) Tj
+1 0 0 1 45 413 Tm (Body:) Tj
+1 0 0 1 45 400 Tm (```json) Tj
+1 0 0 1 45 387 Tm ({) Tj
+1 0 0 1 45 374 Tm (  "status": "processing") Tj
+1 0 0 1 45 361 Tm (}) Tj
+1 0 0 1 45 348 Tm (```) Tj
+1 0 0 1 45 335 Tm ( ) Tj
+1 0 0 1 45 322 Tm (## 17\) Shipping APIs) Tj
+1 0 0 1 45 309 Tm (### GET `/api/shipping/methods`) Tj
+1 0 0 1 45 296 Tm (Auth: Public) Tj
+1 0 0 1 45 283 Tm ( ) Tj
+1 0 0 1 45 270 Tm (### POST `/api/shipping/calculate`) Tj
+1 0 0 1 45 257 Tm (Auth: Public) Tj
+1 0 0 1 45 244 Tm ( ) Tj
+1 0 0 1 45 231 Tm (Body:) Tj
+1 0 0 1 45 218 Tm (```json) Tj
+1 0 0 1 45 205 Tm ({) Tj
+1 0 0 1 45 192 Tm (  "method_code": "STANDARD",) Tj
+1 0 0 1 45 179 Tm (  "weight": 0.5,) Tj
+1 0 0 1 45 166 Tm (  "amount": 1000) Tj
+1 0 0 1 45 153 Tm (}) Tj
+1 0 0 1 45 140 Tm (```) Tj
+1 0 0 1 45 127 Tm ( ) Tj
+1 0 0 1 45 114 Tm (## 18\) Search API) Tj
+1 0 0 1 45 101 Tm (### GET `/api/search?q=tea`) Tj
+1 0 0 1 45 88 Tm (Auth: Public) Tj
+1 0 0 1 45 75 Tm ( ) Tj
+1 0 0 1 45 62 Tm (## Quick Testing Order) Tj
+ET
+endstream
+endobj
+19 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 20 0 R >>
+endobj
+20 0 obj
+<< /Length 515 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm (1. Register) Tj
+1 0 0 1 45 777 Tm (2. Login \(Customer + Admin\)) Tj
+1 0 0 1 45 764 Tm (3. Create Category \(Admin\)) Tj
+1 0 0 1 45 751 Tm (4. Create Product \(Admin\)) Tj
+1 0 0 1 45 738 Tm (5. Create Variant \(Admin\)) Tj
+1 0 0 1 45 725 Tm (6. Create Address \(Customer\)) Tj
+1 0 0 1 45 712 Tm (7. Add to Cart \(Customer\)) Tj
+1 0 0 1 45 699 Tm (8. Create Order \(Customer\)) Tj
+1 0 0 1 45 686 Tm (9. Create Payment \(Customer\)) Tj
+1 0 0 1 45 673 Tm (10. Track/Review/Search) Tj
+ET
+endstream
+endobj
+xref
+0 21
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000168 00000 n 
+0000000343 00000 n 
+0000002581 00000 n 
+0000002756 00000 n 
+0000005211 00000 n 
+0000005386 00000 n 
+0000007696 00000 n 
+0000007872 00000 n 
+0000010291 00000 n 
+0000010468 00000 n 
+0000012683 00000 n 
+0000012860 00000 n 
+0000015092 00000 n 
+0000015269 00000 n 
+0000017445 00000 n 
+0000017622 00000 n 
+0000019778 00000 n 
+0000019955 00000 n 
+trailer
+<< /Size 21 /Root 1 0 R >>
+startxref
+20522
+%%EOF

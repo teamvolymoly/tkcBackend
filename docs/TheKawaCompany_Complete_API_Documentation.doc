@@ -1,0 +1,259 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>TheKawaCompany Complete API Documentation</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.5; color: #222; margin: 28px; }
+        h1, h2, h3 { color: #0f4c81; }
+        h1 { border-bottom: 2px solid #0f4c81; padding-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0 24px; }
+        th, td { border: 1px solid #cfd8e3; padding: 8px 10px; text-align: left; vertical-align: top; }
+        th { background: #eef4fb; }
+        code, pre { font-family: Consolas, monospace; }
+        pre { background: #f7f9fc; border: 1px solid #dce6f2; padding: 12px; white-space: pre-wrap; }
+        .small { color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>TheKawaCompany Complete API Documentation</h1>
+    <p><strong>Project:</strong> TheKawaCompany E-commerce Backend</p>
+    <p><strong>Generated From:</strong> Current Laravel routes and API controllers in this project</p>
+    <p><strong>Base URL (Apache/XAMPP):</strong> <code>http://localhost/theKawaCompany/public</code></p>
+    <p><strong>API Prefix:</strong> <code>/api</code></p>
+    <p class="small">Note: Agar aap XAMPP Apache use kar rahe hain to API base URL <code>http://localhost/theKawaCompany/public/api</code> hoga.</p>
+
+    <h2>Authentication</h2>
+    <ul>
+        <li>Auth System: Laravel Sanctum</li>
+        <li>Customer/Admin secured endpoints: <code>Authorization: Bearer {token}</code></li>
+        <li>Admin-only endpoints: <code>auth:sanctum</code> + <code>role:admin</code></li>
+    </ul>
+
+    <h2>Standard Response Shape</h2>
+    <pre>{
+  "status": true,
+  "message": "Success message",
+  "data": {}
+}</pre>
+    <pre>{
+  "status": false,
+  "errors": {
+    "field": ["Validation message"]
+  }
+}</pre>
+
+    <h2>1. Auth APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>POST</td><td>/api/auth/register</td><td>Public</td><td>Register new customer account</td></tr>
+        <tr><td>POST</td><td>/api/auth/login</td><td>Public</td><td>Login and receive Sanctum token</td></tr>
+        <tr><td>POST</td><td>/api/auth/logout</td><td>Customer/Admin</td><td>Logout current token</td></tr>
+        <tr><td>POST</td><td>/api/auth/refresh</td><td>Customer/Admin</td><td>Refresh auth token</td></tr>
+        <tr><td>GET</td><td>/api/auth/profile</td><td>Customer/Admin</td><td>Get logged-in profile with roles</td></tr>
+        <tr><td>PUT</td><td>/api/auth/profile</td><td>Customer/Admin</td><td>Update name/email/phone</td></tr>
+        <tr><td>POST</td><td>/api/auth/change-password</td><td>Customer/Admin</td><td>Change current password</td></tr>
+    </table>
+    <pre>{
+  "name": "Test Customer",
+  "email": "customer@example.com",
+  "phone": "9999999999",
+  "password": "password",
+  "password_confirmation": "password"
+}</pre>
+
+    <h2>2. Address APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>POST</td><td>/api/addresses</td><td>Customer/Admin</td><td>Create address</td></tr>
+        <tr><td>GET</td><td>/api/addresses</td><td>Customer/Admin</td><td>List own addresses</td></tr>
+        <tr><td>GET</td><td>/api/addresses/{id}</td><td>Customer/Admin</td><td>Get single address</td></tr>
+        <tr><td>PUT</td><td>/api/addresses/{id}</td><td>Customer/Admin</td><td>Update address</td></tr>
+        <tr><td>DELETE</td><td>/api/addresses/{id}</td><td>Customer/Admin</td><td>Delete address</td></tr>
+        <tr><td>POST</td><td>/api/addresses/{id}/set-default</td><td>Customer/Admin</td><td>Mark address as default</td></tr>
+    </table>
+
+    <h2>3. Category APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/categories</td><td>Public</td><td>List root categories; admin can request inactive too</td></tr>
+        <tr><td>GET</td><td>/api/categories/{category}</td><td>Public</td><td>Get single category by id</td></tr>
+        <tr><td>GET</td><td>/api/categories/{category}/subcategories</td><td>Public</td><td>List subcategories</td></tr>
+        <tr><td>POST</td><td>/api/categories</td><td>Admin</td><td>Create category/subcategory</td></tr>
+        <tr><td>PUT</td><td>/api/categories/{category}</td><td>Admin</td><td>Update category/subcategory</td></tr>
+        <tr><td>DELETE</td><td>/api/categories/{category}</td><td>Admin</td><td>Delete category/subcategory</td></tr>
+    </table>
+
+    <h2>4. Product APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/products</td><td>Public</td><td>List products with category, images, variants</td></tr>
+        <tr><td>GET</td><td>/api/products/{slug}</td><td>Public</td><td>Get product detail by slug</td></tr>
+        <tr><td>POST</td><td>/api/products</td><td>Admin</td><td>Create product with optional nested variants array</td></tr>
+        <tr><td>PUT</td><td>/api/products/{id}</td><td>Admin</td><td>Update product and sync nested variants</td></tr>
+        <tr><td>DELETE</td><td>/api/products/{id}</td><td>Admin</td><td>Delete product</td></tr>
+        <tr><td>GET</td><td>/api/admin/products/{id}</td><td>Admin</td><td>Admin product detail by id</td></tr>
+    </table>
+    <pre>{
+  "category_id": 1,
+  "subcategory_id": 2,
+  "name": "Chamomile Bliss Tea",
+  "short_description": "Relaxing herbal tea",
+  "description": "Full description",
+  "ingredients": "Chamomile, Lemongrass",
+  "tea_type": "Herbal",
+  "status": true,
+  "variants": [
+    {
+      "variant_name": "Premium Pack",
+      "size": "250g",
+      "color": "Green",
+      "sku": "CHAM-250-GRN",
+      "price": 499,
+      "stock": 25,
+      "status": true
+    }
+  ]
+}</pre>
+
+    <h2>5. Product Variant APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/products/{id}/variants</td><td>Public</td><td>List variants for product</td></tr>
+        <tr><td>POST</td><td>/api/variants</td><td>Admin</td><td>Create variant</td></tr>
+        <tr><td>PUT</td><td>/api/variants/{id}</td><td>Admin</td><td>Update variant</td></tr>
+        <tr><td>DELETE</td><td>/api/variants/{id}</td><td>Admin</td><td>Delete variant</td></tr>
+    </table>
+
+    <h2>6. Product Image APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/products/{id}/images</td><td>Public</td><td>List product images</td></tr>
+        <tr><td>POST</td><td>/api/product-images</td><td>Admin</td><td>Add product image</td></tr>
+        <tr><td>DELETE</td><td>/api/product-images/{id}</td><td>Admin</td><td>Delete product image</td></tr>
+    </table>
+
+    <h2>7. Ingredient APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/products/{id}/ingredients</td><td>Public</td><td>List ingredients</td></tr>
+        <tr><td>POST</td><td>/api/products/{id}/ingredients</td><td>Admin</td><td>Add ingredient</td></tr>
+        <tr><td>DELETE</td><td>/api/ingredients/{id}</td><td>Admin</td><td>Delete ingredient</td></tr>
+    </table>
+
+    <h2>8. Nutrition APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/products/{id}/nutrition</td><td>Public</td><td>List nutrition facts</td></tr>
+        <tr><td>POST</td><td>/api/products/{id}/nutrition</td><td>Admin</td><td>Add nutrition item</td></tr>
+    </table>
+
+    <h2>9. Cart APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/cart</td><td>Customer/Admin</td><td>Get cart</td></tr>
+        <tr><td>POST</td><td>/api/cart</td><td>Customer/Admin</td><td>Add or update item in cart</td></tr>
+        <tr><td>PUT</td><td>/api/cart/{id}</td><td>Customer/Admin</td><td>Update cart item quantity</td></tr>
+        <tr><td>DELETE</td><td>/api/cart/{id}</td><td>Customer/Admin</td><td>Remove cart item</td></tr>
+        <tr><td>DELETE</td><td>/api/cart</td><td>Customer/Admin</td><td>Clear full cart</td></tr>
+    </table>
+
+    <h2>10. Wishlist APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>POST</td><td>/api/wishlist</td><td>Customer/Admin</td><td>Add item to wishlist</td></tr>
+        <tr><td>GET</td><td>/api/wishlist</td><td>Customer/Admin</td><td>Get wishlist</td></tr>
+        <tr><td>DELETE</td><td>/api/wishlist/{id}</td><td>Customer/Admin</td><td>Remove wishlist item</td></tr>
+    </table>
+
+    <h2>11. Order APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>POST</td><td>/api/orders</td><td>Customer/Admin</td><td>Create order from cart</td></tr>
+        <tr><td>GET</td><td>/api/orders</td><td>Customer/Admin</td><td>List own orders</td></tr>
+        <tr><td>GET</td><td>/api/orders/{id}</td><td>Customer/Admin</td><td>Get own order detail</td></tr>
+        <tr><td>POST</td><td>/api/orders/{id}/cancel</td><td>Customer/Admin</td><td>Cancel order</td></tr>
+        <tr><td>GET</td><td>/api/orders/{id}/track</td><td>Customer/Admin</td><td>Track order status</td></tr>
+    </table>
+
+    <h2>12. Payment APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>POST</td><td>/api/payments</td><td>Customer/Admin</td><td>Create payment record for order</td></tr>
+        <tr><td>POST</td><td>/api/payments/webhook</td><td>Public</td><td>Payment gateway webhook</td></tr>
+        <tr><td>GET</td><td>/api/payments/{order_id}</td><td>Customer/Admin</td><td>Get payment history for order</td></tr>
+    </table>
+
+    <h2>13. Coupon APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/coupons</td><td>Public</td><td>List active coupons</td></tr>
+        <tr><td>POST</td><td>/api/coupons/apply</td><td>Customer/Admin</td><td>Apply coupon on amount</td></tr>
+    </table>
+
+    <h2>14. Review APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>POST</td><td>/api/reviews</td><td>Customer/Admin</td><td>Create or update review</td></tr>
+        <tr><td>GET</td><td>/api/products/{id}/reviews</td><td>Public</td><td>Get product reviews</td></tr>
+        <tr><td>DELETE</td><td>/api/reviews/{id}</td><td>Customer/Admin</td><td>Delete own review</td></tr>
+    </table>
+
+    <h2>15. Inventory APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/inventory</td><td>Admin</td><td>List inventory records</td></tr>
+        <tr><td>PUT</td><td>/api/inventory/{variant_id}</td><td>Admin</td><td>Update inventory and sync stock</td></tr>
+    </table>
+
+    <h2>16. Shipping APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/shipping/methods</td><td>Public</td><td>List active shipping methods</td></tr>
+        <tr><td>POST</td><td>/api/shipping/calculate</td><td>Public</td><td>Calculate shipping cost</td></tr>
+    </table>
+
+    <h2>17. Search API</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/search?q=tea</td><td>Public</td><td>Search active products</td></tr>
+    </table>
+
+    <h2>18. Admin Dashboard and Orders APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/admin/dashboard</td><td>Admin</td><td>Dashboard summary metrics</td></tr>
+        <tr><td>GET</td><td>/api/admin/customers</td><td>Admin</td><td>Customer listing</td></tr>
+        <tr><td>GET</td><td>/api/admin/orders</td><td>Admin</td><td>Admin order listing with filters</td></tr>
+        <tr><td>GET</td><td>/api/admin/orders/{id}</td><td>Admin</td><td>Admin order detail</td></tr>
+        <tr><td>PUT</td><td>/api/admin/orders/{id}/status</td><td>Admin</td><td>Update order status</td></tr>
+    </table>
+
+    <h2>19. Admin User APIs</h2>
+    <table>
+        <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+        <tr><td>GET</td><td>/api/users</td><td>Admin</td><td>List users with role/search filters</td></tr>
+        <tr><td>GET</td><td>/api/users/{user}</td><td>Admin</td><td>Get user profile, addresses, recent orders</td></tr>
+        <tr><td>DELETE</td><td>/api/users/{user}</td><td>Admin</td><td>Delete non-admin user</td></tr>
+    </table>
+
+    <h2>Quick Testing Flow</h2>
+    <ol>
+        <li>Register or seed admin/customer users</li>
+        <li>Login and capture bearer token</li>
+        <li>Create category/subcategory</li>
+        <li>Create product with nested variants</li>
+        <li>Add product images, ingredients, nutrition</li>
+        <li>Create address</li>
+        <li>Add item to cart</li>
+        <li>Create order</li>
+        <li>Create payment / call webhook</li>
+        <li>Review admin dashboard, orders, inventory, users</li>
+    </ol>
+
+    <h2>Admin Demo Credentials</h2>
+    <p><strong>Email:</strong> <code>admin@example.com</code></p>
+    <p><strong>Password:</strong> <code>password</code></p>
+
+    <p class="small">This document was generated from the current project state and includes both public, customer, and admin APIs available at the time of generation.</p>
+</body>
+</html>

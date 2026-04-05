@@ -1,0 +1,473 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>The Kawa Company Frontend API Reference</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.45; color: #222; margin: 24px; }
+        h1, h2, h3 { color: #111; }
+        h1 { border-bottom: 2px solid #222; padding-bottom: 8px; }
+        h2 { border-bottom: 1px solid #bbb; padding-bottom: 4px; margin-top: 28px; }
+        h3 { margin-top: 22px; }
+        code { background: #f4f4f4; padding: 1px 4px; }
+        pre { background: #f7f7f7; padding: 12px; border: 1px solid #ddd; white-space: pre-wrap; }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; }
+        th, td { border: 1px solid #ccc; padding: 8px; vertical-align: top; text-align: left; }
+        th { background: #f0f0f0; }
+        .note { background: #fff8e6; border-left: 4px solid #d9a400; padding: 10px 12px; margin: 12px 0; }
+    </style>
+</head>
+<body>
+    <h1>The Kawa Company Frontend API Reference</h1>
+    <p>This document is prepared from the current Laravel codebase routes and controllers. It covers the JSON APIs exposed in <code>/api</code> and explains how frontend should call them, what data should be sent, and what response shape comes back.</p>
+    <h2>1. Quick Start</h2>
+    <table>
+        <tr><th>Item</th><th>Details</th></tr>
+        <tr><td>Base URL</td><td><code>/api</code></td></tr>
+        <tr><td>Auth Type</td><td>Laravel Sanctum token in header: <code>Authorization: Bearer {token}</code></td></tr>
+        <tr><td>Default Content-Type</td><td><code>application/json</code></td></tr>
+        <tr><td>File Upload Endpoints</td><td>Use <code>multipart/form-data</code> for category image, variant image, and product create/update with images.</td></tr>
+        <tr><td>Protected APIs</td><td>Require logged-in user token. Admin APIs require logged-in admin token.</td></tr>
+    </table>
+    <h3>Standard Response Pattern</h3>
+    <pre>{
+  "status": true,
+  "message": "Optional message",
+  "data": {}
+}</pre>
+    <p>Validation failure usually returns:</p>
+    <pre>{
+  "status": false,
+  "errors": {
+    "field_name": ["Validation message"]
+  }
+}</pre>
+    <p>Business-rule failure usually returns:</p>
+    <pre>{
+  "status": false,
+  "message": "Reason of failure"
+}</pre>
+    <h3>Pagination Response Shape</h3>
+    <p>Many listing APIs return Laravel pagination object inside <code>data</code>:</p>
+    <pre>{
+  "status": true,
+  "data": {
+    "current_page": 1,
+    "data": [],
+    "first_page_url": "...",
+    "from": 1,
+    "last_page": 3,
+    "last_page_url": "...",
+    "links": [],
+    "next_page_url": "...",
+    "path": "...",
+    "per_page": 20,
+    "prev_page_url": null,
+    "to": 20,
+    "total": 55
+  }
+}</pre>
+    <div class="note">
+        Important: <code>POST /api/payments/webhook</code> is not a frontend API. It is meant for payment gateway/server callback.
+    </div>
+    <h2>2. Authentication APIs</h2>
+    <h3>POST /api/auth/register</h3>
+    <table>
+        <tr><th>Auth</th><td>No</td></tr>
+        <tr><th>Content-Type</th><td><code>application/json</code></td></tr>
+        <tr><th>Body</th><td><code>name</code> required string, <code>email</code> required email unique, <code>phone</code> optional string, <code>password</code> required min 6, <code>password_confirmation</code> required for confirmed rule</td></tr>
+        <tr><th>Success</th><td><code>201</code>, returns token and created user. New user is assigned <code>customer</code> role.</td></tr>
+    </table>
+    <pre>{
+  "name": "Ali Khan",
+  "email": "ali@example.com",
+  "phone": "9999999999",
+  "password": "secret123",
+  "password_confirmation": "secret123"
+}</pre>
+    <h3>POST /api/auth/login</h3>
+    <table>
+        <tr><th>Auth</th><td>No</td></tr>
+        <tr><th>Body</th><td><code>email</code> required, <code>password</code> required</td></tr>
+        <tr><th>Success</th><td>Returns token and user object.</td></tr>
+        <tr><th>Error</th><td><code>401</code> if credentials invalid</td></tr>
+    </table>
+    <h3>POST /api/auth/logout</h3>
+    <table>
+        <tr><th>Auth</th><td>Yes</td></tr>
+        <tr><th>Body</th><td>None</td></tr>
+        <tr><th>Success</th><td>Deletes current access token only.</td></tr>
+    </table>
+    <h3>POST /api/auth/refresh</h3>
+    <table>
+        <tr><th>Auth</th><td>Yes</td></tr>
+        <tr><th>Behavior</th><td>Deletes current token and returns a new token.</td></tr>
+    </table>
+    <h3>GET /api/auth/profile</h3>
+    <table>
+        <tr><th>Auth</th><td>Yes</td></tr>
+        <tr><th>Success</th><td>Returns logged-in user with <code>roles</code> relation loaded.</td></tr>
+    </table>
+    <h3>PUT /api/auth/profile</h3>
+    <table>
+        <tr><th>Auth</th><td>Yes</td></tr>
+        <tr><th>Body</th><td><code>name</code> optional but required if sent, <code>email</code> optional but required if sent and must stay unique, <code>phone</code> optional nullable</td></tr>
+        <tr><th>Success</th><td>Returns updated user in <code>data</code>.</td></tr>
+    </table>
+    <h3>POST /api/auth/change-password</h3>
+    <table>
+        <tr><th>Auth</th><td>Yes</td></tr>
+        <tr><th>Body</th><td><code>current_password</code> required, <code>password</code> required min 6, <code>password_confirmation</code> required</td></tr>
+        <tr><th>Error</th><td><code>422</code> if current password wrong</td></tr>
+    </table>
+    <h2>3. Public Catalog APIs</h2>
+    <h3>GET /api/categories</h3>
+    <table>
+        <tr><th>Auth</th><td>No. Admin token can optionally change output.</td></tr>
+        <tr><th>Query Params</th><td><code>include_inactive=true</code> only works for admin user</td></tr>
+        <tr><th>Success</th><td>Returns top-level categories with <code>children</code>. Public users only get active categories.</td></tr>
+    </table>
+    <h3>GET /api/categories/{category}</h3>
+    <table>
+        <tr><th>Path Param</th><td><code>{category}</code> is category ID via route-model binding</td></tr>
+        <tr><th>Success</th><td>Returns one category with filtered child categories.</td></tr>
+        <tr><th>Error</th><td><code>404</code> for inactive category when caller is not admin</td></tr>
+    </table>
+    <h3>GET /api/categories/{category}/subcategories</h3>
+    <table>
+        <tr><th>Behavior</th><td>Returns selected category's children, and for each child its nested children. Public users only see active rows.</td></tr>
+    </table>
+    <h3>GET /api/products</h3>
+    <table>
+        <tr><th>Auth</th><td>No</td></tr>
+        <tr><th>Query Params</th><td><code>category_id</code> optional, <code>q</code> optional text search, <code>status</code> optional boolean-like value</td></tr>
+        <tr><th>Success</th><td>Paginated active products. Each product includes <code>category</code>, <code>subcategory</code>, <code>defaultVariant.primaryImage</code>, and active <code>variants</code> with <code>inventory</code> and <code>images</code>.</td></tr>
+    </table>
+    <h3>GET /api/products/{slug}</h3>
+    <table>
+        <tr><th>Path Param</th><td><code>{slug}</code> is product slug, not ID</td></tr>
+        <tr><th>Success</th><td>Returns active product detail with category, subcategory, variants, ingredients list, nutrition, and reviews with user.</td></tr>
+    </table>
+    <h3>GET /api/products/{id}/variants</h3>
+    <table>
+        <tr><th>Path Param</th><td>Product ID</td></tr>
+        <tr><th>Success</th><td>Returns active variants only. Each variant includes <code>inventory</code>, <code>primaryImage</code>, and <code>images</code>.</td></tr>
+    </table>
+    <h3>GET /api/variants/{id}/images</h3>
+    <table>
+        <tr><th>Path Param</th><td>Variant ID</td></tr>
+        <tr><th>Success</th><td>Returns all images for the variant.</td></tr>
+    </table>
+    <h3>GET /api/products/{id}/ingredients</h3>
+    <table>
+        <tr><th>Path Param</th><td>Product ID</td></tr>
+        <tr><th>Success</th><td>Returns ingredients ordered by <code>sort_order</code>.</td></tr>
+    </table>
+    <h3>GET /api/products/{id}/nutrition</h3>
+    <table>
+        <tr><th>Path Param</th><td>Product ID</td></tr>
+        <tr><th>Success</th><td>Returns nutrition rows for that product.</td></tr>
+    </table>
+    <h3>GET /api/products/{id}/reviews</h3>
+    <table>
+        <tr><th>Path Param</th><td>Product ID</td></tr>
+        <tr><th>Success</th><td>Returns latest reviews with minimal user data: <code>id</code> and <code>name</code>.</td></tr>
+    </table>
+    <h3>GET /api/search?q=green tea</h3>
+    <table>
+        <tr><th>Query Params</th><td><code>q</code> required, min 1 character</td></tr>
+        <tr><th>Success</th><td>Paginated active products matching name, short_description, or description. Includes <code>images</code> and <code>variants</code>.</td></tr>
+    </table>
+    <h3>GET /api/coupons</h3>
+    <table>
+        <tr><th>Auth</th><td>No</td></tr>
+        <tr><th>Success</th><td>Returns only active, non-expired coupons. Each coupon also contains <code>usages_count</code>.</td></tr>
+    </table>
+    <h2>4. Address APIs</h2>
+    <h3>GET /api/addresses</h3>
+    <p>Returns logged-in user's addresses, latest first.</p>
+    <h3>POST /api/addresses</h3>
+    <table>
+        <tr><th>Auth</th><td>Yes</td></tr>
+        <tr><th>Body</th><td><code>address_line1</code>, <code>city</code>, <code>state</code>, <code>pincode</code>, <code>country</code> required. <code>address_line2</code> optional. <code>is_default</code> optional boolean.</td></tr>
+        <tr><th>Behavior</th><td>If <code>is_default=true</code>, existing user addresses are first reset to non-default.</td></tr>
+    </table>
+    <h3>GET /api/addresses/{id}</h3>
+    <p>Returns one address owned by logged-in user.</p>
+    <h3>PUT /api/addresses/{id}</h3>
+    <p>Updates selected address. Sent fields are updated. If <code>is_default=true</code>, all other addresses become non-default first.</p>
+    <h3>DELETE /api/addresses/{id}</h3>
+    <p>Deletes selected user address.</p>
+    <h3>POST /api/addresses/{id}/set-default</h3>
+    <p>Marks selected address as default and resets all other user addresses to false.</p>
+    <h2>5. Cart APIs</h2>
+    <h3>GET /api/cart</h3>
+    <table>
+        <tr><th>Success</th><td>Returns cart for current user. If cart does not exist, it is auto-created. Loaded relations: <code>items.variant.product</code>, <code>items.variant.primaryImage</code>, <code>items.variant.inventory</code>.</td></tr>
+    </table>
+    <h3>POST /api/cart</h3>
+    <table>
+        <tr><th>Body</th><td><code>variant_id</code> required, <code>quantity</code> required integer min 1</td></tr>
+        <tr><th>Behavior</th><td>If same variant already exists in cart, quantity is overwritten via <code>updateOrCreate</code>.</td></tr>
+        <tr><th>Checks</th><td>Variant must exist, be active, parent product must be active, and requested quantity must be less than or equal to available stock.</td></tr>
+    </table>
+    <h3>PUT /api/cart/{id}</h3>
+    <p>Updates cart item quantity. Same stock and active checks are applied.</p>
+    <h3>DELETE /api/cart/{id}</h3>
+    <p>Removes one cart item for current user.</p>
+    <h3>DELETE /api/cart</h3>
+    <p>Clears all cart items for current user.</p>
+    <h2>6. Wishlist APIs</h2>
+    <h3>GET /api/wishlist</h3>
+    <p>Returns logged-in user's wishlist items with <code>product.defaultVariant.primaryImage</code> and <code>product.variants.images</code>.</p>
+    <h3>POST /api/wishlist</h3>
+    <table>
+        <tr><th>Body</th><td><code>product_id</code> required</td></tr>
+        <tr><th>Behavior</th><td>Uses <code>firstOrCreate</code>. Re-adding same product does not create duplicate row.</td></tr>
+    </table>
+    <h3>DELETE /api/wishlist/{id}</h3>
+    <p>Deletes one wishlist row belonging to current user.</p>
+    <h2>7. Order APIs</h2>
+    <h3>POST /api/orders</h3>
+    <table>
+        <tr><th>Body</th><td><code>address_id</code> required, <code>coupon_code</code> optional, <code>notes</code> optional</td></tr>
+        <tr><th>How it works</th><td>Reads current user's cart, validates each variant, calculates subtotal, optional discount, creates order, copies cart items to order_items, stores coupon usage, and clears cart.</td></tr>
+        <tr><th>Important Rules</th><td>Address must belong to logged-in user. Cart cannot be empty. Coupon must be active and pass min amount / expiry / usage / per-user / completed-order rules.</td></tr>
+        <tr><th>Amounts</th><td><code>shipping_amount</code> is currently always <code>0</code>.</td></tr>
+        <tr><th>Success</th><td>Returns created order with <code>items.variant</code> and <code>address</code>.</td></tr>
+    </table>
+    <h3>GET /api/orders</h3>
+    <p>Returns logged-in user's orders, paginated with <code>items</code> and <code>payments</code>.</p>
+    <h3>GET /api/orders/{id}</h3>
+    <p>Returns one user order with <code>items.variant.product</code>, <code>payments</code>, and <code>address</code>.</p>
+    <h3>POST /api/orders/{id}/cancel</h3>
+    <table>
+        <tr><th>Rule</th><td>Cannot cancel if order status is already <code>shipped</code>, <code>delivered</code>, or <code>cancelled</code>.</td></tr>
+    </table>
+    <h3>GET /api/orders/{id}/track</h3>
+    <p>Returns simplified tracking object:</p>
+    <pre>{
+  "status": true,
+  "data": {
+    "order_id": 1,
+    "order_number": "ORD-20260325112233-1234",
+    "status": "processing",
+    "payment_status": "paid",
+    "updated_at": "..."
+  }
+}</pre>
+    <h2>8. Payment APIs</h2>
+    <h3>POST /api/payments</h3>
+    <table>
+        <tr><th>Auth</th><td>Yes</td></tr>
+        <tr><th>Body</th><td><code>order_id</code> required, <code>payment_method</code> required, <code>transaction_id</code> optional unique, <code>status</code> optional in <code>initiated|success|failed|refunded</code>, <code>gateway_payload</code> optional object/array</td></tr>
+        <tr><th>Behavior</th><td>Creates payment attempt against current user's order. Amount is always copied from <code>order.total_amount</code>.</td></tr>
+        <tr><th>Important Rules</th><td>If order already paid, a new initiated/success payment is blocked. If another initiated/success payment exists, duplicate active payment is blocked.</td></tr>
+        <tr><th>Status Impact</th><td><code>success</code> marks order as <code>payment_status=paid</code> and <code>status=confirmed</code>. <code>failed</code> marks order payment_status failed.</td></tr>
+    </table>
+    <h3>GET /api/payments/{order_id}</h3>
+    <p>Returns all payments for current user's order, latest first.</p>
+    <h3>POST /api/payments/webhook</h3>
+    <table>
+        <tr><th>Frontend Use</th><td>No</td></tr>
+        <tr><th>Body</th><td><code>transaction_id</code> required, <code>status</code> required in <code>success|failed|refunded</code></td></tr>
+        <tr><th>Behavior</th><td>Finds payment by transaction ID, stores full callback payload into <code>gateway_payload</code>, and updates related order payment status.</td></tr>
+    </table>
+    <h2>9. Coupon Apply API</h2>
+    <h3>POST /api/coupons/apply</h3>
+    <table>
+        <tr><th>Auth</th><td>Yes</td></tr>
+        <tr><th>Body</th><td><code>code</code> required coupon code, <code>amount</code> required numeric amount before discount</td></tr>
+        <tr><th>Success</th><td>Returns coupon object, calculated <code>discount</code>, and <code>final_amount</code>.</td></tr>
+        <tr><th>Important Rules</th><td>Coupon must be active. Extra checks may require login history, minimum amount, usage limits, or per-user limit.</td></tr>
+    </table>
+    <h2>10. Review APIs</h2>
+    <h3>POST /api/reviews</h3>
+    <table>
+        <tr><th>Auth</th><td>Yes</td></tr>
+        <tr><th>Body</th><td><code>product_id</code> required, <code>rating</code> required integer 1 to 5, <code>review</code> optional text</td></tr>
+        <tr><th>Behavior</th><td>Uses <code>updateOrCreate</code>, so one user has one review per product. Re-submit updates previous review.</td></tr>
+    </table>
+    <h3>DELETE /api/reviews/{id}</h3>
+    <p>Deletes one review of current user only.</p>
+    <h2>11. Admin APIs</h2>
+    <p>All APIs below require:</p>
+    <pre>Authorization: Bearer {admin_token}</pre>
+    <h3>Category Management</h3>
+    <table>
+        <tr><th>POST /api/categories</th><td>Create category. Use <code>multipart/form-data</code> when sending <code>image</code>. Fields: <code>name</code> required, <code>description</code> optional, <code>image</code> optional image max 5 MB, <code>parent_id</code> optional category ID, <code>status</code> optional boolean.</td></tr>
+        <tr><th>PUT /api/categories/{category}</th><td>Update category. Same fields as create. Category slug is regenerated if name changes.</td></tr>
+        <tr><th>DELETE /api/categories/{category}</th><td>Delete category. Fails with <code>422</code> if child categories still exist.</td></tr>
+    </table>
+    <h3>Product Management</h3>
+    <table>
+        <tr><th>GET /api/admin/products/{id}</th><td>Returns full admin product detail with category, subcategory, defaultVariant.primaryImage, all variants, ingredientsList, and nutrition.</td></tr>
+        <tr><th>POST /api/products</th><td>Create product with nested variants and images. Use <code>multipart/form-data</code> if files are included.</td></tr>
+        <tr><th>PUT /api/products/{id}</th><td>Update product. If <code>variants</code> array is sent, service syncs variants; missing old variants are deleted.</td></tr>
+        <tr><th>DELETE /api/products/{id}</th><td>Deletes product.</td></tr>
+    </table>
+    <p><strong>Product create/update main fields</strong></p>
+    <pre>{
+  "category_id": 1,
+  "subcategory_id": 3,
+  "name": "Jasmine Green Tea",
+  "short_description": "Light floral tea",
+  "allergic_information": "Optional text",
+  "tea_type": "Green Tea",
+  "disclaimer": "Optional text",
+  "description": "Full description",
+  "ingredients": "Optional string",
+  "features": ["Fresh", "Premium"],
+  "status": true,
+  "variants": [
+    {
+      "id": 10,
+      "variant_name": "100g Pack",
+      "size": "100g",
+      "color": null,
+      "sku": "JGT-100",
+      "price": 499,
+      "stock": 20,
+      "weight": 100,
+      "dimensions": "10x10x5",
+      "net_weight": "100g",
+      "tags": ["green", "floral"],
+      "brewing_rituals": ["80C", "3 mins"],
+      "is_default": true,
+      "status": true,
+      "images": [
+        {
+          "id": 55,
+          "file": "(optional uploaded file)",
+          "is_primary": true,
+          "sort_order": 0
+        }
+      ]
+    }
+  ]
+}</pre>
+    <div class="note">
+        Product update behavior: if <code>variants</code> key is provided, service treats it as sync input. Existing variants not included in that array are deleted.
+    </div>
+    <h3>Variant Management</h3>
+    <table>
+        <tr><th>POST /api/variants</th><td>Create single variant. Required: <code>product_id</code>, <code>variant_name</code>, <code>sku</code>, <code>price</code>. Optional: <code>size</code>, <code>color</code>, <code>stock</code>, <code>weight</code>, <code>dimensions</code>, <code>net_weight</code>, <code>tags</code> array, <code>brewing_rituals</code> array, <code>is_default</code>, <code>status</code>.</td></tr>
+        <tr><th>PUT /api/variants/{id}</th><td>Update variant. Same fields optional. If stock changes and inventory exists, inventory stock is also updated.</td></tr>
+        <tr><th>DELETE /api/variants/{id}</th><td>Delete variant.</td></tr>
+    </table>
+    <h3>Variant Image Management</h3>
+    <table>
+        <tr><th>POST /api/variant-images</th><td>Use <code>multipart/form-data</code>. Fields: <code>variant_id</code> required, <code>image</code> required file image max 5 MB, <code>is_primary</code> optional, <code>sort_order</code> optional.</td></tr>
+        <tr><th>PUT /api/variant-images/{id}</th><td>Use <code>multipart/form-data</code> if replacing file. Can update file, <code>is_primary</code>, and <code>sort_order</code>.</td></tr>
+        <tr><th>DELETE /api/variant-images/{id}</th><td>Deletes image and auto-selects replacement primary image if deleted image was primary.</td></tr>
+    </table>
+    <h3>Ingredient Management</h3>
+    <table>
+        <tr><th>POST /api/products/{id}/ingredients</th><td>Fields: <code>name</code> required, <code>value</code> optional, <code>sort_order</code> optional.</td></tr>
+        <tr><th>PUT /api/ingredients/{id}</th><td>Fields: <code>name</code> required, <code>value</code> optional, <code>sort_order</code> optional.</td></tr>
+        <tr><th>DELETE /api/ingredients/{id}</th><td>Delete ingredient.</td></tr>
+    </table>
+    <h3>Nutrition Management</h3>
+    <table>
+        <tr><th>POST /api/products/{id}/nutrition</th><td>Fields: <code>nutrient</code> required, <code>value</code> required, <code>unit</code> optional.</td></tr>
+        <tr><th>PUT /api/nutrition/{id}</th><td>Fields: <code>nutrient</code> required, <code>value</code> required, <code>unit</code> optional.</td></tr>
+        <tr><th>DELETE /api/nutrition/{id}</th><td>Delete nutrition row.</td></tr>
+    </table>
+    <h3>Coupon Management</h3>
+    <table>
+        <tr><th>GET /api/admin/coupons</th><td>Paginated coupon list. Supports query param <code>q</code>.</td></tr>
+        <tr><th>GET /api/coupons/{coupon}</th><td>Coupon detail with usages, user, and order summary.</td></tr>
+        <tr><th>POST /api/coupons</th><td>Create coupon.</td></tr>
+        <tr><th>PUT /api/coupons/{coupon}</th><td>Update coupon.</td></tr>
+        <tr><th>DELETE /api/coupons/{coupon}</th><td>Delete coupon.</td></tr>
+    </table>
+    <p><strong>Coupon fields</strong>: <code>code</code>, <code>discount_type</code> (<code>fixed</code> or <code>percent</code>), <code>discount_value</code>, <code>min_order_amount</code>, <code>max_discount</code>, <code>expiry_date</code>, <code>usage_limit</code>, <code>per_user_limit</code>, <code>required_completed_orders</code>, <code>is_active</code>.</p>
+    <h3>User Management</h3>
+    <table>
+        <tr><th>GET /api/users</th><td>Paginated users with roles. Filters: <code>q</code>, <code>role</code>.</td></tr>
+        <tr><th>GET /api/users/{user}</th><td>User detail with roles, addresses, and latest 10 orders.</td></tr>
+        <tr><th>PUT /api/users/{user}</th><td>Fields: <code>name</code>, <code>email</code>, <code>phone</code>, <code>role</code> where role is <code>admin</code> or <code>customer</code>.</td></tr>
+        <tr><th>DELETE /api/users/{user}</th><td>Cannot delete own account. Cannot delete admin account from this panel.</td></tr>
+    </table>
+    <h3>Inventory Management</h3>
+    <table>
+        <tr><th>GET /api/inventory</th><td>Paginated inventory records with <code>variant.product</code>.</td></tr>
+        <tr><th>PUT /api/inventory/{variant_id}</th><td>Fields: <code>stock</code> optional integer, <code>reserved_stock</code> optional integer, <code>warehouse</code> optional string. If stock changes, variant stock is also updated.</td></tr>
+    </table>
+    <h3>Admin Dashboard and Orders</h3>
+    <table>
+        <tr><th>GET /api/admin/dashboard</th><td>Returns summary stats: <code>total_customers</code>, <code>total_orders</code>, <code>pending_orders</code>, <code>paid_orders</code>, <code>revenue</code>.</td></tr>
+        <tr><th>GET /api/admin/customers</th><td>Paginated customer list with roles. Filter: <code>q</code>.</td></tr>
+        <tr><th>GET /api/admin/orders</th><td>Paginated orders. Filters: <code>q</code>, <code>status</code>.</td></tr>
+        <tr><th>GET /api/admin/orders/{id}</th><td>Admin order detail with user, address, items.variant.product, payments.</td></tr>
+        <tr><th>PUT /api/admin/orders/{id}/status</th><td>Body: <code>status</code> in <code>pending|confirmed|processing|shipped|delivered|cancelled</code>. Transition rules are enforced.</td></tr>
+    </table>
+    <p><strong>Allowed order status transitions</strong></p>
+    <pre>pending    -> confirmed, cancelled
+confirmed  -> processing, cancelled
+processing -> shipped, cancelled
+shipped    -> delivered
+delivered  -> no next state
+cancelled  -> no next state</pre>
+    <h3>Admin Reviews</h3>
+    <table>
+        <tr><th>GET /api/admin/reviews</th><td>Paginated reviews. Filters: <code>q</code>, <code>rating</code>.</td></tr>
+        <tr><th>GET /api/admin/reviews/{id}</th><td>Review detail with user and product images.</td></tr>
+        <tr><th>DELETE /api/admin/reviews/{id}</th><td>Delete any review as admin.</td></tr>
+    </table>
+    <h3>Admin Payments</h3>
+    <table>
+        <tr><th>GET /api/admin/payments</th><td>Paginated payments. Filters: <code>q</code>, <code>status</code>, <code>payment_method</code>.</td></tr>
+        <tr><th>GET /api/admin/payments/{id}</th><td>Payment detail with order, user, address, items.variant.product.</td></tr>
+        <tr><th>PUT /api/admin/payments/{id}</th><td>Fields: <code>payment_method</code>, <code>transaction_id</code>, <code>status</code>, <code>gateway_payload</code>. Also updates related order payment_status.</td></tr>
+    </table>
+    <h3>Admin Carts</h3>
+    <table>
+        <tr><th>GET /api/admin/carts</th><td>Paginated carts with user and items.variant.product. Filter: <code>q</code>.</td></tr>
+        <tr><th>GET /api/admin/carts/{id}</th><td>Single cart detail with user addresses, variant images, and inventory.</td></tr>
+    </table>
+    <h3>Admin Wishlists</h3>
+    <table>
+        <tr><th>GET /api/admin/wishlists</th><td>Paginated wishlist rows. Filter: <code>q</code> by user or product.</td></tr>
+        <tr><th>DELETE /api/admin/wishlists/{id}</th><td>Delete any wishlist row as admin.</td></tr>
+    </table>
+    <h2>12. Frontend Integration Notes</h2>
+    <table>
+        <tr><th>Need Bearer Token?</th><td>All <code>/auth/profile</code>, address, cart, wishlist, order, payment, coupon apply, review, and all admin routes.</td></tr>
+        <tr><th>Use multipart/form-data?</th><td>Category image upload, variant image upload, and product create/update when nested image files are included.</td></tr>
+        <tr><th>Product detail route key</th><td>Public product detail uses <code>slug</code>, not product ID.</td></tr>
+        <tr><th>Category detail route key</th><td>Category routes use category ID route-model binding.</td></tr>
+        <tr><th>Cart add behavior</th><td>Same variant add again overwrites quantity, it does not increment automatically.</td></tr>
+        <tr><th>Review behavior</th><td>One review per product per user. Re-submit updates same record.</td></tr>
+        <tr><th>Order create</th><td>Creates order from current cart only. Direct line-item payload is not accepted.</td></tr>
+        <tr><th>Payment create</th><td>Records payment attempt/status; actual gateway processing must happen outside this controller.</td></tr>
+    </table>
+    <h2>13. Suggested Call Examples</h2>
+    <h3>Authenticated JSON Request</h3>
+    <pre>fetch('/api/cart', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer YOUR_TOKEN'
+  },
+  body: JSON.stringify({
+    variant_id: 12,
+    quantity: 2
+  })
+})</pre>
+    <h3>Multipart File Upload</h3>
+    <pre>const formData = new FormData();
+formData.append('variant_id', 12);
+formData.append('image', fileInput.files[0]);
+formData.append('is_primary', '1');
+
+fetch('/api/variant-images', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer ADMIN_TOKEN'
+  },
+  body: formData
+})</pre>
+    <h2>14. Coverage Note</h2>
+    <p>This file documents the JSON routes defined in <code>routes/api.php</code>. Blade/web admin routes from <code>routes/web.php</code> are page routes, not frontend JSON APIs, so they are intentionally not listed here.</p>
+</body>
+</html>

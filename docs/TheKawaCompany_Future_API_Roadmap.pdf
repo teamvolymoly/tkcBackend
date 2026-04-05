@@ -1,0 +1,388 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R 7 0 R 9 0 R 11 0 R 13 0 R] /Count 6 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 2825 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm (# TheKawaCompany - Future E-Commerce API Roadmap \(No Code Changes\)) Tj
+1 0 0 1 45 777 Tm ( ) Tj
+1 0 0 1 45 764 Tm (## Purpose) Tj
+1 0 0 1 45 751 Tm (Yeh document clear karta hai:) Tj
+1 0 0 1 45 738 Tm (1. Abhi project me kaun-kaun APIs available hain.) Tj
+1 0 0 1 45 725 Tm (2. Production-grade ecommerce ke liye kaun si APIs abhi pending hain.) Tj
+1 0 0 1 45 712 Tm (3. Future roadmap kis priority order me execute karna best rahega.) Tj
+1 0 0 1 45 699 Tm ( ) Tj
+1 0 0 1 45 686 Tm (## Current API Coverage \(Implemented\)) Tj
+1 0 0 1 45 673 Tm (Source routes: `routes/api.php` \(66 routes\)) Tj
+1 0 0 1 45 660 Tm ( ) Tj
+1 0 0 1 45 647 Tm (### Implemented Modules) Tj
+1 0 0 1 45 634 Tm (- Auth) Tj
+1 0 0 1 45 621 Tm (  - register, login, logout, refresh, profile, update profile, change password) Tj
+1 0 0 1 45 608 Tm (- User Address) Tj
+1 0 0 1 45 595 Tm (  - CRUD + set-default) Tj
+1 0 0 1 45 582 Tm (- Category/Subcategory) Tj
+1 0 0 1 45 569 Tm (  - list, detail, subcategories, admin create/update/delete) Tj
+1 0 0 1 45 556 Tm (- Product Catalog) Tj
+1 0 0 1 45 543 Tm (  - list, slug detail, admin create/update/delete) Tj
+1 0 0 1 45 530 Tm (- Product Variants) Tj
+1 0 0 1 45 517 Tm (  - list, admin create/update/delete) Tj
+1 0 0 1 45 504 Tm (- Product Images) Tj
+1 0 0 1 45 491 Tm (  - list, admin add/delete) Tj
+1 0 0 1 45 478 Tm (- Ingredients) Tj
+1 0 0 1 45 465 Tm (  - list, admin add/delete) Tj
+1 0 0 1 45 452 Tm (- Nutrition) Tj
+1 0 0 1 45 439 Tm (  - list, admin add) Tj
+1 0 0 1 45 426 Tm (- Cart) Tj
+1 0 0 1 45 413 Tm (  - get/add/update/delete/clear) Tj
+1 0 0 1 45 400 Tm (- Wishlist) Tj
+1 0 0 1 45 387 Tm (  - add/list/delete) Tj
+1 0 0 1 45 374 Tm (- Orders) Tj
+1 0 0 1 45 361 Tm (  - create/list/show/cancel/track) Tj
+1 0 0 1 45 348 Tm (- Payments) Tj
+1 0 0 1 45 335 Tm (  - create, webhook, list by order) Tj
+1 0 0 1 45 322 Tm (- Coupons) Tj
+1 0 0 1 45 309 Tm (  - list/apply) Tj
+1 0 0 1 45 296 Tm (- Reviews) Tj
+1 0 0 1 45 283 Tm (  - add/list/delete) Tj
+1 0 0 1 45 270 Tm (- Inventory) Tj
+1 0 0 1 45 257 Tm (  - admin list/update) Tj
+1 0 0 1 45 244 Tm (- Admin) Tj
+1 0 0 1 45 231 Tm (  - dashboard/customers/orders/order-status-update) Tj
+1 0 0 1 45 218 Tm (- Shipping) Tj
+1 0 0 1 45 205 Tm (  - methods/calculate) Tj
+1 0 0 1 45 192 Tm (- Search) Tj
+1 0 0 1 45 179 Tm (  - product keyword search) Tj
+1 0 0 1 45 166 Tm ( ) Tj
+1 0 0 1 45 153 Tm (## Gap Analysis: APIs Still Needed for Best-Standard E-Commerce) Tj
+1 0 0 1 45 140 Tm ( ) Tj
+1 0 0 1 45 127 Tm (## Phase 1 \(Business-Critical\) - Must Have) Tj
+1 0 0 1 45 114 Tm ( ) Tj
+1 0 0 1 45 101 Tm (### 1. Payment Security + Gateway Integrity APIs) Tj
+1 0 0 1 45 88 Tm (Current gap:) Tj
+1 0 0 1 45 75 Tm (- webhook endpoint is open and does not include gateway signature verification layer.) Tj
+1 0 0 1 45 62 Tm ( ) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 2816 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm (Recommended APIs:) Tj
+1 0 0 1 45 777 Tm (- `POST /api/payments/webhook/{gateway}`) Tj
+1 0 0 1 45 764 Tm (- `POST /api/payments/{payment_id}/verify`) Tj
+1 0 0 1 45 751 Tm (- `GET /api/payments/{payment_id}/status`) Tj
+1 0 0 1 45 738 Tm ( ) Tj
+1 0 0 1 45 725 Tm (Why:) Tj
+1 0 0 1 45 712 Tm (- Fraud prevention, payment-state consistency, reconciliation safety.) Tj
+1 0 0 1 45 699 Tm ( ) Tj
+1 0 0 1 45 686 Tm (### 2. Refund & Return APIs) Tj
+1 0 0 1 45 673 Tm (Current gap:) Tj
+1 0 0 1 45 660 Tm (- dedicated refund and return workflows missing.) Tj
+1 0 0 1 45 647 Tm ( ) Tj
+1 0 0 1 45 634 Tm (Recommended APIs:) Tj
+1 0 0 1 45 621 Tm (- `POST /api/orders/{id}/return-request`) Tj
+1 0 0 1 45 608 Tm (- `GET /api/orders/{id}/return-status`) Tj
+1 0 0 1 45 595 Tm (- `POST /api/payments/{id}/refund`) Tj
+1 0 0 1 45 582 Tm (- `GET /api/refunds/{id}`) Tj
+1 0 0 1 45 569 Tm (- `GET /api/admin/refunds`) Tj
+1 0 0 1 45 556 Tm (- `PUT /api/admin/refunds/{id}/approve`) Tj
+1 0 0 1 45 543 Tm ( ) Tj
+1 0 0 1 45 530 Tm (Why:) Tj
+1 0 0 1 45 517 Tm (- Core ecommerce lifecycle incomplete without returns/refunds.) Tj
+1 0 0 1 45 504 Tm ( ) Tj
+1 0 0 1 45 491 Tm (### 3. Inventory Reservation & Stock Movement APIs) Tj
+1 0 0 1 45 478 Tm (Current gap:) Tj
+1 0 0 1 45 465 Tm (- stock deduction/reservation lifecycle endpoints not explicit.) Tj
+1 0 0 1 45 452 Tm ( ) Tj
+1 0 0 1 45 439 Tm (Recommended APIs:) Tj
+1 0 0 1 45 426 Tm (- `POST /api/inventory/reserve`) Tj
+1 0 0 1 45 413 Tm (- `POST /api/inventory/release`) Tj
+1 0 0 1 45 400 Tm (- `POST /api/inventory/deduct`) Tj
+1 0 0 1 45 387 Tm (- `GET /api/admin/inventory/movements`) Tj
+1 0 0 1 45 374 Tm ( ) Tj
+1 0 0 1 45 361 Tm (Why:) Tj
+1 0 0 1 45 348 Tm (- Prevent overselling and improve auditability.) Tj
+1 0 0 1 45 335 Tm ( ) Tj
+1 0 0 1 45 322 Tm (### 4. Order Fulfillment APIs) Tj
+1 0 0 1 45 309 Tm (Current gap:) Tj
+1 0 0 1 45 296 Tm (- shipment and package-level management missing.) Tj
+1 0 0 1 45 283 Tm ( ) Tj
+1 0 0 1 45 270 Tm (Recommended APIs:) Tj
+1 0 0 1 45 257 Tm (- `POST /api/admin/orders/{id}/pack`) Tj
+1 0 0 1 45 244 Tm (- `POST /api/admin/orders/{id}/ship`) Tj
+1 0 0 1 45 231 Tm (- `POST /api/admin/orders/{id}/deliver`) Tj
+1 0 0 1 45 218 Tm (- `POST /api/admin/orders/{id}/failed-delivery`) Tj
+1 0 0 1 45 205 Tm ( ) Tj
+1 0 0 1 45 192 Tm (Why:) Tj
+1 0 0 1 45 179 Tm (- Real operations need fulfillment states beyond generic status update.) Tj
+1 0 0 1 45 166 Tm ( ) Tj
+1 0 0 1 45 153 Tm (## Phase 2 \(High Value\) - Strongly Recommended) Tj
+1 0 0 1 45 140 Tm ( ) Tj
+1 0 0 1 45 127 Tm (### 5. Invoice APIs) Tj
+1 0 0 1 45 114 Tm (Current gap:) Tj
+1 0 0 1 45 101 Tm (- invoice generation/download endpoints missing.) Tj
+1 0 0 1 45 88 Tm ( ) Tj
+1 0 0 1 45 75 Tm (Recommended APIs:) Tj
+1 0 0 1 45 62 Tm (- `GET /api/orders/{id}/invoice`) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 2793 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm (- `POST /api/orders/{id}/invoice/regenerate`) Tj
+1 0 0 1 45 777 Tm (- `GET /api/admin/invoices`) Tj
+1 0 0 1 45 764 Tm ( ) Tj
+1 0 0 1 45 751 Tm (Why:) Tj
+1 0 0 1 45 738 Tm (- B2C/B2B compliance, accounting and customer support.) Tj
+1 0 0 1 45 725 Tm ( ) Tj
+1 0 0 1 45 712 Tm (### 6. Coupon Admin Management APIs) Tj
+1 0 0 1 45 699 Tm (Current gap:) Tj
+1 0 0 1 45 686 Tm (- only coupon list/apply is available.) Tj
+1 0 0 1 45 673 Tm ( ) Tj
+1 0 0 1 45 660 Tm (Recommended APIs:) Tj
+1 0 0 1 45 647 Tm (- `POST /api/admin/coupons`) Tj
+1 0 0 1 45 634 Tm (- `GET /api/admin/coupons`) Tj
+1 0 0 1 45 621 Tm (- `GET /api/admin/coupons/{id}`) Tj
+1 0 0 1 45 608 Tm (- `PUT /api/admin/coupons/{id}`) Tj
+1 0 0 1 45 595 Tm (- `DELETE /api/admin/coupons/{id}`) Tj
+1 0 0 1 45 582 Tm (- `PUT /api/admin/coupons/{id}/toggle`) Tj
+1 0 0 1 45 569 Tm ( ) Tj
+1 0 0 1 45 556 Tm (Why:) Tj
+1 0 0 1 45 543 Tm (- Marketing team ko campaign control chahiye.) Tj
+1 0 0 1 45 530 Tm ( ) Tj
+1 0 0 1 45 517 Tm (### 7. Shipping Method Admin APIs) Tj
+1 0 0 1 45 504 Tm (Current gap:) Tj
+1 0 0 1 45 491 Tm (- shipping methods create/update/delete not available.) Tj
+1 0 0 1 45 478 Tm ( ) Tj
+1 0 0 1 45 465 Tm (Recommended APIs:) Tj
+1 0 0 1 45 452 Tm (- `POST /api/admin/shipping-methods`) Tj
+1 0 0 1 45 439 Tm (- `GET /api/admin/shipping-methods`) Tj
+1 0 0 1 45 426 Tm (- `PUT /api/admin/shipping-methods/{id}`) Tj
+1 0 0 1 45 413 Tm (- `DELETE /api/admin/shipping-methods/{id}`) Tj
+1 0 0 1 45 400 Tm ( ) Tj
+1 0 0 1 45 387 Tm (Why:) Tj
+1 0 0 1 45 374 Tm (- Logistics pricing dynamic hoti hai; admin manage kar ???.) Tj
+1 0 0 1 45 361 Tm ( ) Tj
+1 0 0 1 45 348 Tm (### 8. Customer Account Management APIs \(Admin\)) Tj
+1 0 0 1 45 335 Tm (Current gap:) Tj
+1 0 0 1 45 322 Tm (- customer detail lifecycle limited.) Tj
+1 0 0 1 45 309 Tm ( ) Tj
+1 0 0 1 45 296 Tm (Recommended APIs:) Tj
+1 0 0 1 45 283 Tm (- `GET /api/admin/customers/{id}`) Tj
+1 0 0 1 45 270 Tm (- `PUT /api/admin/customers/{id}/status`) Tj
+1 0 0 1 45 257 Tm (- `GET /api/admin/customers/{id}/orders`) Tj
+1 0 0 1 45 244 Tm (- `GET /api/admin/customers/{id}/addresses`) Tj
+1 0 0 1 45 231 Tm ( ) Tj
+1 0 0 1 45 218 Tm (Why:) Tj
+1 0 0 1 45 205 Tm (- Support and fraud/risk handling needs deeper customer view.) Tj
+1 0 0 1 45 192 Tm ( ) Tj
+1 0 0 1 45 179 Tm (## Phase 3 \(Scale/Advanced\) - Future Best) Tj
+1 0 0 1 45 166 Tm ( ) Tj
+1 0 0 1 45 153 Tm (### 9. Product Merchandising APIs) Tj
+1 0 0 1 45 140 Tm (Recommended APIs:) Tj
+1 0 0 1 45 127 Tm (- `POST /api/admin/products/{id}/publish`) Tj
+1 0 0 1 45 114 Tm (- `POST /api/admin/products/{id}/unpublish`) Tj
+1 0 0 1 45 101 Tm (- `POST /api/admin/products/{id}/feature`) Tj
+1 0 0 1 45 88 Tm (- `PUT /api/admin/products/{id}/sort-order`) Tj
+1 0 0 1 45 75 Tm ( ) Tj
+1 0 0 1 45 62 Tm (Why:) Tj
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 2627 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm (- catalog curation and conversion optimization.) Tj
+1 0 0 1 45 777 Tm ( ) Tj
+1 0 0 1 45 764 Tm (### 10. SEO APIs) Tj
+1 0 0 1 45 751 Tm (Recommended APIs:) Tj
+1 0 0 1 45 738 Tm (- `PUT /api/admin/products/{id}/seo`) Tj
+1 0 0 1 45 725 Tm (- `PUT /api/admin/categories/{id}/seo`) Tj
+1 0 0 1 45 712 Tm (- `GET /api/sitemap/products`) Tj
+1 0 0 1 45 699 Tm ( ) Tj
+1 0 0 1 45 686 Tm (Why:) Tj
+1 0 0 1 45 673 Tm (- organic traffic scaling.) Tj
+1 0 0 1 45 660 Tm ( ) Tj
+1 0 0 1 45 647 Tm (### 11. Analytics APIs) Tj
+1 0 0 1 45 634 Tm (Recommended APIs:) Tj
+1 0 0 1 45 621 Tm (- `GET /api/admin/analytics/revenue`) Tj
+1 0 0 1 45 608 Tm (- `GET /api/admin/analytics/orders`) Tj
+1 0 0 1 45 595 Tm (- `GET /api/admin/analytics/customers`) Tj
+1 0 0 1 45 582 Tm (- `GET /api/admin/analytics/conversion`) Tj
+1 0 0 1 45 569 Tm (- `GET /api/admin/analytics/top-products`) Tj
+1 0 0 1 45 556 Tm ( ) Tj
+1 0 0 1 45 543 Tm (Why:) Tj
+1 0 0 1 45 530 Tm (- decision-making and growth tracking.) Tj
+1 0 0 1 45 517 Tm ( ) Tj
+1 0 0 1 45 504 Tm (### 12. Notification APIs) Tj
+1 0 0 1 45 491 Tm (Recommended APIs:) Tj
+1 0 0 1 45 478 Tm (- `POST /api/notifications/test`) Tj
+1 0 0 1 45 465 Tm (- `GET /api/notifications`) Tj
+1 0 0 1 45 452 Tm (- `PUT /api/notifications/{id}/read`) Tj
+1 0 0 1 45 439 Tm (- `POST /api/admin/orders/{id}/resend-email`) Tj
+1 0 0 1 45 426 Tm ( ) Tj
+1 0 0 1 45 413 Tm (Why:) Tj
+1 0 0 1 45 400 Tm (- order communication and customer trust.) Tj
+1 0 0 1 45 387 Tm ( ) Tj
+1 0 0 1 45 374 Tm (### 13. Wishlist Enhancements) Tj
+1 0 0 1 45 361 Tm (Recommended APIs:) Tj
+1 0 0 1 45 348 Tm (- `POST /api/wishlist/{id}/move-to-cart`) Tj
+1 0 0 1 45 335 Tm (- `POST /api/wishlist/share`) Tj
+1 0 0 1 45 322 Tm ( ) Tj
+1 0 0 1 45 309 Tm (Why:) Tj
+1 0 0 1 45 296 Tm (- customer engagement and retention.) Tj
+1 0 0 1 45 283 Tm ( ) Tj
+1 0 0 1 45 270 Tm (### 14. Review Moderation APIs) Tj
+1 0 0 1 45 257 Tm (Recommended APIs:) Tj
+1 0 0 1 45 244 Tm (- `GET /api/admin/reviews`) Tj
+1 0 0 1 45 231 Tm (- `PUT /api/admin/reviews/{id}/approve`) Tj
+1 0 0 1 45 218 Tm (- `PUT /api/admin/reviews/{id}/reject`) Tj
+1 0 0 1 45 205 Tm ( ) Tj
+1 0 0 1 45 192 Tm (Why:) Tj
+1 0 0 1 45 179 Tm (- content quality and abuse control.) Tj
+1 0 0 1 45 166 Tm ( ) Tj
+1 0 0 1 45 153 Tm (### 15. Search & Filter Advanced APIs) Tj
+1 0 0 1 45 140 Tm (Recommended APIs:) Tj
+1 0 0 1 45 127 Tm (- `GET /api/search/suggestions?q=`) Tj
+1 0 0 1 45 114 Tm (- `GET /api/products/filters`) Tj
+1 0 0 1 45 101 Tm (- `POST /api/search/faceted`) Tj
+1 0 0 1 45 88 Tm ( ) Tj
+1 0 0 1 45 75 Tm (Why:) Tj
+1 0 0 1 45 62 Tm (- better discovery and conversion.) Tj
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 12 0 R >>
+endobj
+12 0 obj
+<< /Length 2849 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm ( ) Tj
+1 0 0 1 45 777 Tm (## Phase 4 \(Enterprise Grade\)) Tj
+1 0 0 1 45 764 Tm ( ) Tj
+1 0 0 1 45 751 Tm (### 16. Multi-Warehouse APIs) Tj
+1 0 0 1 45 738 Tm (Recommended APIs:) Tj
+1 0 0 1 45 725 Tm (- `POST /api/admin/warehouses`) Tj
+1 0 0 1 45 712 Tm (- `GET /api/admin/warehouses`) Tj
+1 0 0 1 45 699 Tm (- `PUT /api/admin/warehouses/{id}`) Tj
+1 0 0 1 45 686 Tm (- `POST /api/admin/inventory/transfer`) Tj
+1 0 0 1 45 673 Tm ( ) Tj
+1 0 0 1 45 660 Tm (### 17. Tax/GST APIs) Tj
+1 0 0 1 45 647 Tm (Recommended APIs:) Tj
+1 0 0 1 45 634 Tm (- `POST /api/tax/calculate`) Tj
+1 0 0 1 45 621 Tm (- `GET /api/admin/tax-rules`) Tj
+1 0 0 1 45 608 Tm (- `PUT /api/admin/tax-rules/{id}`) Tj
+1 0 0 1 45 595 Tm ( ) Tj
+1 0 0 1 45 582 Tm (### 18. Seller/Vendor APIs \(if marketplace expansion\)) Tj
+1 0 0 1 45 569 Tm (Recommended APIs:) Tj
+1 0 0 1 45 556 Tm (- `POST /api/admin/vendors`) Tj
+1 0 0 1 45 543 Tm (- `GET /api/admin/vendors`) Tj
+1 0 0 1 45 530 Tm (- `GET /api/vendor/orders`) Tj
+1 0 0 1 45 517 Tm (- `PUT /api/vendor/orders/{id}/status`) Tj
+1 0 0 1 45 504 Tm ( ) Tj
+1 0 0 1 45 491 Tm (## Non-Functional API Needs \(Critical\)) Tj
+1 0 0 1 45 478 Tm ( ) Tj
+1 0 0 1 45 465 Tm (### 1. API Versioning) Tj
+1 0 0 1 45 452 Tm (- Introduce `/api/v1/...` \(and future `/v2`\).) Tj
+1 0 0 1 45 439 Tm ( ) Tj
+1 0 0 1 45 426 Tm (### 2. Idempotency) Tj
+1 0 0 1 45 413 Tm (- For payment/order creation APIs add idempotency keys.) Tj
+1 0 0 1 45 400 Tm ( ) Tj
+1 0 0 1 45 387 Tm (### 3. Rate Limiting) Tj
+1 0 0 1 45 374 Tm (- public/search/auth endpoints par stricter throttling.) Tj
+1 0 0 1 45 361 Tm ( ) Tj
+1 0 0 1 45 348 Tm (### 4. Audit Logs) Tj
+1 0 0 1 45 335 Tm (- admin actions ke liye audit endpoints:) Tj
+1 0 0 1 45 322 Tm (  - `GET /api/admin/audit-logs`) Tj
+1 0 0 1 45 309 Tm ( ) Tj
+1 0 0 1 45 296 Tm (### 5. Health/Readiness APIs) Tj
+1 0 0 1 45 283 Tm (- `GET /api/health`) Tj
+1 0 0 1 45 270 Tm (- `GET /api/ready`) Tj
+1 0 0 1 45 257 Tm ( ) Tj
+1 0 0 1 45 244 Tm (## Suggested Build Order \(Recommended\)) Tj
+1 0 0 1 45 231 Tm (1. Payment security + refunds/returns) Tj
+1 0 0 1 45 218 Tm (2. Inventory reservation/deduction movement APIs) Tj
+1 0 0 1 45 205 Tm (3. Invoice + coupon/shipping admin CRUD) Tj
+1 0 0 1 45 192 Tm (4. Fulfillment APIs) Tj
+1 0 0 1 45 179 Tm (5. Analytics + notifications + review moderation) Tj
+1 0 0 1 45 166 Tm (6. Multi-warehouse + tax + vendor \(if needed\)) Tj
+1 0 0 1 45 153 Tm ( ) Tj
+1 0 0 1 45 140 Tm (## Summary for Client Communication) Tj
+1 0 0 1 45 127 Tm (- Current backend covers core shopping journey end-to-end.) Tj
+1 0 0 1 45 114 Tm (- Next priority should focus on reliability and operations:) Tj
+1 0 0 1 45 101 Tm (  - payment integrity,) Tj
+1 0 0 1 45 88 Tm (  - returns/refunds,) Tj
+1 0 0 1 45 75 Tm (  - inventory correctness,) Tj
+1 0 0 1 45 62 Tm (  - fulfillment traceability.) Tj
+ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 14 0 R >>
+endobj
+14 0 obj
+<< /Length 396 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm (- After that, growth-focused APIs:) Tj
+1 0 0 1 45 777 Tm (  - analytics,) Tj
+1 0 0 1 45 764 Tm (  - SEO,) Tj
+1 0 0 1 45 751 Tm (  - merchandising,) Tj
+1 0 0 1 45 738 Tm (  - advanced search.) Tj
+1 0 0 1 45 725 Tm ( ) Tj
+1 0 0 1 45 712 Tm (---) Tj
+1 0 0 1 45 699 Tm (Document generated without changing business code/API logic; this is roadmap-only analysis.) Tj
+ET
+endstream
+endobj
+xref
+0 15
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000147 00000 n 
+0000000322 00000 n 
+0000003199 00000 n 
+0000003374 00000 n 
+0000006242 00000 n 
+0000006417 00000 n 
+0000009262 00000 n 
+0000009438 00000 n 
+0000012118 00000 n 
+0000012295 00000 n 
+0000015197 00000 n 
+0000015374 00000 n 
+trailer
+<< /Size 15 /Root 1 0 R >>
+startxref
+15822
+%%EOF

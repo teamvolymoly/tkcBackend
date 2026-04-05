@@ -1,0 +1,110 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 2565 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 50 780 Tm (# TheKawaCompany API - Step by Step Postman Guide) Tj
+1 0 0 1 50 766 Tm () Tj
+1 0 0 1 50 752 Tm (## 1\) Import Files) Tj
+1 0 0 1 50 738 Tm (1. Import collection: `TheKawaCompany_Ecommerce_API.postman_collection.json`) Tj
+1 0 0 1 50 724 Tm (2. Import environment: `TheKawaCompany_Local.postman_environment.json`) Tj
+1 0 0 1 50 710 Tm (3. Select environment: **TheKawaCompany Local**) Tj
+1 0 0 1 50 696 Tm () Tj
+1 0 0 1 50 682 Tm (## 2\) Base URL) Tj
+1 0 0 1 50 668 Tm (- Default: `http://127.0.0.1:8000`) Tj
+1 0 0 1 50 654 Tm (- If using XAMPP public path: update `base_url` in environment.) Tj
+1 0 0 1 50 640 Tm () Tj
+1 0 0 1 50 626 Tm (## 3\) Run Sequence \(Recommended\)) Tj
+1 0 0 1 50 612 Tm (1. `Auth -> Register`) Tj
+1 0 0 1 50 598 Tm (2. `Auth -> Login \(Customer\)`) Tj
+1 0 0 1 50 584 Tm (3. `Auth -> Login \(Admin\)`) Tj
+1 0 0 1 50 570 Tm (4. `Category -> Create Category \(Admin\)`) Tj
+1 0 0 1 50 556 Tm (5. `Product -> Create Product \(Admin\)`) Tj
+1 0 0 1 50 542 Tm (6. `Product Variant -> Create Variant \(Admin\)`) Tj
+1 0 0 1 50 528 Tm (7. `Product Image -> Add Product Image \(Admin\)`) Tj
+1 0 0 1 50 514 Tm (8. `Address -> Create Address`) Tj
+1 0 0 1 50 500 Tm (9. `Cart -> Add to Cart`) Tj
+1 0 0 1 50 486 Tm (10. `Order -> Create Order`) Tj
+1 0 0 1 50 472 Tm (11. `Payment -> Create Payment`) Tj
+1 0 0 1 50 458 Tm (12. `Order -> Track Order`) Tj
+1 0 0 1 50 444 Tm () Tj
+1 0 0 1 50 430 Tm (## 4\) Token Handling) Tj
+1 0 0 1 50 416 Tm (- `Login \(Customer\)` automatically saves token to `{{token}}`) Tj
+1 0 0 1 50 402 Tm (- `Login \(Admin\)` automatically saves token to `{{admin_token}}`) Tj
+1 0 0 1 50 388 Tm () Tj
+1 0 0 1 50 374 Tm (## 5\) Variable Mapping) Tj
+1 0 0 1 50 360 Tm (Update these variables from your DB results:) Tj
+1 0 0 1 50 346 Tm (- `category`) Tj
+1 0 0 1 50 332 Tm (- `product_id`) Tj
+1 0 0 1 50 318 Tm (- `product_slug`) Tj
+1 0 0 1 50 304 Tm (- `variant_id`) Tj
+1 0 0 1 50 290 Tm (- `address_id`) Tj
+1 0 0 1 50 276 Tm (- `cart_item_id`) Tj
+1 0 0 1 50 262 Tm (- `order_id`) Tj
+1 0 0 1 50 248 Tm (- `review_id`) Tj
+1 0 0 1 50 234 Tm (- `image_id`) Tj
+1 0 0 1 50 220 Tm (- `ingredient_id`) Tj
+1 0 0 1 50 206 Tm (- `wishlist_id`) Tj
+1 0 0 1 50 192 Tm () Tj
+1 0 0 1 50 178 Tm (## 6\) API Modules Included) Tj
+1 0 0 1 50 164 Tm (- Auth) Tj
+1 0 0 1 50 150 Tm (- Address) Tj
+1 0 0 1 50 136 Tm (- Category/Subcategory) Tj
+1 0 0 1 50 122 Tm (- Product) Tj
+1 0 0 1 50 108 Tm (- Product Variant) Tj
+1 0 0 1 50 94 Tm (- Product Image) Tj
+1 0 0 1 50 80 Tm (- Ingredient) Tj
+1 0 0 1 50 66 Tm (- Nutrition) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 648 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 50 780 Tm (- Cart) Tj
+1 0 0 1 50 766 Tm (- Wishlist) Tj
+1 0 0 1 50 752 Tm (- Order) Tj
+1 0 0 1 50 738 Tm (- Payment \(including webhook\)) Tj
+1 0 0 1 50 724 Tm (- Coupon) Tj
+1 0 0 1 50 710 Tm (- Review) Tj
+1 0 0 1 50 696 Tm (- Inventory \(Admin\)) Tj
+1 0 0 1 50 682 Tm (- Admin Dashboard/Customers/Orders) Tj
+1 0 0 1 50 668 Tm (- Shipping) Tj
+1 0 0 1 50 654 Tm (- Search) Tj
+1 0 0 1 50 640 Tm () Tj
+1 0 0 1 50 626 Tm (## 7\) Notes) Tj
+1 0 0 1 50 612 Tm (- Admin endpoints use `{{admin_token}}`.) Tj
+1 0 0 1 50 598 Tm (- Customer endpoints use `{{token}}`.) Tj
+1 0 0 1 50 584 Tm (- Public endpoints can run without token.) Tj
+ET
+endstream
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000296 00000 n 
+0000002913 00000 n 
+0000003088 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+3787
+%%EOF

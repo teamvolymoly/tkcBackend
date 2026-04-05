@@ -1,0 +1,56 @@
+/node_modules
+/public/hot
+/public/storage
+/storage/*.key
+/storage/app/public
+/storage/framework/cache/data
+/storage/framework/sessions
+/storage/framework/testing
+/storage/framework/views
+/storage/logs
+/vendor
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+
+# IDE Files
+/.idea
+/.vscode
+*.sublime-project
+*.sublime-workspace
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Laravel Mix
+/public/mix-manifest.json
+
+# PHPUnit
+.phpunit.cache
+
+# Debug
+_debugbar
+
+# Logs
+*.log
+
+# Composer
+composer.lock
+
+# Node
+package-lock.json
+
+# Sail
+docker-compose.override.yml
+
+# Laravel Cache
+bootstrap/cache/*.php
+bootstrap/cache/packages.php
+bootstrap/cache/services.php
+bootstrap/cache/config.php

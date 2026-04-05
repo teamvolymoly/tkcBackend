@@ -1,0 +1,128 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R] /Count 2 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 3202 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm (# TheKawaCompany API Audit + Future Plan) Tj
+1 0 0 1 45 777 Tm ( ) Tj
+1 0 0 1 45 764 Tm (## 1\) Current Status) Tj
+1 0 0 1 45 751 Tm (- Total API routes: 66) Tj
+1 0 0 1 45 738 Tm (- Core modules implemented: Auth, Address, Category, Product, Variant, Images, Ingredients, Nutritio) Tj
+1 0 0 1 45 725 Tm (n, Cart, Wishlist, Order, Payment, Coupon, Review, Inventory, Admin, Shipping, Search.) Tj
+1 0 0 1 45 712 Tm (- Migrations: all ran successfully.) Tj
+1 0 0 1 45 699 Tm ( ) Tj
+1 0 0 1 45 686 Tm (## 2\) Health Check Result) Tj
+1 0 0 1 45 673 Tm (System is runnable, but production-grade readiness ke liye niche ke issues fix karne recommended hai) Tj
+1 0 0 1 45 660 Tm (n.) Tj
+1 0 0 1 45 647 Tm ( ) Tj
+1 0 0 1 45 634 Tm (## 3\) Key Issues Found) Tj
+1 0 0 1 45 621 Tm ( ) Tj
+1 0 0 1 45 608 Tm (### High Priority) Tj
+1 0 0 1 45 595 Tm (1. Payment webhook security hardening required) Tj
+1 0 0 1 45 582 Tm (- Endpoint public hai; signature verification layer add karni chahiye.) Tj
+1 0 0 1 45 569 Tm (- Risk: payment status spoof/update.) Tj
+1 0 0 1 45 556 Tm ( ) Tj
+1 0 0 1 45 543 Tm (2. Order address ownership validation needed) Tj
+1 0 0 1 45 530 Tm (- `address_id` exists check hai, but ownership check \(same user\) enforce karna chahiye.) Tj
+1 0 0 1 45 517 Tm (- Risk: cross-user address misuse.) Tj
+1 0 0 1 45 504 Tm ( ) Tj
+1 0 0 1 45 491 Tm (3. Stock reservation/deduction flow incomplete at order placement) Tj
+1 0 0 1 45 478 Tm (- Order create ke waqt stock movement explicit nahi hai.) Tj
+1 0 0 1 45 465 Tm (- Risk: overselling.) Tj
+1 0 0 1 45 452 Tm ( ) Tj
+1 0 0 1 45 439 Tm (### Medium Priority) Tj
+1 0 0 1 45 426 Tm (4. Inventory update endpoint should validate variant existence before upsert.) Tj
+1 0 0 1 45 413 Tm ( ) Tj
+1 0 0 1 45 400 Tm (### Low Priority) Tj
+1 0 0 1 45 387 Tm (5. API feature tests are minimal; ecommerce flows ke tests required.) Tj
+1 0 0 1 45 374 Tm ( ) Tj
+1 0 0 1 45 361 Tm (## 4\) What APIs Are Still Needed \(Best Ecommerce Standard\)) Tj
+1 0 0 1 45 348 Tm ( ) Tj
+1 0 0 1 45 335 Tm (### Phase 1 \(Business Critical\)) Tj
+1 0 0 1 45 322 Tm (- Refund APIs) Tj
+1 0 0 1 45 309 Tm (  - `POST /api/orders/{id}/return-request`) Tj
+1 0 0 1 45 296 Tm (  - `POST /api/payments/{id}/refund`) Tj
+1 0 0 1 45 283 Tm (  - `GET /api/refunds/{id}`) Tj
+1 0 0 1 45 270 Tm (- Payment verification APIs) Tj
+1 0 0 1 45 257 Tm (  - `POST /api/payments/{id}/verify`) Tj
+1 0 0 1 45 244 Tm (  - `GET /api/payments/{id}/status`) Tj
+1 0 0 1 45 231 Tm (- Inventory movement APIs) Tj
+1 0 0 1 45 218 Tm (  - `POST /api/inventory/reserve`) Tj
+1 0 0 1 45 205 Tm (  - `POST /api/inventory/release`) Tj
+1 0 0 1 45 192 Tm (  - `POST /api/inventory/deduct`) Tj
+1 0 0 1 45 179 Tm ( ) Tj
+1 0 0 1 45 166 Tm (### Phase 2 \(Operational\)) Tj
+1 0 0 1 45 153 Tm (- Invoice APIs) Tj
+1 0 0 1 45 140 Tm (  - `GET /api/orders/{id}/invoice`) Tj
+1 0 0 1 45 127 Tm (  - `POST /api/orders/{id}/invoice/regenerate`) Tj
+1 0 0 1 45 114 Tm (- Coupon Admin CRUD) Tj
+1 0 0 1 45 101 Tm (  - `POST/GET/PUT/DELETE /api/admin/coupons`) Tj
+1 0 0 1 45 88 Tm (- Shipping Method Admin CRUD) Tj
+1 0 0 1 45 75 Tm (  - `POST/GET/PUT/DELETE /api/admin/shipping-methods`) Tj
+1 0 0 1 45 62 Tm ( ) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 1572 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 45 790 Tm (### Phase 3 \(Growth\)) Tj
+1 0 0 1 45 777 Tm (- Analytics APIs) Tj
+1 0 0 1 45 764 Tm (  - `GET /api/admin/analytics/revenue`) Tj
+1 0 0 1 45 751 Tm (  - `GET /api/admin/analytics/top-products`) Tj
+1 0 0 1 45 738 Tm (- Review moderation APIs) Tj
+1 0 0 1 45 725 Tm (  - `GET /api/admin/reviews`) Tj
+1 0 0 1 45 712 Tm (  - `PUT /api/admin/reviews/{id}/approve`) Tj
+1 0 0 1 45 699 Tm (- Search enhancements) Tj
+1 0 0 1 45 686 Tm (  - `GET /api/search/suggestions`) Tj
+1 0 0 1 45 673 Tm (  - `POST /api/search/faceted`) Tj
+1 0 0 1 45 660 Tm ( ) Tj
+1 0 0 1 45 647 Tm (### Phase 4 \(Scale\)) Tj
+1 0 0 1 45 634 Tm (- Multi-warehouse APIs) Tj
+1 0 0 1 45 621 Tm (- Tax/GST APIs) Tj
+1 0 0 1 45 608 Tm (- Vendor/Seller APIs \(if marketplace model\)) Tj
+1 0 0 1 45 595 Tm ( ) Tj
+1 0 0 1 45 582 Tm (## 5\) Recommended Build Order) Tj
+1 0 0 1 45 569 Tm (1. Payment security + refund flow) Tj
+1 0 0 1 45 556 Tm (2. Inventory reservation/deduction) Tj
+1 0 0 1 45 543 Tm (3. Invoice + coupon/shipping admin CRUD) Tj
+1 0 0 1 45 530 Tm (4. Fulfillment/operations APIs) Tj
+1 0 0 1 45 517 Tm (5. Analytics + moderation + advanced search) Tj
+1 0 0 1 45 504 Tm ( ) Tj
+1 0 0 1 45 491 Tm (## 6\) Client Summary \(Ready-to-Say\)) Tj
+1 0 0 1 45 478 Tm (- Backend core ecommerce APIs live and functional hain.) Tj
+1 0 0 1 45 465 Tm (- Next sprint ka focus reliability and operations pe hona chahiye \(payment integrity, stock safety, ) Tj
+1 0 0 1 45 452 Tm (refunds\).) Tj
+1 0 0 1 45 439 Tm (- Uske baad growth APIs \(analytics/search/SEO\) add karna best rahega.) Tj
+ET
+endstream
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000296 00000 n 
+0000003550 00000 n 
+0000003725 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+5349
+%%EOF

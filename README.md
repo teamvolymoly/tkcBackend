@@ -67,8 +67,21 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 
 ssh -p 22 kirayaca1@103.86.176.233
-qZ2(Hs&5OVN1
+Kirayacare@123
 
 
 ssh server key:
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPQksabpGs4CnH2jbqzEDj8qyF/q28x0MTZ4dWO4UDLW teamvolymoly@gmail.com
+
+local code push to github
+1. git add .
+2. git commit -m "sms"
+3. git push origin main
+
+github to server pull
+1. ssh krna : ssh -p 22 kirayaca1@103.86.176.233	password -- Kirayacare@123
+2. cd tkc.volymoly.com
+3. git pull origin main
+
+
+

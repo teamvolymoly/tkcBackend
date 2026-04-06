@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 30, 2026 at 05:43 AM
+-- Generation Time: Apr 05, 2026 at 09:09 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -32,6 +32,13 @@ CREATE TABLE `cache` (
   `value` mediumtext NOT NULL,
   `expiration` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cache`
+--
+
+INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
+('laravel_cache_spatie.permission.cache', 'a:3:{s:5:\"alias\";a:4:{s:1:\"a\";s:2:\"id\";s:1:\"b\";s:4:\"name\";s:1:\"c\";s:10:\"guard_name\";s:1:\"r\";s:5:\"roles\";}s:11:\"permissions\";a:78:{i:0;a:4:{s:1:\"a\";i:1;s:1:\"b\";s:12:\"admin.access\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:4;}}i:1;a:4:{s:1:\"a\";i:2;s:1:\"b\";s:14:\"dashboard.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:4;}}i:2;a:4:{s:1:\"a\";i:3;s:1:\"b\";s:11:\"orders.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:4;}}i:3;a:4:{s:1:\"a\";i:4;s:1:\"b\";s:13:\"orders.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:3;}}i:4;a:4:{s:1:\"a\";i:5;s:1:\"b\";s:13:\"payments.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:4;}}i:5;a:4:{s:1:\"a\";i:6;s:1:\"b\";s:15:\"payments.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:3;}}i:6;a:4:{s:1:\"a\";i:7;s:1:\"b\";s:13:\"products.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:4;}}i:7;a:4:{s:1:\"a\";i:8;s:1:\"b\";s:15:\"products.create\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:3;}}i:8;a:4:{s:1:\"a\";i:9;s:1:\"b\";s:15:\"products.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:3;}}i:9;a:4:{s:1:\"a\";i:10;s:1:\"b\";s:15:\"products.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:10;a:4:{s:1:\"a\";i:11;s:1:\"b\";s:15:\"categories.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:4;}}i:11;a:4:{s:1:\"a\";i:12;s:1:\"b\";s:17:\"categories.create\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:3;}}i:12;a:4:{s:1:\"a\";i:13;s:1:\"b\";s:17:\"categories.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:3;}}i:13;a:4:{s:1:\"a\";i:14;s:1:\"b\";s:17:\"categories.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:14;a:4:{s:1:\"a\";i:15;s:1:\"b\";s:14:\"inventory.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:4;}}i:15;a:4:{s:1:\"a\";i:16;s:1:\"b\";s:16:\"inventory.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:3;}}i:16;a:4:{s:1:\"a\";i:17;s:1:\"b\";s:12:\"coupons.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:4;}}i:17;a:4:{s:1:\"a\";i:18;s:1:\"b\";s:14:\"coupons.create\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:3;}}i:18;a:4:{s:1:\"a\";i:19;s:1:\"b\";s:14:\"coupons.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:3;}}i:19;a:4:{s:1:\"a\";i:20;s:1:\"b\";s:14:\"coupons.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:20;a:4:{s:1:\"a\";i:21;s:1:\"b\";s:10:\"users.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:4;}}i:21;a:4:{s:1:\"a\";i:22;s:1:\"b\";s:12:\"users.create\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:22;a:4:{s:1:\"a\";i:23;s:1:\"b\";s:12:\"users.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:23;a:4:{s:1:\"a\";i:24;s:1:\"b\";s:12:\"users.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:24;a:4:{s:1:\"a\";i:25;s:1:\"b\";s:12:\"reviews.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:4;}}i:25;a:4:{s:1:\"a\";i:26;s:1:\"b\";s:14:\"reviews.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:3;}}i:26;a:4:{s:1:\"a\";i:27;s:1:\"b\";s:10:\"carts.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:4;}}i:27;a:4:{s:1:\"a\";i:28;s:1:\"b\";s:14:\"wishlists.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:4;}}i:28;a:4:{s:1:\"a\";i:29;s:1:\"b\";s:16:\"wishlists.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:29;a:4:{s:1:\"a\";i:30;s:1:\"b\";s:10:\"blogs.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:4;}}i:30;a:4:{s:1:\"a\";i:31;s:1:\"b\";s:12:\"blogs.create\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:3;}}i:31;a:4:{s:1:\"a\";i:32;s:1:\"b\";s:12:\"blogs.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:3;}}i:32;a:4:{s:1:\"a\";i:33;s:1:\"b\";s:12:\"blogs.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:33;a:4:{s:1:\"a\";i:34;s:1:\"b\";s:10:\"roles.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:3;}}i:34;a:4:{s:1:\"a\";i:35;s:1:\"b\";s:12:\"roles.create\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:35;a:4:{s:1:\"a\";i:36;s:1:\"b\";s:12:\"roles.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:36;a:4:{s:1:\"a\";i:37;s:1:\"b\";s:12:\"roles.delete\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:1:{i:0;i:1;}}i:37;a:4:{s:1:\"a\";i:38;s:1:\"b\";s:12:\"profile.view\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:4;}}i:38;a:4:{s:1:\"a\";i:39;s:1:\"b\";s:14:\"profile.update\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:4;}}i:39;a:3:{s:1:\"a\";i:40;s:1:\"b\";s:12:\"admin.access\";s:1:\"c\";s:7:\"sanctum\";}i:40;a:3:{s:1:\"a\";i:41;s:1:\"b\";s:14:\"dashboard.view\";s:1:\"c\";s:7:\"sanctum\";}i:41;a:4:{s:1:\"a\";i:42;s:1:\"b\";s:11:\"orders.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:42;a:4:{s:1:\"a\";i:43;s:1:\"b\";s:13:\"orders.update\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:43;a:4:{s:1:\"a\";i:44;s:1:\"b\";s:13:\"payments.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:44;a:4:{s:1:\"a\";i:45;s:1:\"b\";s:15:\"payments.update\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:45;a:4:{s:1:\"a\";i:46;s:1:\"b\";s:13:\"products.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:46;a:4:{s:1:\"a\";i:47;s:1:\"b\";s:15:\"products.create\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:47;a:4:{s:1:\"a\";i:48;s:1:\"b\";s:15:\"products.update\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:48;a:4:{s:1:\"a\";i:49;s:1:\"b\";s:15:\"products.delete\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:49;a:4:{s:1:\"a\";i:50;s:1:\"b\";s:15:\"categories.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:50;a:4:{s:1:\"a\";i:51;s:1:\"b\";s:17:\"categories.create\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:51;a:4:{s:1:\"a\";i:52;s:1:\"b\";s:17:\"categories.update\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:52;a:4:{s:1:\"a\";i:53;s:1:\"b\";s:17:\"categories.delete\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:53;a:4:{s:1:\"a\";i:54;s:1:\"b\";s:14:\"inventory.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:54;a:4:{s:1:\"a\";i:55;s:1:\"b\";s:16:\"inventory.update\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:55;a:4:{s:1:\"a\";i:56;s:1:\"b\";s:12:\"coupons.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:56;a:4:{s:1:\"a\";i:57;s:1:\"b\";s:14:\"coupons.create\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:57;a:4:{s:1:\"a\";i:58;s:1:\"b\";s:14:\"coupons.update\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:58;a:4:{s:1:\"a\";i:59;s:1:\"b\";s:14:\"coupons.delete\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:59;a:3:{s:1:\"a\";i:60;s:1:\"b\";s:10:\"users.view\";s:1:\"c\";s:7:\"sanctum\";}i:60;a:3:{s:1:\"a\";i:61;s:1:\"b\";s:12:\"users.create\";s:1:\"c\";s:7:\"sanctum\";}i:61;a:3:{s:1:\"a\";i:62;s:1:\"b\";s:12:\"users.update\";s:1:\"c\";s:7:\"sanctum\";}i:62;a:3:{s:1:\"a\";i:63;s:1:\"b\";s:12:\"users.delete\";s:1:\"c\";s:7:\"sanctum\";}i:63;a:3:{s:1:\"a\";i:64;s:1:\"b\";s:12:\"reviews.view\";s:1:\"c\";s:7:\"sanctum\";}i:64;a:3:{s:1:\"a\";i:65;s:1:\"b\";s:14:\"reviews.delete\";s:1:\"c\";s:7:\"sanctum\";}i:65;a:4:{s:1:\"a\";i:66;s:1:\"b\";s:10:\"carts.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:66;a:4:{s:1:\"a\";i:67;s:1:\"b\";s:14:\"wishlists.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:67;a:4:{s:1:\"a\";i:68;s:1:\"b\";s:16:\"wishlists.delete\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:68;a:4:{s:1:\"a\";i:69;s:1:\"b\";s:10:\"blogs.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:69;a:3:{s:1:\"a\";i:70;s:1:\"b\";s:12:\"blogs.create\";s:1:\"c\";s:7:\"sanctum\";}i:70;a:3:{s:1:\"a\";i:71;s:1:\"b\";s:12:\"blogs.update\";s:1:\"c\";s:7:\"sanctum\";}i:71;a:3:{s:1:\"a\";i:72;s:1:\"b\";s:12:\"blogs.delete\";s:1:\"c\";s:7:\"sanctum\";}i:72;a:3:{s:1:\"a\";i:73;s:1:\"b\";s:10:\"roles.view\";s:1:\"c\";s:7:\"sanctum\";}i:73;a:3:{s:1:\"a\";i:74;s:1:\"b\";s:12:\"roles.create\";s:1:\"c\";s:7:\"sanctum\";}i:74;a:3:{s:1:\"a\";i:75;s:1:\"b\";s:12:\"roles.update\";s:1:\"c\";s:7:\"sanctum\";}i:75;a:3:{s:1:\"a\";i:76;s:1:\"b\";s:12:\"roles.delete\";s:1:\"c\";s:7:\"sanctum\";}i:76;a:4:{s:1:\"a\";i:77;s:1:\"b\";s:12:\"profile.view\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}i:77;a:4:{s:1:\"a\";i:78;s:1:\"b\";s:14:\"profile.update\";s:1:\"c\";s:7:\"sanctum\";s:1:\"r\";a:1:{i:0;i:5;}}}s:5:\"roles\";a:4:{i:0;a:3:{s:1:\"a\";i:1;s:1:\"b\";s:5:\"admin\";s:1:\"c\";s:3:\"web\";}i:1;a:3:{s:1:\"a\";i:3;s:1:\"b\";s:7:\"manager\";s:1:\"c\";s:3:\"web\";}i:2;a:3:{s:1:\"a\";i:4;s:1:\"b\";s:5:\"staff\";s:1:\"c\";s:3:\"web\";}i:3;a:3:{s:1:\"a\";i:5;s:1:\"b\";s:5:\"staff\";s:1:\"c\";s:7:\"sanctum\";}}}', 1775501570);
 
 -- --------------------------------------------------------
 
@@ -424,6 +431,90 @@ CREATE TABLE `permissions` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `permissions`
+--
+
+INSERT INTO `permissions` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VALUES
+(1, 'admin.access', 'web', '2026-04-05 13:20:40', '2026-04-05 13:20:40'),
+(2, 'dashboard.view', 'web', '2026-04-05 13:20:40', '2026-04-05 13:20:40'),
+(3, 'orders.view', 'web', '2026-04-05 13:20:40', '2026-04-05 13:20:40'),
+(4, 'orders.update', 'web', '2026-04-05 13:20:40', '2026-04-05 13:20:40'),
+(5, 'payments.view', 'web', '2026-04-05 13:20:40', '2026-04-05 13:20:40'),
+(6, 'payments.update', 'web', '2026-04-05 13:20:40', '2026-04-05 13:20:40'),
+(7, 'products.view', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(8, 'products.create', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(9, 'products.update', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(10, 'products.delete', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(11, 'categories.view', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(12, 'categories.create', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(13, 'categories.update', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(14, 'categories.delete', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(15, 'inventory.view', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(16, 'inventory.update', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(17, 'coupons.view', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(18, 'coupons.create', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(19, 'coupons.update', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(20, 'coupons.delete', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(21, 'users.view', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(22, 'users.create', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(23, 'users.update', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(24, 'users.delete', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(25, 'reviews.view', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(26, 'reviews.delete', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(27, 'carts.view', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(28, 'wishlists.view', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(29, 'wishlists.delete', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(30, 'blogs.view', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(31, 'blogs.create', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(32, 'blogs.update', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(33, 'blogs.delete', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(34, 'roles.view', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(35, 'roles.create', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(36, 'roles.update', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(37, 'roles.delete', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(38, 'profile.view', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(39, 'profile.update', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(40, 'admin.access', 'sanctum', '2026-04-05 13:22:05', '2026-04-05 13:22:05'),
+(41, 'dashboard.view', 'sanctum', '2026-04-05 13:22:05', '2026-04-05 13:22:05'),
+(42, 'orders.view', 'sanctum', '2026-04-05 13:22:05', '2026-04-05 13:22:05'),
+(43, 'orders.update', 'sanctum', '2026-04-05 13:22:05', '2026-04-05 13:22:05'),
+(44, 'payments.view', 'sanctum', '2026-04-05 13:22:05', '2026-04-05 13:22:05'),
+(45, 'payments.update', 'sanctum', '2026-04-05 13:22:05', '2026-04-05 13:22:05'),
+(46, 'products.view', 'sanctum', '2026-04-05 13:22:05', '2026-04-05 13:22:05'),
+(47, 'products.create', 'sanctum', '2026-04-05 13:22:05', '2026-04-05 13:22:05'),
+(48, 'products.update', 'sanctum', '2026-04-05 13:22:05', '2026-04-05 13:22:05'),
+(49, 'products.delete', 'sanctum', '2026-04-05 13:22:05', '2026-04-05 13:22:05'),
+(50, 'categories.view', 'sanctum', '2026-04-05 13:22:05', '2026-04-05 13:22:05'),
+(51, 'categories.create', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(52, 'categories.update', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(53, 'categories.delete', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(54, 'inventory.view', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(55, 'inventory.update', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(56, 'coupons.view', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(57, 'coupons.create', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(58, 'coupons.update', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(59, 'coupons.delete', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(60, 'users.view', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(61, 'users.create', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(62, 'users.update', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(63, 'users.delete', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(64, 'reviews.view', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(65, 'reviews.delete', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(66, 'carts.view', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(67, 'wishlists.view', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(68, 'wishlists.delete', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(69, 'blogs.view', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(70, 'blogs.create', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(71, 'blogs.update', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(72, 'blogs.delete', 'sanctum', '2026-04-05 13:22:06', '2026-04-05 13:22:06'),
+(73, 'roles.view', 'sanctum', '2026-04-05 13:22:07', '2026-04-05 13:22:07'),
+(74, 'roles.create', 'sanctum', '2026-04-05 13:22:07', '2026-04-05 13:22:07'),
+(75, 'roles.update', 'sanctum', '2026-04-05 13:22:07', '2026-04-05 13:22:07'),
+(76, 'roles.delete', 'sanctum', '2026-04-05 13:22:07', '2026-04-05 13:22:07'),
+(77, 'profile.view', 'sanctum', '2026-04-05 13:22:07', '2026-04-05 13:22:07'),
+(78, 'profile.update', 'sanctum', '2026-04-05 13:22:07', '2026-04-05 13:22:07');
+
 -- --------------------------------------------------------
 
 --
@@ -467,7 +558,13 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (18, 'App\\Models\\User', 2, 'auth_token', '6db243ce9d62d795b13874b709b54190b4a4d5d63c76cf4b1e07604e1181dfe7', '[\"*\"]', '2026-03-28 15:10:14', NULL, '2026-03-28 14:15:06', '2026-03-28 15:10:14'),
 (19, 'App\\Models\\User', 2, 'auth_token', 'ef37fa8b441386bd8ea48eb85e997b6b70a126620a559cf9f0d860ac306a7989', '[\"*\"]', '2026-03-29 00:01:53', NULL, '2026-03-29 00:01:51', '2026-03-29 00:01:53'),
 (21, 'App\\Models\\User', 2, 'auth_token', '2f875c29933b7491940a288cdbed67b1ead053b87aa8d2a8b1d3fb8d54340dee', '[\"*\"]', '2026-03-29 08:48:48', NULL, '2026-03-29 08:07:00', '2026-03-29 08:48:48'),
-(24, 'App\\Models\\User', 2, 'auth_token', 'db0c499b577b5a61aff85b99ffe85c20e3a353544a2d93f1820ea2ff5eb2b23a', '[\"*\"]', '2026-03-29 11:56:08', NULL, '2026-03-29 11:49:19', '2026-03-29 11:56:08');
+(24, 'App\\Models\\User', 2, 'auth_token', 'db0c499b577b5a61aff85b99ffe85c20e3a353544a2d93f1820ea2ff5eb2b23a', '[\"*\"]', '2026-03-29 11:56:08', NULL, '2026-03-29 11:49:19', '2026-03-29 11:56:08'),
+(25, 'App\\Models\\User', 2, 'auth_token', '2f8571430fdf1b331aa4c2f565b9be0fc9afbcefbed773c1a868dca3786e872b', '[\"*\"]', '2026-03-30 13:40:45', NULL, '2026-03-30 11:55:57', '2026-03-30 13:40:45'),
+(26, 'App\\Models\\User', 2, 'auth_token', '944367463863f6a9767be44009cb3e816d5bf204f20ff8b1f03af8867cb91a69', '[\"*\"]', '2026-03-30 22:08:27', NULL, '2026-03-30 21:36:22', '2026-03-30 22:08:27'),
+(28, 'App\\Models\\User', 2, 'auth_token', '499a89cb9cc6aadb3b1661623735128dfe36dd75735d664acff05ca66b531688', '[\"*\"]', '2026-04-05 01:21:21', NULL, '2026-04-05 00:13:57', '2026-04-05 01:21:21'),
+(29, 'App\\Models\\User', 2, 'auth_token', '7607f9b2c04414079187e978d225a4da97fc9d9de39b790c427b9ddfe08812a3', '[\"*\"]', '2026-04-05 05:32:09', NULL, '2026-04-05 04:39:41', '2026-04-05 05:32:09'),
+(30, 'App\\Models\\User', 2, 'auth_token', 'fd904441b5017aefdd9d7a8fe6cefeee50f2fd0c5ec9a80ed0e33cb4543f2fc0', '[\"*\"]', '2026-04-05 08:19:53', NULL, '2026-04-05 07:55:59', '2026-04-05 08:19:53'),
+(31, 'App\\Models\\User', 2, 'auth_token', '0e1a68a356b884a918281451a28c0d3f0132488c2a8455841db9ae355d648c12', '[\"*\"]', '2026-04-05 13:37:42', NULL, '2026-04-05 10:36:13', '2026-04-05 13:37:42');
 
 -- --------------------------------------------------------
 
@@ -633,7 +730,10 @@ CREATE TABLE `roles` (
 
 INSERT INTO `roles` (`id`, `name`, `guard_name`, `created_at`, `updated_at`) VALUES
 (1, 'admin', 'web', '2026-03-12 12:33:34', '2026-03-12 12:33:34'),
-(2, 'customer', 'web', '2026-03-12 12:33:39', '2026-03-12 12:33:39');
+(2, 'customer', 'web', '2026-03-12 12:33:39', '2026-03-12 12:33:39'),
+(3, 'manager', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(4, 'staff', 'web', '2026-04-05 13:20:41', '2026-04-05 13:20:41'),
+(5, 'staff', 'sanctum', '2026-04-05 13:22:48', '2026-04-05 13:22:48');
 
 -- --------------------------------------------------------
 
@@ -645,6 +745,118 @@ CREATE TABLE `role_has_permissions` (
   `permission_id` bigint(20) UNSIGNED NOT NULL,
   `role_id` bigint(20) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `role_has_permissions`
+--
+
+INSERT INTO `role_has_permissions` (`permission_id`, `role_id`) VALUES
+(1, 1),
+(1, 3),
+(1, 4),
+(2, 1),
+(2, 3),
+(2, 4),
+(3, 1),
+(3, 3),
+(3, 4),
+(4, 1),
+(4, 3),
+(5, 1),
+(5, 3),
+(5, 4),
+(6, 1),
+(6, 3),
+(7, 1),
+(7, 3),
+(7, 4),
+(8, 1),
+(8, 3),
+(9, 1),
+(9, 3),
+(10, 1),
+(11, 1),
+(11, 3),
+(11, 4),
+(12, 1),
+(12, 3),
+(13, 1),
+(13, 3),
+(14, 1),
+(15, 1),
+(15, 3),
+(15, 4),
+(16, 1),
+(16, 3),
+(17, 1),
+(17, 3),
+(17, 4),
+(18, 1),
+(18, 3),
+(19, 1),
+(19, 3),
+(20, 1),
+(21, 1),
+(21, 3),
+(21, 4),
+(22, 1),
+(23, 1),
+(24, 1),
+(25, 1),
+(25, 3),
+(25, 4),
+(26, 1),
+(26, 3),
+(27, 1),
+(27, 3),
+(27, 4),
+(28, 1),
+(28, 3),
+(28, 4),
+(29, 1),
+(30, 1),
+(30, 3),
+(30, 4),
+(31, 1),
+(31, 3),
+(32, 1),
+(32, 3),
+(33, 1),
+(34, 1),
+(34, 3),
+(35, 1),
+(36, 1),
+(37, 1),
+(38, 1),
+(38, 3),
+(38, 4),
+(39, 1),
+(39, 3),
+(39, 4),
+(42, 5),
+(43, 5),
+(44, 5),
+(45, 5),
+(46, 5),
+(47, 5),
+(48, 5),
+(49, 5),
+(50, 5),
+(51, 5),
+(52, 5),
+(53, 5),
+(54, 5),
+(55, 5),
+(56, 5),
+(57, 5),
+(58, 5),
+(59, 5),
+(66, 5),
+(67, 5),
+(68, 5),
+(69, 5),
+(77, 5),
+(78, 5);
 
 -- --------------------------------------------------------
 
@@ -666,7 +878,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('ffq57WEiogpq0EM8ceMGYBgJjcPdjmnIg23PtwdR', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'YTo2OntzOjY6Il90b2tlbiI7czo0MDoiU1FLWW5GeUU5YnRNWmpuVDRnWEQ4cVFiMktwaTJhSVg1bTEyaktVMSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjc6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hZG1pbiI7czo1OiJyb3V0ZSI7czoxNToiYWRtaW4uZGFzaGJvYXJkIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czoxMToiYWRtaW5fdG9rZW4iO3M6NTE6IjI0fFRNSWVVSjJsOXVaVnJqdjhGWWEzVVpWVGZ6Znc3MkxobzJSUG1ReUoyZTY2ZjgzYSI7czoxMDoiYWRtaW5fdXNlciI7YTo4OntzOjI6ImlkIjtpOjI7czo0OiJuYW1lIjtzOjEyOiJEZWVwYWsgTWVlbmEiO3M6NToiZW1haWwiO3M6MTc6ImFkbWluQGV4YW1wbGUuY29tIjtzOjU6InBob25lIjtzOjEwOiI5MDA5MjU1MDg1IjtzOjE3OiJlbWFpbF92ZXJpZmllZF9hdCI7TjtzOjEwOiJjcmVhdGVkX2F0IjtzOjI3OiIyMDI2LTAzLTE5VDE5OjEwOjU5LjAwMDAwMFoiO3M6MTA6InVwZGF0ZWRfYXQiO3M6Mjc6IjIwMjYtMDMtMTlUMjE6MDY6NTIuMDAwMDAwWiI7czo1OiJyb2xlcyI7YToxOntpOjA7YTo2OntzOjI6ImlkIjtpOjE7czo0OiJuYW1lIjtzOjU6ImFkbWluIjtzOjEwOiJndWFyZF9uYW1lIjtzOjM6IndlYiI7czoxMDoiY3JlYXRlZF9hdCI7czoyNzoiMjAyNi0wMy0xMlQxODowMzozNC4wMDAwMDBaIjtzOjEwOiJ1cGRhdGVkX2F0IjtzOjI3OiIyMDI2LTAzLTEyVDE4OjAzOjM0LjAwMDAwMFoiO3M6NToicGl2b3QiO2E6Mzp7czoxMDoibW9kZWxfdHlwZSI7czoxNToiQXBwXE1vZGVsc1xVc2VyIjtzOjg6Im1vZGVsX2lkIjtpOjI7czo3OiJyb2xlX2lkIjtpOjE7fX19fXM6MjQ6ImFkbWluX3Byb2ZpbGVfY2hlY2tlZF9hdCI7aToxNzc0ODA1MTMyO30=', 1774805168);
+('LY3OLeWBgP9WXgW0ecvph10V0uDv6d2zSp1Qnle6', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'YTo2OntzOjY6Il90b2tlbiI7czo0MDoiajRCSU5oTHp6NE93cWhpN25GcmFlMEZEbkhDakVENndnV0lXVXJ3SyI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NTI6Imh0dHA6Ly9sb2NhbGhvc3QvdGhlS2F3YUNvbXBhbnkvcHVibGljL2FkbWluL2NvdXBvbnMiO3M6NToicm91dGUiO3M6MTk6ImFkbWluLmNvdXBvbnMuaW5kZXgiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjExOiJhZG1pbl90b2tlbiI7czo1MToiMzF8YkI5eERrYnZ0ZG1FRk9XejIwbW90dTY5cjAwaTlMUURSUVFWOGRHQzA4ZjlmNmM2IjtzOjEwOiJhZG1pbl91c2VyIjthOjY6e3M6MjoiaWQiO2k6MjtzOjQ6Im5hbWUiO3M6MTI6IkRlZXBhayBNZWVuYSI7czo1OiJlbWFpbCI7czoxNzoiYWRtaW5AZXhhbXBsZS5jb20iO3M6NToicGhvbmUiO3M6MTA6IjkwMDkyNTUwODUiO3M6NToicm9sZXMiO2E6MTp7aTowO2E6Mjp7czoyOiJpZCI7aToxO3M6NDoibmFtZSI7czo1OiJhZG1pbiI7fX1zOjExOiJwZXJtaXNzaW9ucyI7YTozOTp7aTowO2E6Mjp7czoyOiJpZCI7aToxO3M6NDoibmFtZSI7czoxMjoiYWRtaW4uYWNjZXNzIjt9aToxO2E6Mjp7czoyOiJpZCI7aToyO3M6NDoibmFtZSI7czoxNDoiZGFzaGJvYXJkLnZpZXciO31pOjI7YToyOntzOjI6ImlkIjtpOjM7czo0OiJuYW1lIjtzOjExOiJvcmRlcnMudmlldyI7fWk6MzthOjI6e3M6MjoiaWQiO2k6NDtzOjQ6Im5hbWUiO3M6MTM6Im9yZGVycy51cGRhdGUiO31pOjQ7YToyOntzOjI6ImlkIjtpOjU7czo0OiJuYW1lIjtzOjEzOiJwYXltZW50cy52aWV3Ijt9aTo1O2E6Mjp7czoyOiJpZCI7aTo2O3M6NDoibmFtZSI7czoxNToicGF5bWVudHMudXBkYXRlIjt9aTo2O2E6Mjp7czoyOiJpZCI7aTo3O3M6NDoibmFtZSI7czoxMzoicHJvZHVjdHMudmlldyI7fWk6NzthOjI6e3M6MjoiaWQiO2k6ODtzOjQ6Im5hbWUiO3M6MTU6InByb2R1Y3RzLmNyZWF0ZSI7fWk6ODthOjI6e3M6MjoiaWQiO2k6OTtzOjQ6Im5hbWUiO3M6MTU6InByb2R1Y3RzLnVwZGF0ZSI7fWk6OTthOjI6e3M6MjoiaWQiO2k6MTA7czo0OiJuYW1lIjtzOjE1OiJwcm9kdWN0cy5kZWxldGUiO31pOjEwO2E6Mjp7czoyOiJpZCI7aToxMTtzOjQ6Im5hbWUiO3M6MTU6ImNhdGVnb3JpZXMudmlldyI7fWk6MTE7YToyOntzOjI6ImlkIjtpOjEyO3M6NDoibmFtZSI7czoxNzoiY2F0ZWdvcmllcy5jcmVhdGUiO31pOjEyO2E6Mjp7czoyOiJpZCI7aToxMztzOjQ6Im5hbWUiO3M6MTc6ImNhdGVnb3JpZXMudXBkYXRlIjt9aToxMzthOjI6e3M6MjoiaWQiO2k6MTQ7czo0OiJuYW1lIjtzOjE3OiJjYXRlZ29yaWVzLmRlbGV0ZSI7fWk6MTQ7YToyOntzOjI6ImlkIjtpOjE1O3M6NDoibmFtZSI7czoxNDoiaW52ZW50b3J5LnZpZXciO31pOjE1O2E6Mjp7czoyOiJpZCI7aToxNjtzOjQ6Im5hbWUiO3M6MTY6ImludmVudG9yeS51cGRhdGUiO31pOjE2O2E6Mjp7czoyOiJpZCI7aToxNztzOjQ6Im5hbWUiO3M6MTI6ImNvdXBvbnMudmlldyI7fWk6MTc7YToyOntzOjI6ImlkIjtpOjE4O3M6NDoibmFtZSI7czoxNDoiY291cG9ucy5jcmVhdGUiO31pOjE4O2E6Mjp7czoyOiJpZCI7aToxOTtzOjQ6Im5hbWUiO3M6MTQ6ImNvdXBvbnMudXBkYXRlIjt9aToxOTthOjI6e3M6MjoiaWQiO2k6MjA7czo0OiJuYW1lIjtzOjE0OiJjb3Vwb25zLmRlbGV0ZSI7fWk6MjA7YToyOntzOjI6ImlkIjtpOjIxO3M6NDoibmFtZSI7czoxMDoidXNlcnMudmlldyI7fWk6MjE7YToyOntzOjI6ImlkIjtpOjIyO3M6NDoibmFtZSI7czoxMjoidXNlcnMuY3JlYXRlIjt9aToyMjthOjI6e3M6MjoiaWQiO2k6MjM7czo0OiJuYW1lIjtzOjEyOiJ1c2Vycy51cGRhdGUiO31pOjIzO2E6Mjp7czoyOiJpZCI7aToyNDtzOjQ6Im5hbWUiO3M6MTI6InVzZXJzLmRlbGV0ZSI7fWk6MjQ7YToyOntzOjI6ImlkIjtpOjI1O3M6NDoibmFtZSI7czoxMjoicmV2aWV3cy52aWV3Ijt9aToyNTthOjI6e3M6MjoiaWQiO2k6MjY7czo0OiJuYW1lIjtzOjE0OiJyZXZpZXdzLmRlbGV0ZSI7fWk6MjY7YToyOntzOjI6ImlkIjtpOjI3O3M6NDoibmFtZSI7czoxMDoiY2FydHMudmlldyI7fWk6Mjc7YToyOntzOjI6ImlkIjtpOjI4O3M6NDoibmFtZSI7czoxNDoid2lzaGxpc3RzLnZpZXciO31pOjI4O2E6Mjp7czoyOiJpZCI7aToyOTtzOjQ6Im5hbWUiO3M6MTY6Indpc2hsaXN0cy5kZWxldGUiO31pOjI5O2E6Mjp7czoyOiJpZCI7aTozMDtzOjQ6Im5hbWUiO3M6MTA6ImJsb2dzLnZpZXciO31pOjMwO2E6Mjp7czoyOiJpZCI7aTozMTtzOjQ6Im5hbWUiO3M6MTI6ImJsb2dzLmNyZWF0ZSI7fWk6MzE7YToyOntzOjI6ImlkIjtpOjMyO3M6NDoibmFtZSI7czoxMjoiYmxvZ3MudXBkYXRlIjt9aTozMjthOjI6e3M6MjoiaWQiO2k6MzM7czo0OiJuYW1lIjtzOjEyOiJibG9ncy5kZWxldGUiO31pOjMzO2E6Mjp7czoyOiJpZCI7aTozNDtzOjQ6Im5hbWUiO3M6MTA6InJvbGVzLnZpZXciO31pOjM0O2E6Mjp7czoyOiJpZCI7aTozNTtzOjQ6Im5hbWUiO3M6MTI6InJvbGVzLmNyZWF0ZSI7fWk6MzU7YToyOntzOjI6ImlkIjtpOjM2O3M6NDoibmFtZSI7czoxMjoicm9sZXMudXBkYXRlIjt9aTozNjthOjI6e3M6MjoiaWQiO2k6Mzc7czo0OiJuYW1lIjtzOjEyOiJyb2xlcy5kZWxldGUiO31pOjM3O2E6Mjp7czoyOiJpZCI7aTozODtzOjQ6Im5hbWUiO3M6MTI6InByb2ZpbGUudmlldyI7fWk6Mzg7YToyOntzOjI6ImlkIjtpOjM5O3M6NDoibmFtZSI7czoxNDoicHJvZmlsZS51cGRhdGUiO319fXM6MjQ6ImFkbWluX3Byb2ZpbGVfY2hlY2tlZF9hdCI7aToxNzc1NDE2MDYxO30=', 1775416062);
 
 -- --------------------------------------------------------
 
@@ -1091,13 +1303,13 @@ ALTER TABLE `payments`
 -- AUTO_INCREMENT for table `permissions`
 --
 ALTER TABLE `permissions`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -1145,7 +1357,7 @@ ALTER TABLE `reviews`
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `shipping_methods`

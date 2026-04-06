@@ -36,7 +36,7 @@
                     <p class="mt-2 font-medium text-slate-900 dark:text-white">{{ $user['phone'] ?: 'Not added yet' }}</p>
                 </div>
                 <div class="rounded-[1.5rem] bg-slate-50 p-4 text-slate-600 dark:bg-slate-950/60 dark:text-slate-300">
-                    Agar aap apne khud ke admin account ko edit kar rahe ho, system role ko non-admin par downgrade nahi karega taaki panel access safe rahe.
+                    Agar aap apne khud ke admin account ko edit kar rahe ho, system role ko aise role par shift nahi karega jisse admin panel access chala jaye.
                 </div>
             </div>
         </section>
@@ -70,8 +70,9 @@
                     <div>
                         <label for="role" class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">Role</label>
                         <select id="role" name="role" class="block w-full rounded-2xl border-slate-200 bg-white/80 px-4 py-3 text-sm shadow-sm focus:border-sky-500 focus:ring-sky-500 dark:border-slate-700 dark:bg-slate-950/60 dark:text-white">
-                            <option value="customer" @selected(old('role', $currentRole) === 'customer')>Customer</option>
-                            <option value="admin" @selected(old('role', $currentRole) === 'admin')>Admin</option>
+                            @foreach ($roleOptions as $roleOption)
+                                <option value="{{ $roleOption['name'] }}" @selected(old('role', $currentRole) === $roleOption['name'])>{{ ucfirst($roleOption['name']) }}</option>
+                            @endforeach
                         </select>
                     </div>
                 </div>

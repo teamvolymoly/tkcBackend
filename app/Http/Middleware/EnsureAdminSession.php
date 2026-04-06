@@ -26,6 +26,7 @@ class EnsureAdminSession
 
         if ($cachedAdmin && (time() - $checkedAt) < 300) {
             view()->share('adminUser', $cachedAdmin);
+            view()->share('adminPermissions', collect($cachedAdmin['permissions'] ?? [])->pluck('name')->all());
 
             return $next($request);
         }
@@ -42,8 +43,9 @@ class EnsureAdminSession
 
         $user = $response['data'];
         $roles = collect($user['roles'] ?? [])->pluck('name');
+        $permissions = collect($user['permissions'] ?? [])->pluck('name');
 
-        if (! $roles->contains('admin')) {
+        if (! $roles->contains('admin') && ! $permissions->contains('admin.access')) {
             $request->session()->forget(['admin_token', 'admin_user', 'admin_profile_checked_at']);
 
             return redirect()->route('admin.login')->withErrors([
@@ -54,6 +56,7 @@ class EnsureAdminSession
         $request->session()->put('admin_user', $user);
         $request->session()->put('admin_profile_checked_at', time());
         view()->share('adminUser', $user);
+        view()->share('adminPermissions', $permissions->all());
 
         return $next($request);
     }

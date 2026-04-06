@@ -16,12 +16,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(HandleCors::class);
         $middleware->alias([
             'admin.session' => \App\Http\Middleware\EnsureAdminSession::class,
+            'admin.permission' => \App\Http\Middleware\EnsureAdminPermission::class,
+            'admin.api_permission' => \App\Http\Middleware\EnsureApiPermission::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
-
         ]);
-
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

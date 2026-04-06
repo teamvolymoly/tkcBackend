@@ -48,12 +48,13 @@ class AuthController extends BaseAdminController
 
         $profile = $this->apiService->profile($token);
         $roles = collect($profile['data']['roles'] ?? [])->pluck('name');
+        $permissions = collect($profile['data']['permissions'] ?? [])->pluck('name');
 
-        if (! $profile['ok'] || ! $roles->contains('admin')) {
+        if (! $profile['ok'] || (! $roles->contains('admin') && ! $permissions->contains('admin.access'))) {
             $this->apiService->logout($token);
 
             return back()->withErrors([
-                'email' => 'This account does not have admin access.',
+                'email' => 'This account does not have admin panel access.',
             ])->withInput();
         }
 
@@ -131,169 +132,128 @@ class AuthController extends BaseAdminController
             'email' => ['required', 'email'],
         ]);
 
-        $admin = $this->findAdminByEmail($validated['email']);
+        $user = User::query()
+            ->where('email', $validated['email'])
+            ->get()
+            ->first(fn (User $user) => $user->canAccessAdminPanel());
 
-        if (! $admin) {
+        if (! $user) {
             return back()->withErrors([
-                'email' => 'Admin account with this email was not found.',
-            ])->withInput();
-        }
-
-        $existingReset = DB::table('password_reset_tokens')->where('email', $admin->email)->first();
-
-        if ($existingReset?->created_at && Carbon::parse($existingReset->created_at)->gt(now()->subMinute())) {
-            return back()->withErrors([
-                'email' => 'Please wait one minute before requesting another OTP.',
+                'email' => 'We could not find an admin account with that email address.',
             ])->withInput();
         }
 
         $otp = (string) random_int(100000, 999999);
+        $expiresAt = Carbon::now()->addMinutes(self::OTP_EXPIRES_IN_MINUTES);
 
         DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $admin->email],
+            ['email' => $user->email],
             [
                 'token' => Hash::make($otp),
-                'created_at' => now(),
+                'created_at' => Carbon::now(),
             ]
         );
 
-        try {
-            Mail::to($admin->email)->send(new AdminPasswordResetOtpMail($admin, $otp, self::OTP_EXPIRES_IN_MINUTES));
-        } catch (\Throwable $exception) {
-            report($exception);
+        session([
+            'admin_password_reset_email' => $user->email,
+            'admin_password_reset_expires_at' => $expiresAt->timestamp,
+        ]);
 
-            return back()->withErrors([
-                'email' => 'OTP email could not be sent. Please check mail settings and try again.',
-            ])->withInput();
-        }
+        Mail::to($user->email)->send(new AdminPasswordResetOtpMail($otp, $user->name, $expiresAt));
 
-        $request->session()->forget('admin_password_reset_verified');
-        $request->session()->put('admin_password_reset_email', $admin->email);
-
-        return redirect()
-            ->route('admin.password.otp', ['email' => $admin->email])
-            ->with('success', 'OTP has been sent to the admin email address.');
+        return redirect()->route('admin.password.otp')->with('success', 'A verification code has been sent to your email address.');
     }
 
-    public function showOtpVerificationForm(Request $request): View|RedirectResponse
+    public function showOtpVerificationForm(): View|RedirectResponse
     {
-        if (session()->has('admin_token')) {
-            return redirect()->route('admin.dashboard');
-        }
-
-        $email = $request->query('email', $request->session()->get('admin_password_reset_email'));
+        $email = session('admin_password_reset_email');
 
         if (! $email) {
-            return redirect()->route('admin.password.request');
+            return redirect()->route('admin.password.request')->with('error', 'Start the password reset flow first.');
         }
 
         return view('admin.auth.verify-otp', [
             'email' => $email,
-            'expiresInMinutes' => self::OTP_EXPIRES_IN_MINUTES,
+            'expiresAt' => session('admin_password_reset_expires_at'),
         ]);
     }
 
     public function verifyResetOtp(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'email' => ['required', 'email'],
             'otp' => ['required', 'digits:6'],
         ]);
 
-        $admin = $this->findAdminByEmail($validated['email']);
+        $email = session('admin_password_reset_email');
+        $expiresAt = session('admin_password_reset_expires_at');
 
-        if (! $admin) {
+        if (! $email || ! $expiresAt) {
+            return redirect()->route('admin.password.request')->with('error', 'Start the password reset flow first.');
+        }
+
+        if (Carbon::now()->timestamp > (int) $expiresAt) {
+            session()->forget(['admin_password_reset_email', 'admin_password_reset_expires_at', 'admin_password_reset_verified']);
+            DB::table('password_reset_tokens')->where('email', $email)->delete();
+
+            return redirect()->route('admin.password.request')->withErrors([
+                'email' => 'Your verification code has expired. Please request a new one.',
+            ]);
+        }
+
+        $record = DB::table('password_reset_tokens')->where('email', $email)->first();
+
+        if (! $record || ! Hash::check($validated['otp'], $record->token)) {
             return back()->withErrors([
-                'email' => 'Admin account with this email was not found.',
+                'otp' => 'The verification code is incorrect.',
             ])->withInput();
         }
 
-        $reset = DB::table('password_reset_tokens')->where('email', $admin->email)->first();
+        session(['admin_password_reset_verified' => true]);
 
-        if (! $reset) {
-            return back()->withErrors([
-                'otp' => 'OTP not found. Please request a new OTP.',
-            ])->withInput();
-        }
-
-        $createdAt = $reset->created_at ? Carbon::parse($reset->created_at) : null;
-
-        if (! $createdAt || $createdAt->lte(now()->subMinutes(self::OTP_EXPIRES_IN_MINUTES))) {
-            DB::table('password_reset_tokens')->where('email', $admin->email)->delete();
-
-            return back()->withErrors([
-                'otp' => 'OTP has expired. Please request a new one.',
-            ])->withInput();
-        }
-
-        if (! Hash::check($validated['otp'], $reset->token)) {
-            return back()->withErrors([
-                'otp' => 'Entered OTP is invalid.',
-            ])->withInput();
-        }
-
-        $request->session()->put('admin_password_reset_verified', [
-            'email' => $admin->email,
-            'verified_at' => now()->timestamp,
-        ]);
-
-        return redirect()->route('admin.password.reset', ['email' => $admin->email]);
+        return redirect()->route('admin.password.reset')->with('success', 'Verification successful. Set your new password.');
     }
 
-    public function showResetPasswordForm(Request $request): View|RedirectResponse
+    public function showResetPasswordForm(): View|RedirectResponse
     {
-        if (session()->has('admin_token')) {
-            return redirect()->route('admin.dashboard');
-        }
-
-        $email = $request->query('email');
-        $verified = $request->session()->get('admin_password_reset_verified');
-
-        if (! $email || ! $verified || ($verified['email'] ?? null) !== $email) {
-            return redirect()->route('admin.password.request')->with('error', 'Verify OTP before resetting password.');
+        if (! session('admin_password_reset_verified')) {
+            return redirect()->route('admin.password.request')->with('error', 'Verify your email before resetting your password.');
         }
 
         return view('admin.auth.reset-password', [
-            'email' => $email,
+            'email' => session('admin_password_reset_email'),
         ]);
     }
 
     public function updatePassword(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string', 'min:6', 'confirmed'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
 
-        $verified = $request->session()->get('admin_password_reset_verified');
+        $email = session('admin_password_reset_email');
 
-        if (! $verified || ($verified['email'] ?? null) !== $validated['email']) {
-            return redirect()->route('admin.password.request')->with('error', 'OTP verification is required before password reset.');
+        if (! $email || ! session('admin_password_reset_verified')) {
+            return redirect()->route('admin.password.request')->with('error', 'Restart the password reset process.');
         }
 
-        $admin = $this->findAdminByEmail($validated['email']);
+        $user = User::query()
+            ->where('email', $email)
+            ->get()
+            ->first(fn (User $user) => $user->canAccessAdminPanel());
 
-        if (! $admin) {
+        if (! $user) {
             return redirect()->route('admin.password.request')->withErrors([
-                'email' => 'Admin account with this email was not found.',
+                'email' => 'We could not find an admin account for this reset request.',
             ]);
         }
 
-        $admin->update([
-            'password' => $validated['password'],
-        ]);
+        $user->forceFill([
+            'password' => Hash::make($validated['password']),
+        ])->save();
 
-        DB::table('password_reset_tokens')->where('email', $admin->email)->delete();
-        $request->session()->forget(['admin_password_reset_email', 'admin_password_reset_verified']);
+        DB::table('password_reset_tokens')->where('email', $email)->delete();
+        session()->forget(['admin_password_reset_email', 'admin_password_reset_expires_at', 'admin_password_reset_verified']);
 
-        return redirect()->route('admin.login')->with('success', 'Admin password has been reset. Please login with the new password.');
-    }
-
-    private function findAdminByEmail(string $email): ?User
-    {
-        return User::query()
-            ->where('email', $email)
-            ->get()
-            ->first(fn (User $user) => $user->hasRole('admin'));
+        return redirect()->route('admin.login')->with('success', 'Your password has been updated. You can sign in now.');
     }
 }

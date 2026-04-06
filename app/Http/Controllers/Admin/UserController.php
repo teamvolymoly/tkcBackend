@@ -15,7 +15,27 @@ class UserController extends BaseAdminController
         return view('admin.users.index', [
             'users' => $this->apiService->get('users', array_filter($filters, fn ($value) => $value !== null && $value !== ''))['data'] ?? [],
             'filters' => $filters,
+            'roleOptions' => $this->roleOptions(),
         ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $payload = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'password' => ['required', 'string', 'min:8'],
+            'role' => ['required', 'string'],
+        ]);
+
+        $response = $this->apiService->post('users', $payload);
+
+        if (! $response['ok']) {
+            return $this->backWithApiError($response, 'Unable to create user.');
+        }
+
+        return redirect()->route('admin.users.index')->with('success', $response['message'] ?: 'User created successfully.');
     }
 
     public function show(int $user): View
@@ -35,6 +55,7 @@ class UserController extends BaseAdminController
 
         return view('admin.users.edit', [
             'user' => $response['data'],
+            'roleOptions' => $this->roleOptions(),
         ]);
     }
 
@@ -44,7 +65,7 @@ class UserController extends BaseAdminController
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email'],
             'phone' => ['nullable', 'string', 'max:20'],
-            'role' => ['required', 'in:admin,customer'],
+            'role' => ['required', 'string'],
         ]);
 
         $response = $this->apiService->put("users/{$user}", $payload);
@@ -85,5 +106,10 @@ class UserController extends BaseAdminController
         }
 
         return redirect()->route('admin.users.index')->with('success', 'Selected users deleted successfully.');
+    }
+
+    private function roleOptions(): array
+    {
+        return $this->apiService->get('roles/options')['data'] ?? [];
     }
 }

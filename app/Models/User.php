@@ -56,4 +56,41 @@ class User extends Authenticatable
     {
         return $this->hasMany(Review::class);
     }
+
+    public function canAccessAdminPanel(): bool
+    {
+        return $this->hasRole('admin') || $this->can('admin.access');
+    }
+
+    public function adminProfileData(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'roles' => $this->roles()
+                ->get(['roles.id', 'roles.name'])
+                ->map(fn ($role) => ['id' => $role->id, 'name' => $role->name])
+                ->values()
+                ->all(),
+            'permissions' => $this->getAllPermissions()
+                ->map(fn ($permission) => ['id' => $permission->id, 'name' => $permission->name])
+                ->values()
+                ->all(),
+        ];
+    }
+
+    public function customerProfileData(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'email_verified_at' => $this->email_verified_at,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
+    }
 }

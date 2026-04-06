@@ -91,7 +91,14 @@ class AuthController extends Controller
 
     public function profile(Request $request)
     {
-        return response()->json(['status' => true, 'data' => $request->user()->load('roles')]);
+        $user = $request->user();
+
+        return response()->json([
+            'status' => true,
+            'data' => $user->canAccessAdminPanel()
+                ? $user->adminProfileData()
+                : $user->customerProfileData(),
+        ]);
     }
 
     public function updateProfile(Request $request)
@@ -110,7 +117,15 @@ class AuthController extends Controller
 
         $user->update($request->only(['name', 'email', 'phone']));
 
-        return response()->json(['status' => true, 'message' => 'Profile updated', 'data' => $user->fresh()]);
+        $freshUser = $user->fresh();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Profile updated',
+            'data' => $freshUser->canAccessAdminPanel()
+                ? $freshUser->adminProfileData()
+                : $freshUser->customerProfileData(),
+        ]);
     }
 
     public function changePassword(Request $request)

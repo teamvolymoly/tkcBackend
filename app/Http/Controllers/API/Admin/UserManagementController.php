@@ -3,12 +3,42 @@
 namespace App\Http\Controllers\API\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class UserManagementController extends Controller
 {
+    public function store(Request $request)
+    {
+        $guardName = config('auth.defaults.guard', 'web');
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'password' => ['required', 'string', 'min:8'],
+            'role' => ['required', 'string', Rule::exists('roles', 'name')->where(fn ($query) => $query->where('guard_name', $guardName))],
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'] ?? null,
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        $user->syncRoles([$validated['role']]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User created successfully',
+            'data' => $user->load('roles'),
+        ], 201);
+    }
+
     public function index(Request $request)
     {
         $users = User::with('roles')
@@ -50,12 +80,23 @@ class UserManagementController extends Controller
 
     public function update(Request $request, User $user)
     {
+        $guardName = config('auth.defaults.guard', 'web');
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($user->id)],
             'phone' => ['nullable', 'string', 'max:20'],
-            'role' => ['required', 'in:admin,customer'],
+            'role' => ['required', 'string', Rule::exists('roles', 'name')->where(fn ($query) => $query->where('guard_name', $guardName))],
         ]);
+
+        $targetRole = Role::findByName($validated['role'], $guardName);
+
+        if ($request->user()->is($user) && ! ($targetRole->name === 'admin' || $targetRole->hasPermissionTo('admin.access'))) {
+            return response()->json([
+                'status' => false,
+                'message' => 'You cannot remove your own admin panel access.',
+            ], 422);
+        }
 
         $user->update([
             'name' => $validated['name'],
@@ -63,9 +104,7 @@ class UserManagementController extends Controller
             'phone' => $validated['phone'] ?? null,
         ]);
 
-        if (! ($request->user()->is($user) && $validated['role'] !== 'admin')) {
-            $user->syncRoles([$validated['role']]);
-        }
+        $user->syncRoles([$validated['role']]);
 
         return response()->json([
             'status' => true,

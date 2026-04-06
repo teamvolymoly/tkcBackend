@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantImage;
+use App\Services\HomeCatalogService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +15,14 @@ use Illuminate\Validation\ValidationException;
 
 class ProductService
 {
+    public function __construct(private readonly HomeCatalogService $homeCatalogService)
+    {
+    }
+
+    public function homeBestSellingProducts(int $limit = 8)
+    {
+        return $this->homeCatalogService->bestSellingProducts($limit);
+    }
     public function paginatedCatalog(array $filters): LengthAwarePaginator
     {
         $query = Product::with([
@@ -309,3 +318,6 @@ class ProductService
         return $slug;
     }
 }
+
+
+

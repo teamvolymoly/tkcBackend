@@ -1,0 +1,429 @@
+{
+  "info": {
+    "_postman_id": "9f6c2f08-7e33-4b1b-9e6b-1e7d6c17c001",
+    "name": "The Kawa Company Frontend APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost/theKawaCompany/public"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "cart_item_id",
+      "value": "1"
+    },
+    {
+      "key": "order_id",
+      "value": "1"
+    },
+    {
+      "key": "review_id",
+      "value": "1"
+    },
+    {
+      "key": "product_id",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@example.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Customer login ke liye. Response me token milega, use {{token}} me set karna hai."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Home Public APIs",
+      "item": [
+        {
+          "name": "Hero Sections",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/home/hero-sections",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "home",
+                "hero-sections"
+              ]
+            },
+            "description": "Home page hero section dikhane ke liye. Token ki zarurat nahi hai."
+          }
+        },
+        {
+          "name": "Bestselling Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/home/bestselling-products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "home",
+                "bestselling-products"
+              ]
+            },
+            "description": "Home page bestselling products section ke liye. Token ki zarurat nahi hai."
+          }
+        },
+        {
+          "name": "Shop By Category",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/home/shop-by-category",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "home",
+                "shop-by-category"
+              ]
+            },
+            "description": "Home page shop by category section ke liye. Token ki zarurat nahi hai."
+          }
+        },
+        {
+          "name": "Home Blogs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/home/blogs",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "home",
+                "blogs"
+              ]
+            },
+            "description": "Home page latest 3 blogs dikhane ke liye. Token ki zarurat nahi hai."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer Dashboard",
+      "item": [
+        {
+          "name": "Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dashboard"
+              ]
+            },
+            "description": "Customer dashboard data ke liye. Login ke baad token ke saath call karna hai."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "Get Cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/cart", "host": ["{{base_url}}"], "path": ["api", "cart"] },
+            "description": "Current cart dikhane ke liye."
+          }
+        },
+        {
+          "name": "Add To Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"variant_id\": 1,\n  \"quantity\": 1\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/cart", "host": ["{{base_url}}"], "path": ["api", "cart"] },
+            "description": "Product variant cart me add karne ke liye."
+          }
+        },
+        {
+          "name": "Update Cart Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 2\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/cart/{{cart_item_id}}", "host": ["{{base_url}}"], "path": ["api", "cart", "{{cart_item_id}}"] },
+            "description": "Cart item quantity update karne ke liye."
+          }
+        },
+        {
+          "name": "Delete Cart Item",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/cart/{{cart_item_id}}", "host": ["{{base_url}}"], "path": ["api", "cart", "{{cart_item_id}}"] },
+            "description": "Cart se ek item remove karne ke liye."
+          }
+        },
+        {
+          "name": "Clear Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/cart", "host": ["{{base_url}}"], "path": ["api", "cart"] },
+            "description": "Pura cart clear karne ke liye."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Place Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"address_id\": 1,\n  \"coupon_code\": null,\n  \"notes\": \"Please deliver fast\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/orders", "host": ["{{base_url}}"], "path": ["api", "orders"] },
+            "description": "Naya order place karne ke liye."
+          }
+        },
+        {
+          "name": "Get Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/orders", "host": ["{{base_url}}"], "path": ["api", "orders"] },
+            "description": "Customer ke sabhi orders dikhane ke liye."
+          }
+        },
+        {
+          "name": "Get Order Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/orders/{{order_id}}", "host": ["{{base_url}}"], "path": ["api", "orders", "{{order_id}}"] },
+            "description": "Ek order ki detail dikhane ke liye."
+          }
+        },
+        {
+          "name": "Cancel Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/orders/{{order_id}}/cancel", "host": ["{{base_url}}"], "path": ["api", "orders", "{{order_id}}", "cancel"] },
+            "description": "Order cancel karne ke liye."
+          }
+        },
+        {
+          "name": "Track Order",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/orders/{{order_id}}/track", "host": ["{{base_url}}"], "path": ["api", "orders", "{{order_id}}", "track"] },
+            "description": "Order ka status ya tracking dikhane ke liye."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Create Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": {{order_id}},\n  \"payment_method\": \"razorpay\",\n  \"transaction_id\": \"TXN123456\",\n  \"status\": \"initiated\",\n  \"gateway_payload\": {}\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/payments", "host": ["{{base_url}}"], "path": ["api", "payments"] },
+            "description": "Order ka payment create ya submit karne ke liye."
+          }
+        },
+        {
+          "name": "Get Payments By Order",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/payments/{{order_id}}", "host": ["{{base_url}}"], "path": ["api", "payments", "{{order_id}}"] },
+            "description": "Kisi order ke payment details dikhane ke liye."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Get Product Reviews",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/api/products/{{product_id}}/reviews", "host": ["{{base_url}}"], "path": ["api", "products", "{{product_id}}", "reviews"] },
+            "description": "Kisi product ke reviews dikhane ke liye. Public API hai."
+          }
+        },
+        {
+          "name": "Add Or Update Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": {{product_id}},\n  \"rating\": 5,\n  \"review\": \"Very good product\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/api/reviews", "host": ["{{base_url}}"], "path": ["api", "reviews"] },
+            "description": "Product review add ya update karne ke liye."
+          }
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/reviews/{{review_id}}", "host": ["{{base_url}}"], "path": ["api", "reviews", "{{review_id}}"] },
+            "description": "Apna review delete karne ke liye."
+          }
+        }
+      ]
+    }
+  ]
+}

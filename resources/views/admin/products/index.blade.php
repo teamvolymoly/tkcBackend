@@ -5,13 +5,12 @@
 @extends('admin.layouts.app')
 @section('title', 'Products')
 @section('content')
-<div class="space-y-6" x-data="selectionTable()">
+<div class="space-y-6" x-data="productTable()">
     <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div class="max-w-3xl">
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Catalog</p>
                 <h1 class="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-3xl">Products</h1>
-                
             </div>
             <div class="flex flex-wrap items-center gap-3">
                 <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-800 dark:bg-slate-950">
@@ -22,6 +21,7 @@
                     <span>Active</span>
                     <span class="ml-2 font-semibold">{{ $activeProducts }}</span>
                 </div>
+                <a href="{{ route('admin.categories.index') }}" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800">Add Category</a>
                 <a href="{{ route('admin.products.create') }}" class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Add Product</a>
             </div>
         </div>
@@ -49,7 +49,6 @@
         <div class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
                 <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Product listing</h2>
-                
             </div>
             <form method="POST" action="{{ route('admin.products.bulk-delete') }}" data-confirm="Delete selected products and their variants?" class="flex items-center gap-3">
                 @csrf
@@ -106,8 +105,7 @@
 </div>
 @endsection
 @push('scripts')
-<script>function selectionTable(){return{selected:[],toggleAll(event){const boxes=Array.from(document.querySelectorAll('tbody input[type=checkbox]'));this.selected=event.target.checked?boxes.map(box=>box.value):[]}}}</script>
+<script>
+function productTable(){return{selected:[],toggleAll(event){const boxes=Array.from(document.querySelectorAll('tbody input[type=checkbox]'));this.selected=event.target.checked?boxes.map(box=>box.value):[]}}}
+</script>
 @endpush
-
-
-

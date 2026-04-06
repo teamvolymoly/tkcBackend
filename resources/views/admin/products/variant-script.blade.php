@@ -1,5 +1,5 @@
 <script>
-function productForm(initialVariants, initialFeatures) {
+function productForm(initialVariants, initialFeatures, initialCategories) {
     const normalizeRituals = (rituals) => (rituals || []).length
         ? (rituals || []).map((ritual, index) => ({
             uid: ritual.id || `ritual-${Date.now()}-${index}`,
@@ -42,6 +42,10 @@ function productForm(initialVariants, initialFeatures) {
             text: feature.text || '',
         })),
         variants,
+        categories: initialCategories || [],
+        categoryModalOpen: false,
+        categorySaving: false,
+        categoryErrors: [],
         addFeature() {
             this.features.push({ uid: `feature-${Date.now()}-${Math.random()}`, icon: '', text: '' });
         },
@@ -125,6 +129,79 @@ function productForm(initialVariants, initialFeatures) {
             this.variants[index].images.forEach((image, idx) => {
                 image.is_primary = idx === imageIndex;
             });
+        },
+        replaceCategoryOptions(categories, selectedCategoryId = '', selectedSubcategoryId = '') {
+            this.categories = categories || [];
+            const categorySelect = this.$refs.categorySelect;
+            const subcategorySelect = this.$refs.subcategorySelect;
+
+            if (! categorySelect || ! subcategorySelect) {
+                return;
+            }
+
+            categorySelect.innerHTML = '<option value="">Select category</option>';
+            subcategorySelect.innerHTML = '<option value="">Optional subcategory</option>';
+
+            this.categories.forEach((category) => {
+                const categoryOption = document.createElement('option');
+                categoryOption.value = category.id;
+                categoryOption.textContent = category.name;
+                if (String(selectedCategoryId) === String(category.id)) {
+                    categoryOption.selected = true;
+                }
+                categorySelect.appendChild(categoryOption);
+
+                (category.children || []).forEach((child) => {
+                    const childOption = document.createElement('option');
+                    childOption.value = child.id;
+                    childOption.textContent = `${category.name} / ${child.name}`;
+                    if (String(selectedSubcategoryId) === String(child.id)) {
+                        childOption.selected = true;
+                    }
+                    subcategorySelect.appendChild(childOption);
+                });
+            });
+        },
+        async submitCategoryModal(event) {
+            const form = event.target;
+            const data = new FormData(form);
+            this.categorySaving = true;
+            this.categoryErrors = [];
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                        'Accept': 'application/json',
+                    },
+                    body: data,
+                });
+
+                const result = await response.json();
+
+                if (! response.ok || ! result.status) {
+                    this.categoryErrors = Object.values(result.errors || {}).flat();
+                    if (! this.categoryErrors.length && result.message) {
+                        this.categoryErrors = [result.message];
+                    }
+                    return;
+                }
+
+                const created = result.category || {};
+                const selectedCategoryId = created.parent_id ? this.$refs.categorySelect.value : created.id;
+                const selectedSubcategoryId = created.parent_id ? created.id : this.$refs.subcategorySelect.value;
+                this.replaceCategoryOptions(result.categories || [], selectedCategoryId, selectedSubcategoryId);
+                form.reset();
+                this.categoryModalOpen = false;
+            } catch (error) {
+                this.categoryErrors = ['Category save karte waqt unexpected problem aayi.'];
+            } finally {
+                this.categorySaving = false;
+            }
+        },
+        init() {
+            this.replaceCategoryOptions(this.categories, this.$refs.categorySelect?.value, this.$refs.subcategorySelect?.value);
         }
     }
 }

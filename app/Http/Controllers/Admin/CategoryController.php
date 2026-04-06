@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class CategoryController extends BaseAdminController
@@ -34,7 +36,29 @@ class CategoryController extends BaseAdminController
             return $this->backWithApiError($response, 'Unable to create category.');
         }
 
-        return redirect()->route('admin.categories.index')->with('success', $response['message'] ?: 'Category created successfully.');
+        return $this->redirectAfterSave($request, $response['message'] ?: 'Category created successfully.');
+    }
+
+    public function quickStore(Request $request): JsonResponse
+    {
+        $response = $this->apiService->postMultipart('categories', $this->payload($request), [
+            'image' => $request->file('image'),
+        ]);
+
+        if (! $response['ok']) {
+            return response()->json([
+                'status' => false,
+                'message' => $response['message'] ?: 'Unable to create category.',
+                'errors' => $response['errors'],
+            ], $response['status'] ?: 422);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => $response['message'] ?: 'Category created successfully.',
+            'category' => $response['data'],
+            'categories' => $this->apiService->get('categories', ['include_inactive' => 1])['data'] ?? [],
+        ], 201);
     }
 
     public function edit(int $category): View
@@ -107,5 +131,16 @@ class CategoryController extends BaseAdminController
         unset($payload['image']);
 
         return $payload;
+    }
+
+    private function redirectAfterSave(Request $request, string $message): RedirectResponse
+    {
+        $target = (string) $request->input('redirect_to', '');
+
+        if ($target !== '' && Str::startsWith($target, ['/admin', url('/admin')])) {
+            return redirect($target)->with('success', $message);
+        }
+
+        return redirect()->route('admin.categories.index')->with('success', $message);
     }
 }

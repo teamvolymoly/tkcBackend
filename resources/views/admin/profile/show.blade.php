@@ -36,6 +36,12 @@
                     <p class="mt-2 font-medium text-slate-900 dark:text-white">{{ $profile['phone'] ?: 'Not added yet' }}</p>
                 </div>
                 <div class="rounded-[1.5rem] bg-slate-50 p-4 dark:bg-slate-950/60">
+                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Member since</p>
+                    <p class="mt-2 font-medium text-slate-900 dark:text-white">
+                        {{ !empty($profile['created_at']) ? \Illuminate\Support\Carbon::parse($profile['created_at'])->format('d M Y') : 'N/A' }}
+                    </p>
+                </div>
+                <div class="rounded-[1.5rem] bg-slate-50 p-4 dark:bg-slate-950/60">
                     <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Roles</p>
                     <div class="mt-3 flex flex-wrap gap-2">
                         @forelse ($roles as $role)
@@ -125,3 +131,4 @@
     </div>
 </div>
 @endsection
+

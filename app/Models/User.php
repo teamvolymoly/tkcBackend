@@ -69,6 +69,8 @@ class User extends Authenticatable
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
             'roles' => $this->roles()
                 ->get(['roles.id', 'roles.name'])
                 ->map(fn ($role) => ['id' => $role->id, 'name' => $role->name])
@@ -84,9 +86,9 @@ class User extends Authenticatable
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'email_verified_at' => $this->email_verified_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'email_verified_at' => $this->email_verified_at,
         ];
     }
 }

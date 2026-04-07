@@ -16,7 +16,7 @@ class EnsureApiPermission
         if (! $user) {
             return new JsonResponse([
                 'status' => false,
-                'message' => 'Unauthenticated.',
+                'message' => 'Authentication is required to access this resource. Please log in and try again.',
             ], 401);
         }
 
@@ -26,7 +26,7 @@ class EnsureApiPermission
 
         return new JsonResponse([
             'status' => false,
-            'message' => 'User does not have the right permissions.',
+            'message' => 'You do not have permission to perform this action.',
         ], 403);
     }
 }

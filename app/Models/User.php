@@ -74,10 +74,6 @@ class User extends Authenticatable
                 ->map(fn ($role) => ['id' => $role->id, 'name' => $role->name])
                 ->values()
                 ->all(),
-            'permissions' => $this->getAllPermissions()
-                ->map(fn ($permission) => ['id' => $permission->id, 'name' => $permission->name])
-                ->values()
-                ->all(),
         ];
     }
 

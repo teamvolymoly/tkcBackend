@@ -8,6 +8,7 @@ use App\Models\ProductVariantImage;
 use App\Services\HomeCatalogService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -23,6 +24,7 @@ class ProductService
     {
         return $this->homeCatalogService->bestSellingProducts($limit);
     }
+
     public function paginatedCatalog(array $filters): LengthAwarePaginator
     {
         $query = Product::with([
@@ -52,17 +54,118 @@ class ProductService
         return $query->latest()->paginate(20)->withQueryString();
     }
 
-    public function publicDetailBySlug(string $slug): Product
+    public function publicDetailBySlug(string $slug): array
     {
-        return Product::with([
+        $product = Product::with([
             'category',
             'subcategory',
             'defaultVariant' => fn ($variantQuery) => $variantQuery->where('status', true)->with('primaryImage'),
-            'variants' => fn ($variantQuery) => $variantQuery->where('status', true)->with(['inventory', 'images']),
+            'variants' => fn ($variantQuery) => $variantQuery->where('status', true)->with(['inventory', 'primaryImage', 'images']),
             'ingredientsList',
             'nutrition',
             'reviews.user',
         ])->where('status', true)->where('slug', $slug)->firstOrFail();
+
+        $activeVariants = $product->variants
+            ->where('status', true)
+            ->values();
+
+        $selectedVariant = $activeVariants->firstWhere('is_default', true)
+            ?? $activeVariants->first();
+
+        $discoverMore = Product::query()
+            ->with([
+                'category',
+                'subcategory',
+                'defaultVariant' => fn ($variantQuery) => $variantQuery->where('status', true)->with(['primaryImage', 'inventory', 'images']),
+            ])
+            ->where('status', true)
+            ->where('id', '!=', $product->id)
+            ->latest()
+            ->get()
+            ->map(fn (Product $discoverProduct) => $this->transformDiscoverMoreProduct($discoverProduct))
+            ->values()
+            ->all();
+
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'slug' => $product->slug,
+            'short_description' => $product->short_description,
+            'description' => $product->description,
+            'allergic_information' => $product->allergic_information,
+            'tea_type' => $product->tea_type,
+            'disclaimer' => $product->disclaimer,
+            'features' => $product->features ?? [],
+            'category' => $product->category,
+            'subcategory' => $product->subcategory,
+            'breadcrumbs' => $this->buildBreadcrumbs($product),
+            'gallery' => $this->buildGallery($selectedVariant, $activeVariants),
+            'default_variant_id' => $selectedVariant?->id,
+            'price' => $selectedVariant?->price !== null ? (float) $selectedVariant->price : null,
+            'compare_price' => $selectedVariant?->compare_price !== null ? (float) $selectedVariant->compare_price : null,
+            'currency' => 'INR',
+            'variants' => $activeVariants->map(fn (ProductVariant $variant) => $this->transformVariant($variant))->values()->all(),
+            'default_variant' => $selectedVariant ? $this->transformVariant($selectedVariant) : null,
+            'defaultVariant' => $selectedVariant ? $this->transformVariant($selectedVariant) : null,
+            'selected_variant' => $selectedVariant ? $this->transformVariant($selectedVariant) : null,
+            'brewing_rituals' => $this->transformBrewingRituals($selectedVariant),
+            'ingredients' => $product->ingredientsList
+                ->sortBy('sort_order')
+                ->values()
+                ->map(fn ($ingredient) => [
+                    'id' => $ingredient->id,
+                    'name' => $ingredient->name,
+                    'value' => $ingredient->value,
+                    'image_path' => $ingredient->image_path,
+                    'image_url' => $ingredient->image_url,
+                    'sort_order' => $ingredient->sort_order,
+                ])
+                ->all(),
+            'ingredients_text' => $product->ingredients,
+            'ingredients_list' => $product->ingredientsList
+                ->sortBy('sort_order')
+                ->values()
+                ->map(fn ($ingredient) => [
+                    'id' => $ingredient->id,
+                    'name' => $ingredient->name,
+                    'value' => $ingredient->value,
+                    'image_path' => $ingredient->image_path,
+                    'image_url' => $ingredient->image_url,
+                    'sort_order' => $ingredient->sort_order,
+                ])
+                ->all(),
+            'nutrition' => $product->nutrition
+                ->values()
+                ->map(fn ($nutrition) => [
+                    'id' => $nutrition->id,
+                    'nutrient' => $nutrition->nutrient,
+                    'value' => $nutrition->value,
+                    'unit' => $nutrition->unit,
+                ])
+                ->all(),
+            'reviews' => [
+                'average_rating' => round((float) $product->reviews->avg('rating'), 1),
+                'count' => $product->reviews->count(),
+                'items' => $product->reviews
+                    ->sortByDesc('created_at')
+                    ->values()
+                    ->map(fn ($review) => [
+                        'id' => $review->id,
+                        'rating' => (int) $review->rating,
+                        'review' => $review->review,
+                        'created_at' => $review->created_at,
+                        'user' => $review->user ? [
+                            'id' => $review->user->id,
+                            'name' => $review->user->name,
+                            'email' => $review->user->email,
+                        ] : null,
+                    ])
+                    ->all(),
+            ],
+            'discover_more' => $discoverMore,
+            'discoverMore' => $discoverMore,
+        ];
     }
 
     public function adminDetailById(int|string $id): Product
@@ -289,6 +392,7 @@ class ProductService
             'color' => $color !== '' ? $color : null,
             'sku' => $variantData['sku'],
             'price' => $variantData['price'],
+            'compare_price' => $variantData['compare_price'] ?? null,
             'stock' => (int) ($variantData['stock'] ?? 0),
             'weight' => $variantData['weight'] ?? null,
             'dimensions' => $variantData['dimensions'] ?? null,
@@ -297,6 +401,113 @@ class ProductService
             'brewing_rituals' => $variantData['brewing_rituals'] ?? null,
             'is_default' => false,
             'status' => (bool) ($variantData['status'] ?? true),
+        ];
+    }
+
+    private function buildBreadcrumbs(Product $product): array
+    {
+        return array_values(array_filter([
+            ['label' => 'Home', 'value' => 'home'],
+            $product->category ? ['label' => $product->category->name, 'value' => $product->category->slug] : null,
+            ['label' => $product->name, 'value' => $product->slug],
+        ]));
+    }
+
+    private function buildGallery(?ProductVariant $selectedVariant, Collection $variants): array
+    {
+        $images = collect();
+
+        if ($selectedVariant) {
+            $images = $images->merge($selectedVariant->images);
+        }
+
+        $images = $images->merge($variants->flatMap(fn (ProductVariant $variant) => $variant->images));
+
+        return $images
+            ->unique(fn ($image) => $image->id ?: $image->image_url)
+            ->values()
+            ->map(fn ($image) => [
+                'id' => $image->id,
+                'image_path' => $image->image_path,
+                'image_url' => $image->image_url,
+                'is_primary' => (bool) $image->is_primary,
+                'sort_order' => $image->sort_order,
+            ])
+            ->all();
+    }
+
+    private function transformVariant(ProductVariant $variant): array
+    {
+        $price = $variant->price !== null ? (float) $variant->price : null;
+
+        return [
+            'id' => $variant->id,
+            'variant_name' => $variant->variant_name,
+            'size' => $variant->size,
+            'color' => $variant->color,
+            'sku' => $variant->sku,
+            'price' => $price,
+            'formatted_price' => $price !== null ? number_format($price, 2, '.', '') : null,
+            'compare_price' => $variant->compare_price !== null ? (float) $variant->compare_price : null,
+            'formatted_compare_price' => $variant->compare_price !== null ? number_format((float) $variant->compare_price, 2, '.', '') : null,
+            'stock' => (int) ($variant->inventory?->stock ?? $variant->stock ?? 0),
+            'weight' => $variant->weight,
+            'dimensions' => $variant->dimensions,
+            'net_weight' => $variant->net_weight,
+            'tags' => $variant->tags ?? [],
+            'brewing_rituals' => $variant->brewing_rituals ?? [],
+            'is_default' => (bool) $variant->is_default,
+            'status' => (bool) $variant->status,
+            'primary_image' => $variant->primaryImage ? [
+                'id' => $variant->primaryImage->id,
+                'image_url' => $variant->primaryImage->image_url,
+                'image_path' => $variant->primaryImage->image_path,
+            ] : null,
+            'images' => $variant->images->map(fn ($image) => [
+                'id' => $image->id,
+                'image_url' => $image->image_url,
+                'image_path' => $image->image_path,
+                'is_primary' => (bool) $image->is_primary,
+                'sort_order' => $image->sort_order,
+            ])->values()->all(),
+        ];
+    }
+
+    private function transformBrewingRituals(?ProductVariant $selectedVariant): array
+    {
+        if (! $selectedVariant) {
+            return [];
+        }
+
+        return collect($selectedVariant->brewing_rituals ?? [])
+            ->filter(fn ($ritual) => is_array($ritual))
+            ->values()
+            ->map(fn (array $ritual) => [
+                'group' => $ritual['group'] ?? null,
+                'title' => $ritual['title'] ?? null,
+                'icon' => $ritual['icon'] ?? null,
+                'text' => $ritual['text'] ?? null,
+                'value' => $ritual['value'] ?? null,
+            ])
+            ->all();
+    }
+
+    private function transformDiscoverMoreProduct(Product $product): array
+    {
+        $defaultVariant = $product->defaultVariant;
+        $price = $defaultVariant?->price !== null ? (float) $defaultVariant->price : null;
+
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'slug' => $product->slug,
+            'short_description' => $product->short_description,
+            'category' => $product->category,
+            'subcategory' => $product->subcategory,
+            'default_variant' => $defaultVariant ? $this->transformVariant($defaultVariant) : null,
+            'price' => $price,
+            'compare_price' => $defaultVariant?->compare_price !== null ? (float) $defaultVariant->compare_price : null,
+            'image_url' => $defaultVariant?->primaryImage?->image_url,
         ];
     }
 

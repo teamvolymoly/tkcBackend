@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductIngredient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ProductIngredientController extends Controller
@@ -17,6 +18,7 @@ class ProductIngredientController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'value' => 'nullable|string|max:255',
+            'image' => 'nullable|image|max:5120',
             'sort_order' => 'nullable|integer|min:0',
         ]);
 
@@ -28,10 +30,11 @@ class ProductIngredientController extends Controller
             'product_id' => $id,
             'name' => $request->name,
             'value' => $request->value,
+            'image_path' => $request->file('image')?->store('products/ingredients', 'public'),
             'sort_order' => $request->integer('sort_order', 0),
         ]);
 
-        return response()->json(['status' => true, 'message' => 'Ingredient added', 'data' => $ingredient], 201);
+        return response()->json(['status' => true, 'message' => 'Ingredient added', 'data' => $ingredient->fresh()], 201);
     }
 
     public function index($id)
@@ -49,6 +52,7 @@ class ProductIngredientController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'value' => 'nullable|string|max:255',
+            'image' => 'nullable|image|max:5120',
             'sort_order' => 'nullable|integer|min:0',
         ]);
 
@@ -56,11 +60,21 @@ class ProductIngredientController extends Controller
             return response()->json(['status' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $ingredient->update([
+        $payload = [
             'name' => $request->name,
             'value' => $request->value,
             'sort_order' => $request->integer('sort_order', 0),
-        ]);
+        ];
+
+        if ($request->hasFile('image')) {
+            if ($ingredient->image_path) {
+                Storage::disk('public')->delete($ingredient->image_path);
+            }
+
+            $payload['image_path'] = $request->file('image')->store('products/ingredients', 'public');
+        }
+
+        $ingredient->update($payload);
 
         return response()->json(['status' => true, 'message' => 'Ingredient updated', 'data' => $ingredient->fresh()]);
     }
@@ -68,6 +82,11 @@ class ProductIngredientController extends Controller
     public function destroy($id)
     {
         $ingredient = ProductIngredient::findOrFail($id);
+
+        if ($ingredient->image_path) {
+            Storage::disk('public')->delete($ingredient->image_path);
+        }
+
         $ingredient->delete();
 
         return response()->json(['status' => true, 'message' => 'Ingredient deleted']);

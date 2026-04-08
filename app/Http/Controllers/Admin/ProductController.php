@@ -161,11 +161,20 @@ class ProductController extends BaseAdminController
 
     public function storeIngredient(Request $request, int $product): RedirectResponse
     {
-        $response = $this->apiService->post("products/{$product}/ingredients", $request->validate([
+        $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'value' => ['nullable', 'string', 'max:255'],
+            'image' => ['nullable', 'file', 'image', 'max:5120'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
-        ]));
+        ]);
+
+        $response = $this->apiService->postMultipart("products/{$product}/ingredients", [
+            'name' => $validated['name'],
+            'value' => $validated['value'] ?? null,
+            'sort_order' => $validated['sort_order'] ?? 0,
+        ], [
+            'image' => $request->file('image'),
+        ]);
 
         if (! $response['ok']) {
             return $this->backWithApiError($response, 'Unable to add ingredient.');
@@ -176,11 +185,20 @@ class ProductController extends BaseAdminController
 
     public function updateIngredient(Request $request, int $product, int $ingredient): RedirectResponse
     {
-        $response = $this->apiService->put("ingredients/{$ingredient}", $request->validate([
+        $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'value' => ['nullable', 'string', 'max:255'],
+            'image' => ['nullable', 'file', 'image', 'max:5120'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
-        ]));
+        ]);
+
+        $response = $this->apiService->putMultipart("ingredients/{$ingredient}", [
+            'name' => $validated['name'],
+            'value' => $validated['value'] ?? null,
+            'sort_order' => $validated['sort_order'] ?? 0,
+        ], [
+            'image' => $request->file('image'),
+        ]);
 
         if (! $response['ok']) {
             return $this->backWithApiError($response, 'Unable to update ingredient.');
@@ -264,14 +282,18 @@ class ProductController extends BaseAdminController
             'variants.*.color' => ['nullable', 'string', 'max:100'],
             'variants.*.sku' => ['required', 'string', 'max:100'],
             'variants.*.price' => ['required', 'numeric', 'min:0'],
+            'variants.*.compare_price' => ['nullable', 'numeric', 'min:0'],
             'variants.*.stock' => ['nullable', 'integer', 'min:0'],
             'variants.*.weight' => ['nullable', 'numeric', 'min:0'],
             'variants.*.dimensions' => ['nullable', 'string', 'max:255'],
             'variants.*.net_weight' => ['nullable', 'string', 'max:255'],
             'variants.*.tags_raw' => ['nullable', 'string'],
             'variants.*.brewing_rituals' => ['nullable', 'array'],
+            'variants.*.brewing_rituals.*.group' => ['nullable', 'string', 'max:100'],
+            'variants.*.brewing_rituals.*.title' => ['nullable', 'string', 'max:100'],
             'variants.*.brewing_rituals.*.icon' => ['nullable', 'string', 'max:100'],
             'variants.*.brewing_rituals.*.text' => ['nullable', 'string', 'max:255'],
+            'variants.*.brewing_rituals.*.value' => ['nullable', 'string', 'max:255'],
             'variants.*.images' => ['nullable', 'array'],
             'variants.*.images.*.file' => ['nullable', 'file', 'image', 'max:5120'],
             'variants.*.images.*.is_primary' => ['nullable'],
@@ -293,14 +315,18 @@ class ProductController extends BaseAdminController
 
         $validated['variants'] = collect($validated['variants'])->map(function ($variant, $index) use ($request) {
             $variant['stock'] = (int) ($variant['stock'] ?? 0);
+            $variant['compare_price'] = isset($variant['compare_price']) && $variant['compare_price'] !== '' ? (float) $variant['compare_price'] : null;
             $variant['tags'] = collect(preg_split('/\s*,\s*/', (string) ($variant['tags_raw'] ?? ''), -1, PREG_SPLIT_NO_EMPTY))->values()->all();
             unset($variant['tags_raw']);
             $variant['brewing_rituals'] = collect($variant['brewing_rituals'] ?? [])
                 ->map(fn ($ritual) => [
+                    'group' => trim((string) ($ritual['group'] ?? '')),
+                    'title' => trim((string) ($ritual['title'] ?? '')),
                     'icon' => trim((string) ($ritual['icon'] ?? '')),
                     'text' => trim((string) ($ritual['text'] ?? '')),
+                    'value' => trim((string) ($ritual['value'] ?? '')),
                 ])
-                ->filter(fn ($ritual) => $ritual['icon'] !== '' || $ritual['text'] !== '')
+                ->filter(fn ($ritual) => collect($ritual)->some(fn ($value) => $value !== ''))
                 ->values()
                 ->all();
             $variant['status'] = $request->boolean("variants.{$index}.status");
@@ -329,4 +355,3 @@ class ProductController extends BaseAdminController
         return $validated;
     }
 }
-

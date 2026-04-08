@@ -16,6 +16,7 @@ class ProductVariant extends Model
         'color',
         'sku',
         'price',
+        'compare_price',
         'stock',
         'weight',
         'dimensions',
@@ -28,6 +29,7 @@ class ProductVariant extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'compare_price' => 'decimal:2',
         'weight' => 'decimal:2',
         'tags' => 'array',
         'brewing_rituals' => 'array',

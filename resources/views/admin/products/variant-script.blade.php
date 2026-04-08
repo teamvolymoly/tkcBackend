@@ -1,12 +1,24 @@
 <script>
 function productForm(initialVariants, initialFeatures, initialCategories) {
+    const ritualTemplate = () => ({
+        uid: `ritual-${Date.now()}-${Math.random()}`,
+        group: '',
+        title: '',
+        icon: '',
+        text: '',
+        value: '',
+    });
+
     const normalizeRituals = (rituals) => (rituals || []).length
         ? (rituals || []).map((ritual, index) => ({
             uid: ritual.id || `ritual-${Date.now()}-${index}`,
+            group: ritual.group || '',
+            title: ritual.title || '',
             icon: ritual.icon || '',
             text: ritual.text || '',
+            value: ritual.value || '',
         }))
-        : [{ uid: `ritual-${Date.now()}-0`, icon: '', text: '' }];
+        : [ritualTemplate()];
 
     const normalizeImages = (images) => (images || []).length
         ? (images || []).map((image, index) => ({
@@ -24,6 +36,7 @@ function productForm(initialVariants, initialFeatures, initialCategories) {
         color: variant.color || '',
         sku: variant.sku || '',
         price: variant.price || '',
+        compare_price: variant.compare_price || '',
         stock: variant.stock ?? 0,
         weight: variant.weight || '',
         dimensions: variant.dimensions || '',
@@ -65,12 +78,13 @@ function productForm(initialVariants, initialFeatures, initialCategories) {
                 color: '',
                 sku: '',
                 price: '',
+                compare_price: '',
                 stock: 0,
                 weight: '',
                 dimensions: '',
                 net_weight: '',
                 tags_raw: '',
-                brewing_rituals: [{ uid: `ritual-${Date.now()}-${Math.random()}`, icon: '', text: '' }],
+                brewing_rituals: [ritualTemplate()],
                 images: [{ uid: `image-${Date.now()}-${Math.random()}`, sort_order: 0, is_primary: true }],
                 is_default: this.variants.length === 0,
                 status: true,
@@ -98,11 +112,11 @@ function productForm(initialVariants, initialFeatures, initialCategories) {
             });
         },
         addRitual(index) {
-            this.variants[index].brewing_rituals.push({ uid: `ritual-${Date.now()}-${Math.random()}`, icon: '', text: '' });
+            this.variants[index].brewing_rituals.push(ritualTemplate());
         },
         removeRitual(index, ritualIndex) {
             if (this.variants[index].brewing_rituals.length === 1) {
-                this.variants[index].brewing_rituals[ritualIndex] = { uid: `ritual-${Date.now()}-${Math.random()}`, icon: '', text: '' };
+                this.variants[index].brewing_rituals[ritualIndex] = ritualTemplate();
                 return;
             }
             this.variants[index].brewing_rituals.splice(ritualIndex, 1);

@@ -29,6 +29,7 @@ class ProductVariantController extends Controller
             'color' => 'nullable|string|max:100',
             'sku' => 'required|string|max:100|unique:product_variants,sku',
             'price' => 'required|numeric|min:0',
+            'compare_price' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
             'weight' => 'nullable|numeric|min:0',
             'dimensions' => 'nullable|string|max:255',
@@ -50,6 +51,7 @@ class ProductVariantController extends Controller
             'color' => $request->color,
             'sku' => $request->sku,
             'price' => $request->price,
+            'compare_price' => $request->compare_price,
             'stock' => $request->integer('stock', 0),
             'weight' => $request->weight,
             'dimensions' => $request->dimensions,
@@ -88,6 +90,7 @@ class ProductVariantController extends Controller
             'color' => 'nullable|string|max:100',
             'sku' => 'sometimes|required|string|max:100|unique:product_variants,sku,'.$variant->id,
             'price' => 'sometimes|required|numeric|min:0',
+            'compare_price' => 'nullable|numeric|min:0',
             'stock' => 'nullable|integer|min:0',
             'weight' => 'nullable|numeric|min:0',
             'dimensions' => 'nullable|string|max:255',
@@ -102,7 +105,7 @@ class ProductVariantController extends Controller
             return response()->json(['status' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $variant->update($request->only(['variant_name', 'size', 'color', 'sku', 'price', 'stock', 'weight', 'dimensions', 'net_weight', 'tags', 'brewing_rituals', 'status']));
+        $variant->update($request->only(['variant_name', 'size', 'color', 'sku', 'price', 'compare_price', 'stock', 'weight', 'dimensions', 'net_weight', 'tags', 'brewing_rituals', 'status']));
 
         if ($request->has('is_default') && $request->boolean('is_default')) {
             ProductVariant::where('product_id', $variant->product_id)->update(['is_default' => false]);

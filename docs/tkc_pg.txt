@@ -1,0 +1,19 @@
+The Kahawa Company - Razorpay Gateway Details
+
+Title: Credit Card/Debit Card/NetBanking 
+
+Description : Pay securely by Credit or Debit card or Internet Banking through Razorpay.
+
+Key ID : rzp_live_RdcjOVDBu62pZo
+
+Key Secret : znGCqDPGyJEuKZgy8gFW7Nkn
+
+Payment Action : Authorize and Capture
+
+Order Completion Message : Thank you for shopping with us. Your account has been charged and your transaction is successful. We will be processing your order soon.
+
+
+##########################################################
+Delhivery : 
+
+Existing API Token : c6393ef5b8bbdf6df8c0c01835b1e8478f49825e

@@ -1,6 +1,6 @@
 @php
     $current = request()->route()?->getName();
-    $sidebarLogoPath = asset('storage/logo/LOGO_TKC-01.png');
+    $sidebarLogoPath = route('media.public', ['path' => 'logo/LOGO_TKC-01.png']);
     $permissionNames = collect($adminUser['permissions'] ?? [])->pluck('name')->all();
     $isAdmin = collect($adminUser['roles'] ?? [])->pluck('name')->contains('admin');
     $canAccess = fn (?string $permission = null) => $permission === null || $isAdmin || in_array($permission, $permissionNames, true);
@@ -131,3 +131,4 @@
         </div>
     </div>
 </aside>
+

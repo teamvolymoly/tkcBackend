@@ -40,7 +40,8 @@
     </style>
 </head>
 <body class="min-h-screen overflow-x-hidden bg-[#eff3ee] font-sans text-slate-900 transition-colors duration-300 dark:bg-[#708372] dark:text-slate-900">
-    @php($loginImagePath = asset('storage/login/login_img.png'))
+    @php($loginImagePath = route('media.public', ['path' => 'login/login_img.png']))
+    @php($adminLogoPath = route('media.public', ['path' => 'logo/LOGO_TKC-01.png']))
 
     <div class="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8 sm:px-6">
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.82),_transparent_32%),linear-gradient(180deg,_#f3f6f1_0%,_#eef3ed_100%)] dark:bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_22%),linear-gradient(180deg,_#738674_0%,_#687c6a_100%)]"></div>
@@ -62,7 +63,7 @@
                     <div class="flex items-start justify-between gap-4">
                         <div class="inline-flex min-h-[44px] items-center rounded-[6px] border border-[#d7d1c8] bg-white px-3 py-2 shadow-sm">
                             <img 
-                                src="{{ asset('storage/logo/LOGO_TKC-01.png') }}" 
+                                src="{{ $adminLogoPath }}" 
                                 alt="The Kahwa Co." 
                                 class="h-10 w-auto sm:h-12"
                             >
@@ -163,6 +164,7 @@
     </div>
 </body>
 </html>
+
 
 
 

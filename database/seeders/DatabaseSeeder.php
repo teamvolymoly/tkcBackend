@@ -33,5 +33,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
         $customer->syncRoles(['customer']);
+
+        $this->call(FrontendDemoSeeder::class);
     }
 }

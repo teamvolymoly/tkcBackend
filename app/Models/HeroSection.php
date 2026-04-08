@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class HeroSection extends Model
@@ -37,7 +36,13 @@ class HeroSection extends Model
                 return $this->product_image_path;
             }
 
-            return Storage::disk('public')->url($this->product_image_path);
+            $path = 'storage/'.ltrim($this->product_image_path, '/');
+
+            if (app()->bound('request')) {
+                return rtrim(request()->root(), '/').'/'.$path;
+            }
+
+            return rtrim((string) config('app.url'), '/').'/'.$path;
         });
     }
 }

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
+use App\Support\PublicMediaUrl;
 use Illuminate\Support\Str;
 
 class BlogPost extends Model
@@ -41,7 +41,7 @@ class BlogPost extends Model
                 return $this->featured_image_path;
             }
 
-            return Storage::disk('public')->url($this->featured_image_path);
+            return PublicMediaUrl::make($this->featured_image_path);
         });
     }
 }

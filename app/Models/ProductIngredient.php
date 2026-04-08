@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
+use App\Support\PublicMediaUrl;
 use Illuminate\Support\Str;
 
 class ProductIngredient extends Model
@@ -37,7 +37,7 @@ class ProductIngredient extends Model
                 return $this->image_path;
             }
 
-            return Storage::disk('public')->url($this->image_path);
+            return PublicMediaUrl::make($this->image_path);
         });
     }
 }

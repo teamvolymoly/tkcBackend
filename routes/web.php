@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\BlogPostController as AdminBlogPostController;
 use App\Http\Controllers\Admin\CartController as AdminCartController;
@@ -16,6 +17,10 @@ use App\Http\Controllers\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\WishlistController as AdminWishlistController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/media/public/{path}', [MediaController::class, 'public'])
+    ->where('path', '.*')
+    ->name('media.public');
 
 Route::redirect('/', '/admin');
 

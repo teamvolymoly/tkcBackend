@@ -295,6 +295,7 @@ class ProductController extends BaseAdminController
             'variants.*.brewing_rituals.*.text' => ['nullable', 'string', 'max:255'],
             'variants.*.brewing_rituals.*.value' => ['nullable', 'string', 'max:255'],
             'variants.*.images' => ['nullable', 'array'],
+            'variants.*.images.*.id' => ['nullable'],
             'variants.*.images.*.file' => ['nullable', 'file', 'image', 'max:5120'],
             'variants.*.images.*.is_primary' => ['nullable'],
             'variants.*.images.*.sort_order' => ['nullable', 'integer', 'min:0'],
@@ -334,12 +335,14 @@ class ProductController extends BaseAdminController
             $variant['images'] = collect($variant['images'] ?? [])
                 ->map(function ($image, $imageIndex) use ($request, $index) {
                     $file = $request->file("variants.{$index}.images.{$imageIndex}.file");
+                    $imageId = $image['id'] ?? null;
 
-                    if (! $file && ($image['sort_order'] ?? null) === null && ! $request->boolean("variants.{$index}.images.{$imageIndex}.is_primary")) {
+                    if (! $file && ! $imageId && ($image['sort_order'] ?? null) === null && ! $request->boolean("variants.{$index}.images.{$imageIndex}.is_primary")) {
                         return null;
                     }
 
                     return [
+                        'id' => $imageId,
                         'file' => $file,
                         'is_primary' => $request->boolean("variants.{$index}.images.{$imageIndex}.is_primary"),
                         'sort_order' => isset($image['sort_order']) ? (int) $image['sort_order'] : null,

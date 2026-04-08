@@ -334,7 +334,12 @@ class ProductService
                     Storage::disk('public')->delete($image->image_path);
                 }
 
-                $image->image_path = $uploadedFile->store('products/variants', 'public');
+                $storedPath = $uploadedFile->store('products/variants', 'public');
+                $image->image_path = $storedPath;
+
+                if (ProductSchema::hasColumn('product_variant_images', 'image_url')) {
+                    $image->image_url = $storedPath;
+                }
             }
 
             if (! $image->image_path) {
@@ -538,6 +543,7 @@ class ProductService
         return $slug;
     }
 }
+
 
 
 

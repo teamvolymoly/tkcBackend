@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use App\Support\ProductSchema;
+use App\Support\PublicMediaUrl;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
-use App\Support\PublicMediaUrl;
 use Illuminate\Support\Str;
 
 class ProductVariantImage extends Model
@@ -13,6 +14,7 @@ class ProductVariantImage extends Model
     protected $fillable = [
         'variant_id',
         'image_path',
+        'image_url',
         'is_primary',
         'sort_order',
     ];
@@ -32,16 +34,31 @@ class ProductVariantImage extends Model
 
     protected function imageUrl(): Attribute
     {
-        return Attribute::get(function () {
-            if (! $this->image_path) {
+        return Attribute::get(function ($value) {
+            $source = $this->image_path ?: $value;
+
+            if (! $source) {
                 return null;
             }
 
-            if (Str::startsWith($this->image_path, ['http://', 'https://'])) {
-                return $this->image_path;
+            if (Str::startsWith($source, ['http://', 'https://'])) {
+                return $source;
             }
 
-            return PublicMediaUrl::make($this->image_path);
+            return PublicMediaUrl::make($source);
+        });
+    }
+
+    protected function imagePath(): Attribute
+    {
+        return Attribute::get(function ($value) {
+            if ($value) {
+                return $value;
+            }
+
+            return ProductSchema::hasColumn('product_variant_images', 'image_url')
+                ? $this->getRawOriginal('image_url')
+                : null;
         });
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\ProductSchema;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -49,15 +50,26 @@ class ProductVariant extends Model
 
     public function images(): HasMany
     {
-        return $this->hasMany(ProductVariantImage::class, 'variant_id')
-            ->orderByDesc('is_primary')
-            ->orderBy('sort_order')
-            ->orderBy('id');
+        $relation = $this->hasMany(ProductVariantImage::class, 'variant_id');
+
+        if (ProductSchema::hasColumn('product_variant_images', 'is_primary')) {
+            $relation->orderByDesc('is_primary');
+        }
+
+        if (ProductSchema::hasColumn('product_variant_images', 'sort_order')) {
+            $relation->orderBy('sort_order');
+        }
+
+        return $relation->orderBy('id');
     }
 
     public function primaryImage(): HasOne
     {
         return $this->hasOne(ProductVariantImage::class, 'variant_id')
-            ->where('is_primary', true);
+            ->when(
+                ProductSchema::hasColumn('product_variant_images', 'is_primary'),
+                fn ($query) => $query->where('is_primary', true),
+                fn ($query) => $query->latest('id')
+            );
     }
 }

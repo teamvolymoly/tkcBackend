@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductIngredient;
+use App\Support\ProductSchema;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -26,13 +27,18 @@ class ProductIngredientController extends Controller
             return response()->json(['status' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $ingredient = ProductIngredient::create([
+        $payload = [
             'product_id' => $id,
             'name' => $request->name,
             'value' => $request->value,
-            'image_path' => $request->file('image')?->store('products/ingredients', 'public'),
             'sort_order' => $request->integer('sort_order', 0),
-        ]);
+        ];
+
+        if (ProductSchema::hasColumn('product_ingredients', 'image_path')) {
+            $payload['image_path'] = $request->file('image')?->store('products/ingredients', 'public');
+        }
+
+        $ingredient = ProductIngredient::create($payload);
 
         return response()->json(['status' => true, 'message' => 'Ingredient added', 'data' => $ingredient->fresh()], 201);
     }
@@ -66,7 +72,7 @@ class ProductIngredientController extends Controller
             'sort_order' => $request->integer('sort_order', 0),
         ];
 
-        if ($request->hasFile('image')) {
+        if (ProductSchema::hasColumn('product_ingredients', 'image_path') && $request->hasFile('image')) {
             if ($ingredient->image_path) {
                 Storage::disk('public')->delete($ingredient->image_path);
             }
@@ -83,7 +89,7 @@ class ProductIngredientController extends Controller
     {
         $ingredient = ProductIngredient::findOrFail($id);
 
-        if ($ingredient->image_path) {
+        if (ProductSchema::hasColumn('product_ingredients', 'image_path') && $ingredient->image_path) {
             Storage::disk('public')->delete($ingredient->image_path);
         }
 

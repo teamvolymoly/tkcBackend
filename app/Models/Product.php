@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\ProductSchema;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -46,7 +47,12 @@ class Product extends Model
 
     public function defaultVariant(): HasOne
     {
-        return $this->hasOne(ProductVariant::class)->where('is_default', true);
+        return $this->hasOne(ProductVariant::class)
+            ->when(
+                ProductSchema::hasColumn('product_variants', 'is_default'),
+                fn ($query) => $query->where('is_default', true),
+                fn ($query) => $query->latest('id')
+            );
     }
 
     public function ingredientsList(): HasMany

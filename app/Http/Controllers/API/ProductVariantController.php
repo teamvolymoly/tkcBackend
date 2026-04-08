@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductVariant;
+use App\Support\ProductSchema;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -44,25 +45,33 @@ class ProductVariantController extends Controller
             return response()->json(['status' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $variant = ProductVariant::create([
+        $payload = [
             'product_id' => $request->product_id,
             'variant_name' => $request->variant_name,
             'size' => $request->size,
             'color' => $request->color,
             'sku' => $request->sku,
             'price' => $request->price,
-            'compare_price' => $request->compare_price,
             'stock' => $request->integer('stock', 0),
             'weight' => $request->weight,
             'dimensions' => $request->dimensions,
             'net_weight' => $request->net_weight,
             'tags' => $request->tags,
             'brewing_rituals' => $request->brewing_rituals,
-            'is_default' => false,
             'status' => $request->boolean('status', true),
-        ]);
+        ];
 
-        if ($request->boolean('is_default')) {
+        if (ProductSchema::hasColumn('product_variants', 'compare_price')) {
+            $payload['compare_price'] = $request->compare_price;
+        }
+
+        if (ProductSchema::hasColumn('product_variants', 'is_default')) {
+            $payload['is_default'] = false;
+        }
+
+        $variant = ProductVariant::create($payload);
+
+        if (ProductSchema::hasColumn('product_variants', 'is_default') && $request->boolean('is_default')) {
             ProductVariant::where('product_id', $variant->product_id)->update(['is_default' => false]);
             $variant->update(['is_default' => true]);
         }
@@ -105,9 +114,15 @@ class ProductVariantController extends Controller
             return response()->json(['status' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $variant->update($request->only(['variant_name', 'size', 'color', 'sku', 'price', 'compare_price', 'stock', 'weight', 'dimensions', 'net_weight', 'tags', 'brewing_rituals', 'status']));
+        $payload = $request->only(['variant_name', 'size', 'color', 'sku', 'price', 'stock', 'weight', 'dimensions', 'net_weight', 'tags', 'brewing_rituals', 'status']);
 
-        if ($request->has('is_default') && $request->boolean('is_default')) {
+        if (ProductSchema::hasColumn('product_variants', 'compare_price')) {
+            $payload['compare_price'] = $request->compare_price;
+        }
+
+        $variant->update($payload);
+
+        if (ProductSchema::hasColumn('product_variants', 'is_default') && $request->has('is_default') && $request->boolean('is_default')) {
             ProductVariant::where('product_id', $variant->product_id)->update(['is_default' => false]);
             $variant->update(['is_default' => true]);
         }

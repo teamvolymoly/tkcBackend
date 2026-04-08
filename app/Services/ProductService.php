@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantImage;
 use App\Services\HomeCatalogService;
+use App\Support\ProductSchema;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
@@ -286,7 +287,7 @@ class ProductService
             }
         }
 
-        if ($defaultVariantId !== null) {
+        if ($defaultVariantId !== null && ProductSchema::hasColumn('product_variants', 'is_default')) {
             $product->variants()->update(['is_default' => false]);
             $product->variants()->whereKey($defaultVariantId)->update(['is_default' => true]);
         }
@@ -386,22 +387,30 @@ class ProductService
             $variantName = collect([$size, $color])->filter()->implode(' / ');
         }
 
-        return [
+        $payload = [
             'variant_name' => $variantName !== '' ? $variantName : 'Default Variant',
             'size' => $size !== '' ? $size : null,
             'color' => $color !== '' ? $color : null,
             'sku' => $variantData['sku'],
             'price' => $variantData['price'],
-            'compare_price' => $variantData['compare_price'] ?? null,
             'stock' => (int) ($variantData['stock'] ?? 0),
             'weight' => $variantData['weight'] ?? null,
             'dimensions' => $variantData['dimensions'] ?? null,
             'net_weight' => $variantData['net_weight'] ?? null,
             'tags' => $variantData['tags'] ?? null,
             'brewing_rituals' => $variantData['brewing_rituals'] ?? null,
-            'is_default' => false,
             'status' => (bool) ($variantData['status'] ?? true),
         ];
+
+        if (ProductSchema::hasColumn('product_variants', 'compare_price')) {
+            $payload['compare_price'] = $variantData['compare_price'] ?? null;
+        }
+
+        if (ProductSchema::hasColumn('product_variants', 'is_default')) {
+            $payload['is_default'] = false;
+        }
+
+        return $payload;
     }
 
     private function buildBreadcrumbs(Product $product): array
@@ -529,6 +538,7 @@ class ProductService
         return $slug;
     }
 }
+
 
 
 

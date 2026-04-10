@@ -26,10 +26,9 @@ class HomeCatalogService
 
         $products = Product::query()
             ->with([
-                'category',
-                'subcategory',
-                'defaultVariant' => fn ($variantQuery) => $variantQuery->where('status', true)->with(['primaryImage', 'inventory']),
+                'defaultVariant' => fn ($variantQuery) => $variantQuery->where('status', true),
             ])
+            ->withCount('reviews')
             ->where('status', true)
             ->whereIn('id', $soldProducts->keys())
             ->get();
@@ -38,17 +37,17 @@ class HomeCatalogService
             ->sortByDesc(fn (Product $product) => (int) ($soldProducts[$product->id] ?? 0))
             ->take($limit)
             ->values()
-            ->map(function (Product $product) use ($soldProducts) {
+            ->map(function (Product $product) {
+                $defaultVariant = $product->defaultVariant;
+
                 return [
-                    'id' => $product->id,
                     'name' => $product->name,
                     'slug' => $product->slug,
-                    'short_description' => $product->short_description,
-                    'status' => (bool) $product->status,
-                    'category' => $product->category,
-                    'subcategory' => $product->subcategory,
-                    'default_variant' => $product->defaultVariant,
-                    'sold_quantity' => (int) ($soldProducts[$product->id] ?? 0),
+                    'price' => $defaultVariant?->price !== null ? (float) $defaultVariant->price : null,
+                    'discount_price' => $defaultVariant?->compare_price !== null ? (float) $defaultVariant->compare_price : null,
+                    'is_bestseller' => true,
+                    'is_new' => $product->created_at?->gte(now()->subDays(30)) ?? false,
+                    'review_count' => (int) $product->reviews_count,
                 ];
             });
     }

@@ -152,15 +152,13 @@ Sample response:
 
 Each item includes:
 
-- `id`
 - `name`
 - `slug`
-- `short_description`
-- `status`
-- `category`
-- `subcategory`
-- `default_variant`
-- `sold_quantity`
+- `price`
+- `discount_price`
+- `is_bestseller`
+- `is_new`
+- `review_count`
 
 ### 5. Home Shop By Category
 

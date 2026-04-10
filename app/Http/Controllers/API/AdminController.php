@@ -6,14 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\API\UpdateOrderStatusRequest;
 use App\Models\Order;
 use App\Models\User;
+use App\Services\AnalyticsService;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    public function __construct(private readonly OrderService $orderService)
-    {
-    }
+    public function __construct(
+        private readonly OrderService $orderService,
+        private readonly AnalyticsService $analyticsService,
+    ) {}
 
     public function dashboard()
     {
@@ -21,6 +23,15 @@ class AdminController extends Controller
             'status' => true,
             'message' => 'Dashboard stats fetched successfully',
             'data' => $this->orderService->adminDashboardStats(),
+        ]);
+    }
+
+    public function analytics(Request $request)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => 'Analytics fetched successfully',
+            'data' => $this->analyticsService->adminAnalytics($request->only(['year', 'range'])),
         ]);
     }
 

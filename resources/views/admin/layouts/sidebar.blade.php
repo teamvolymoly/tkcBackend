@@ -17,7 +17,7 @@
 
         @php($primaryLinks = collect([
             ['route' => 'admin.dashboard', 'label' => 'Dashboard', 'hint' => 'Dashboard overview', 'permission' => 'dashboard.view'],
-            ['route' => 'admin.orders.index', 'label' => 'Analytics', 'hint' => 'Analytics and order insights', 'permission' => 'dashboard.view'],
+            ['route' => 'admin.analytics', 'label' => 'Analytics', 'hint' => 'Analytics and order insights', 'permission' => 'dashboard.view'],
             ['route' => 'admin.orders.index', 'label' => 'Orders', 'hint' => 'Orders management', 'permission' => 'orders.view'],
             ['route' => 'admin.payments.index', 'label' => 'Payments', 'hint' => 'Payments management', 'permission' => 'payments.view'],
             ['route' => 'admin.products.index', 'label' => 'Products', 'hint' => 'Products management', 'permission' => 'products.view'],
@@ -54,7 +54,11 @@
         <div class="mt-4 flex-1 overflow-y-auto pr-1 scrollbar-hide">
             <nav class="space-y-1.5">
                 @foreach ($primaryLinks as $link)
-                    @php($active = $link['label'] === 'Dashboard' ? $current === 'admin.dashboard' : str_starts_with((string) $current, str_replace('.index', '', $link['route'])))
+                    @php($active = match ($link['label']) {
+                        'Dashboard' => $current === 'admin.dashboard',
+                        'Analytics' => $current === 'admin.analytics',
+                        default => str_starts_with((string) $current, str_replace('.index', '', $link['route'])),
+                    })
                     <a href="{{ route($link['route']) }}" title="{{ $link['hint'] }}" class="group flex items-center gap-2.5 rounded-full px-2.5 py-2 text-[15px] font-medium transition {{ $active ? 'bg-[#708271] text-white' : 'text-[#2f3630] hover:bg-[#eef1ec]' }}">
                         <span class="flex h-5 w-5 items-center justify-center {{ $active ? 'text-white' : 'text-[#2f3630]' }}">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.55" viewBox="0 0 24 24">{!! $icons[$link['label']] !!}</svg>

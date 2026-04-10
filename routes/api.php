@@ -8,6 +8,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogPostController;
 use App\Http\Controllers\API\CartController;
 use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\ContactQueryController;
 use App\Http\Controllers\API\CouponController;
 use App\Http\Controllers\API\CustomerDashboardController;
 use App\Http\Controllers\API\HeroSectionController;
@@ -60,6 +61,7 @@ Route::get('/products/{id}/nutrition', [ProductNutritionController::class, 'inde
 Route::get('/products/{id}/reviews', [ReviewController::class, 'productReviews']);
 Route::get('/search', [SearchController::class, 'index']);
 Route::get('/coupons', [CouponController::class, 'index']);
+Route::post('/contact-queries', [ContactQueryController::class, 'store']);
 Route::post('/payments/webhook', [PaymentController::class, 'webhook']);
 Route::get('/blog-posts', [BlogPostController::class, 'index']);
 Route::get('/blog-posts/{blogPost}', [BlogPostController::class, 'show']);
@@ -151,6 +153,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/inventory/{variant_id}', [InventoryController::class, 'update'])->middleware('admin.api_permission:inventory.update');
 
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->middleware('admin.api_permission:dashboard.view');
+    Route::get('/admin/analytics', [AdminController::class, 'analytics'])->middleware('admin.api_permission:dashboard.view');
     Route::get('/admin/customers', [AdminController::class, 'customers'])->middleware('admin.api_permission:users.view');
     Route::get('/admin/products/{id}', [ProductController::class, 'adminShow'])->middleware('admin.api_permission:products.view');
     Route::get('/admin/coupons', [CouponController::class, 'adminIndex'])->middleware('admin.api_permission:coupons.view');

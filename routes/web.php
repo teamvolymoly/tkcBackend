@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\HeroSectionController as AdminHeroSectionController;
 use App\Http\Controllers\Admin\InventoryController as AdminInventoryController;
+use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
@@ -39,6 +40,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/logout', [AdminAuthController::class, 'destroy'])->name('logout');
 
             Route::get('/', AdminDashboardController::class)->middleware('admin.permission:dashboard.view')->name('dashboard');
+            Route::get('/analytics', AdminAnalyticsController::class)->middleware('admin.permission:dashboard.view')->name('analytics');
             Route::get('/profile', [AdminAuthController::class, 'profile'])->middleware('admin.permission:profile.view')->name('profile.show');
             Route::put('/profile', [AdminAuthController::class, 'updateProfile'])->middleware('admin.permission:profile.update')->name('profile.update');
 

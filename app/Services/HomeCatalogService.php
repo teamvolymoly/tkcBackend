@@ -101,6 +101,7 @@ class HomeCatalogService
 
         return [
             'id' => $product->id,
+            'slug' => $product->slug,
             'img1' => $gallery->get(0)['image_url'] ?? null,
             'img2' => $gallery->get(1)['image_url'] ?? null,
             'avg_rating' => round((float) ($product->reviews_avg_rating ?? 0), 1),
@@ -109,9 +110,6 @@ class HomeCatalogService
             'price' => $price,
             'discount_price' => $discountPrice,
             'tag' => $this->buildBestSellingTags($product, $defaultVariant?->name, $price, $discountPrice, $isBestseller, $isNew),
-            'slug' => $product->slug,
-            'is_bestseller' => $isBestseller,
-            'is_new' => $isNew,
         ];
     }
 

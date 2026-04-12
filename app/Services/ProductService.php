@@ -4,12 +4,8 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\ProductVariantImage;
-use App\Services\HomeCatalogService;
-use App\Support\ProductSchema;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -31,8 +27,8 @@ class ProductService
         $query = Product::with([
             'category',
             'subcategory',
-            'defaultVariant' => fn ($variantQuery) => $variantQuery->where('status', true)->with('primaryImage'),
-            'variants' => fn ($variantQuery) => $variantQuery->where('status', true)->with(['inventory', 'images']),
+            'defaultVariant',
+            'variants' => fn ($variantQuery) => $variantQuery->where('status', true)->orderByDesc('is_default')->orderBy('id'),
         ])->where('status', true);
 
         if (! empty($filters['category_id'])) {
@@ -43,8 +39,9 @@ class ProductService
             $term = $filters['q'];
             $query->where(function ($inner) use ($term) {
                 $inner->where('name', 'like', "%{$term}%")
-                    ->orWhere('description', 'like', "%{$term}%")
-                    ->orWhere('short_description', 'like', "%{$term}%");
+                    ->orWhere('tag_line_1', 'like', "%{$term}%")
+                    ->orWhere('tag_line_2', 'like', "%{$term}%")
+                    ->orWhere('description', 'like', "%{$term}%");
             });
         }
 
@@ -60,26 +57,15 @@ class ProductService
         $product = Product::with([
             'category',
             'subcategory',
-            'defaultVariant' => fn ($variantQuery) => $variantQuery->where('status', true)->with('primaryImage'),
-            'variants' => fn ($variantQuery) => $variantQuery->where('status', true)->with(['inventory', 'primaryImage', 'images']),
-            'ingredientsList',
-            'nutrition',
             'reviews.user',
+            'variants' => fn ($variantQuery) => $variantQuery->where('status', true)->orderByDesc('is_default')->orderBy('id'),
         ])->where('status', true)->where('slug', $slug)->firstOrFail();
 
-        $activeVariants = $product->variants
-            ->where('status', true)
-            ->values();
-
-        $selectedVariant = $activeVariants->firstWhere('is_default', true)
-            ?? $activeVariants->first();
+        $activeVariants = $product->variants->values();
+        $selectedVariant = $activeVariants->firstWhere('is_default', true) ?? $activeVariants->first();
 
         $discoverMore = Product::query()
-            ->with([
-                'category',
-                'subcategory',
-                'defaultVariant' => fn ($variantQuery) => $variantQuery->where('status', true)->with(['primaryImage', 'inventory', 'images']),
-            ])
+            ->with(['category', 'subcategory', 'defaultVariant'])
             ->where('status', true)
             ->where('id', '!=', $product->id)
             ->latest()
@@ -90,61 +76,29 @@ class ProductService
 
         return [
             'id' => $product->id,
+            'tag_line_1' => $product->tag_line_1,
             'name' => $product->name,
             'slug' => $product->slug,
-            'short_description' => $product->short_description,
+            'tag_line_2' => $product->tag_line_2,
             'description' => $product->description,
-            'allergic_information' => $product->allergic_information,
-            'tea_type' => $product->tea_type,
-            'disclaimer' => $product->disclaimer,
-            'features' => $product->features ?? [],
             'category' => $product->category,
             'subcategory' => $product->subcategory,
             'breadcrumbs' => $this->buildBreadcrumbs($product),
-            'gallery' => $this->buildGallery($selectedVariant, $activeVariants),
+            'gallery' => $product->gallery,
+            'images' => $product->gallery,
+            'ingredients' => $this->transformIngredients($product),
+            'ingredients_list' => $this->transformIngredients($product),
+            'faqs' => $this->transformFaqs($product),
+            'variants' => $activeVariants->map(fn (ProductVariant $variant) => $this->transformVariant($variant))->all(),
             'default_variant_id' => $selectedVariant?->id,
-            'price' => $selectedVariant?->price !== null ? (float) $selectedVariant->price : null,
-            'compare_price' => $selectedVariant?->compare_price !== null ? (float) $selectedVariant->compare_price : null,
-            'currency' => 'INR',
-            'variants' => $activeVariants->map(fn (ProductVariant $variant) => $this->transformVariant($variant))->values()->all(),
             'default_variant' => $selectedVariant ? $this->transformVariant($selectedVariant) : null,
             'defaultVariant' => $selectedVariant ? $this->transformVariant($selectedVariant) : null,
             'selected_variant' => $selectedVariant ? $this->transformVariant($selectedVariant) : null,
-            'brewing_rituals' => $this->transformBrewingRituals($selectedVariant),
-            'ingredients' => $product->ingredientsList
-                ->sortBy('sort_order')
-                ->values()
-                ->map(fn ($ingredient) => [
-                    'id' => $ingredient->id,
-                    'name' => $ingredient->name,
-                    'value' => $ingredient->value,
-                    'image_path' => $ingredient->image_path,
-                    'image_url' => $ingredient->image_url,
-                    'sort_order' => $ingredient->sort_order,
-                ])
-                ->all(),
-            'ingredients_text' => $product->ingredients,
-            'ingredients_list' => $product->ingredientsList
-                ->sortBy('sort_order')
-                ->values()
-                ->map(fn ($ingredient) => [
-                    'id' => $ingredient->id,
-                    'name' => $ingredient->name,
-                    'value' => $ingredient->value,
-                    'image_path' => $ingredient->image_path,
-                    'image_url' => $ingredient->image_url,
-                    'sort_order' => $ingredient->sort_order,
-                ])
-                ->all(),
-            'nutrition' => $product->nutrition
-                ->values()
-                ->map(fn ($nutrition) => [
-                    'id' => $nutrition->id,
-                    'nutrient' => $nutrition->nutrient,
-                    'value' => $nutrition->value,
-                    'unit' => $nutrition->unit,
-                ])
-                ->all(),
+            'price' => $selectedVariant?->price !== null ? (float) $selectedVariant->price : null,
+            'discount_price' => $selectedVariant?->discount_price !== null ? (float) $selectedVariant->discount_price : null,
+            'compare_price' => $selectedVariant?->discount_price !== null ? (float) $selectedVariant->discount_price : null,
+            'currency' => 'INR',
+            'brewing_rituals' => $this->transformBrewingRituals($selectedVariant, $product),
             'reviews' => [
                 'average_rating' => round((float) $product->reviews->avg('rating'), 1),
                 'count' => $product->reviews->count(),
@@ -174,72 +128,70 @@ class ProductService
         return Product::with([
             'category',
             'subcategory',
-            'defaultVariant.primaryImage',
-            'variants.inventory',
-            'variants.images',
-            'ingredientsList',
-            'nutrition',
+            'defaultVariant',
+            'variants' => fn ($variantQuery) => $variantQuery->orderByDesc('is_default')->orderBy('id'),
         ])->findOrFail($id);
     }
 
     public function create(array $payload): Product
     {
         return DB::transaction(function () use ($payload) {
-            $product = Product::create([
-                'category_id' => $payload['category_id'] ?? null,
-                'subcategory_id' => $payload['subcategory_id'] ?? null,
-                'name' => $payload['name'],
-                'slug' => $this->generateUniqueSlug($payload['name']),
-                'short_description' => $payload['short_description'] ?? null,
-                'allergic_information' => $payload['allergic_information'] ?? null,
-                'tea_type' => $payload['tea_type'] ?? null,
-                'disclaimer' => $payload['disclaimer'] ?? null,
-                'description' => $payload['description'] ?? null,
-                'ingredients' => $payload['ingredients'] ?? null,
-                'features' => $payload['features'] ?? null,
-                'status' => (bool) ($payload['status'] ?? true),
-            ]);
-
+            $product = Product::create($this->buildProductPayload($payload));
             $this->syncVariants($product, $payload['variants'] ?? []);
 
-            return $product->load(['category', 'subcategory', 'defaultVariant.primaryImage', 'variants.inventory', 'variants.images']);
+            return $product->fresh(['category', 'subcategory', 'defaultVariant', 'variants']);
         });
     }
 
     public function update(Product $product, array $payload): Product
     {
         return DB::transaction(function () use ($product, $payload) {
-            $data = collect($payload)->only([
-                'category_id',
-                'subcategory_id',
-                'name',
-                'short_description',
-                'allergic_information',
-                'tea_type',
-                'disclaimer',
-                'description',
-                'ingredients',
-                'features',
-                'status',
-            ])->all();
-
-            if (! empty($payload['name']) && $payload['name'] !== $product->name) {
-                $data['slug'] = $this->generateUniqueSlug($payload['name'], $product->id);
-            }
-
-            $product->update($data);
+            $product->update($this->buildProductPayload($payload, $product));
 
             if (array_key_exists('variants', $payload)) {
                 $this->syncVariants($product, $payload['variants'] ?? [], true);
             }
 
-            return $product->fresh()->load(['category', 'subcategory', 'defaultVariant.primaryImage', 'variants.inventory', 'variants.images']);
+            return $product->fresh(['category', 'subcategory', 'defaultVariant', 'variants']);
         });
     }
 
     public function delete(Product $product): void
     {
+        $product->loadMissing('variants');
+        $this->deleteProductMedia($product);
         $product->delete();
+    }
+
+    private function buildProductPayload(array $payload, ?Product $product = null): array
+    {
+        $data = [
+            'category_id' => $payload['category_id'] ?? $product?->category_id,
+            'subcategory_id' => $payload['subcategory_id'] ?? $product?->subcategory_id,
+            'tag_line_1' => $payload['tag_line_1'] ?? $product?->tag_line_1,
+            'name' => $payload['name'] ?? $product?->name,
+            'tag_line_2' => $payload['tag_line_2'] ?? $product?->tag_line_2,
+            'description' => $payload['description'] ?? $product?->description,
+            'ingredients' => $this->prepareIngredients($payload['ingredients'] ?? ($product?->ingredients ?? []), $product),
+            'faqs' => $payload['faqs'] ?? $product?->faqs ?? [],
+            'status' => array_key_exists('status', $payload) ? (bool) $payload['status'] : ($product?->status ?? true),
+        ];
+
+        if ($product === null || (! empty($payload['name']) && $payload['name'] !== $product->name)) {
+            $data['slug'] = $this->generateUniqueSlug($data['name'], $product?->id);
+        }
+
+        foreach (range(1, 5) as $index) {
+            $column = 'image_'.$index;
+
+            if (array_key_exists($column, $payload)) {
+                $data[$column] = $this->storeOptionalFile($payload[$column], 'products/gallery', $product?->{$column});
+            } elseif ($product !== null) {
+                $data[$column] = $product->{$column};
+            }
+        }
+
+        return $data;
     }
 
     private function syncVariants(Product $product, array $variants, bool $syncDeletes = false): void
@@ -253,11 +205,7 @@ class ProductService
             if (! empty($variantData['id'])) {
                 $variant = $product->variants()->findOrFail($variantData['id']);
 
-                if (
-                    ProductVariant::where('sku', $payload['sku'])
-                        ->where('id', '!=', $variant->id)
-                        ->exists()
-                ) {
+                if (ProductVariant::where('sku', $payload['sku'])->where('id', '!=', $variant->id)->exists()) {
                     throw ValidationException::withMessages([
                         'variants' => ["Variant SKU [{$payload['sku']}] is already in use."],
                     ]);
@@ -268,18 +216,6 @@ class ProductService
                 $variant = $product->variants()->create($payload);
             }
 
-            $this->syncVariantImages($variant, $variantData['images'] ?? []);
-
-            $currentInventory = $variant->inventory()->first();
-            $variant->inventory()->updateOrCreate(
-                ['variant_id' => $variant->id],
-                [
-                    'stock' => $payload['stock'],
-                    'reserved_stock' => $currentInventory?->reserved_stock ?? 0,
-                    'warehouse' => $currentInventory?->warehouse ?? 'default',
-                ]
-            );
-
             $keptVariantIds[] = $variant->id;
 
             if (($variantData['is_default'] ?? false) || ($defaultVariantId === null && $index === 0)) {
@@ -287,7 +223,7 @@ class ProductService
             }
         }
 
-        if ($defaultVariantId !== null && ProductSchema::hasColumn('product_variants', 'is_default')) {
+        if ($defaultVariantId !== null) {
             $product->variants()->update(['is_default' => false]);
             $product->variants()->whereKey($defaultVariantId)->update(['is_default' => true]);
         }
@@ -295,127 +231,114 @@ class ProductService
         if ($syncDeletes) {
             $deleteQuery = $product->variants();
 
-            if (! empty($keptVariantIds)) {
+            if ($keptVariantIds !== []) {
                 $deleteQuery->whereNotIn('id', $keptVariantIds);
             }
 
-            $deleteQuery->get()->each(function (ProductVariant $variant) {
-                $variant->inventory()?->delete();
-                $variant->delete();
-            });
-        }
-    }
-
-    private function syncVariantImages(ProductVariant $variant, array $images): void
-    {
-        if ($images === []) {
-            $this->ensurePrimaryVariantImage($variant);
-
-            return;
-        }
-
-        $primaryImageId = null;
-        $nextSortOrder = (int) ($variant->images()->max('sort_order') ?? -1) + 1;
-
-        foreach ($images as $index => $imageData) {
-            $uploadedFile = $imageData['file'] ?? null;
-            $imageId = $imageData['id'] ?? null;
-
-            if (! $uploadedFile instanceof UploadedFile && ! $imageId) {
-                continue;
-            }
-
-            $image = $imageId
-                ? $variant->images()->findOrFail($imageId)
-                : new ProductVariantImage(['variant_id' => $variant->id]);
-
-            if ($uploadedFile instanceof UploadedFile) {
-                if ($image->exists && $image->image_path) {
-                    Storage::disk('public')->delete($image->image_path);
-                }
-
-                $storedPath = $uploadedFile->store('products/variants', 'public');
-                $image->image_path = $storedPath;
-
-                if (ProductSchema::hasColumn('product_variant_images', 'image_url')) {
-                    $image->image_url = $storedPath;
-                }
-            }
-
-            if (! $image->image_path) {
-                continue;
-            }
-
-            $image->sort_order = isset($imageData['sort_order'])
-                ? (int) $imageData['sort_order']
-                : $nextSortOrder + $index;
-            $image->is_primary = false;
-            $image->save();
-
-            if (($imageData['is_primary'] ?? false) && $primaryImageId === null) {
-                $primaryImageId = $image->id;
-            }
-        }
-
-        if ($primaryImageId !== null) {
-            $variant->images()->update(['is_primary' => false]);
-            $variant->images()->whereKey($primaryImageId)->update(['is_primary' => true]);
-        } else {
-            $this->ensurePrimaryVariantImage($variant);
-        }
-    }
-
-    private function ensurePrimaryVariantImage(ProductVariant $variant): void
-    {
-        if (! $variant->images()->exists()) {
-            return;
-        }
-
-        if ($variant->images()->where('is_primary', true)->exists()) {
-            return;
-        }
-
-        $primary = $variant->images()->orderBy('sort_order')->orderBy('id')->first();
-
-        if ($primary) {
-            $variant->images()->whereKey($primary->id)->update(['is_primary' => true]);
+            $deleteQuery->delete();
         }
     }
 
     private function buildVariantPayload(array $variantData): array
     {
-        $size = trim((string) ($variantData['size'] ?? ''));
-        $color = trim((string) ($variantData['color'] ?? ''));
-        $variantName = trim((string) ($variantData['variant_name'] ?? ''));
-
-        if ($variantName === '') {
-            $variantName = collect([$size, $color])->filter()->implode(' / ');
-        }
-
-        $payload = [
-            'variant_name' => $variantName !== '' ? $variantName : 'Default Variant',
-            'size' => $size !== '' ? $size : null,
-            'color' => $color !== '' ? $color : null,
-            'sku' => $variantData['sku'],
+        return [
+            'name' => trim((string) ($variantData['name'] ?? '')) ?: 'Default Variant',
+            'sku' => trim((string) ($variantData['sku'] ?? '')),
             'price' => $variantData['price'],
-            'stock' => (int) ($variantData['stock'] ?? 0),
+            'discount_price' => $variantData['discount_price'] ?? null,
             'weight' => $variantData['weight'] ?? null,
-            'dimensions' => $variantData['dimensions'] ?? null,
-            'net_weight' => $variantData['net_weight'] ?? null,
-            'tags' => $variantData['tags'] ?? null,
-            'brewing_rituals' => $variantData['brewing_rituals'] ?? null,
+            'brewing_rituals' => $this->prepareBrewingRituals($variantData['brewing_rituals'] ?? []),
+            'is_default' => false,
             'status' => (bool) ($variantData['status'] ?? true),
         ];
+    }
 
-        if (ProductSchema::hasColumn('product_variants', 'compare_price')) {
-            $payload['compare_price'] = $variantData['compare_price'] ?? null;
+    private function transformVariant(ProductVariant $variant): array
+    {
+        $price = $variant->price !== null ? (float) $variant->price : null;
+        $discountPrice = $variant->discount_price !== null ? (float) $variant->discount_price : null;
+
+        return [
+            'id' => $variant->id,
+            'name' => $variant->name,
+            'variant_name' => $variant->name,
+            'sku' => $variant->sku,
+            'price' => $price,
+            'formatted_price' => $price !== null ? number_format($price, 2, '.', '') : null,
+            'discount_price' => $discountPrice,
+            'compare_price' => $discountPrice,
+            'formatted_discount_price' => $discountPrice !== null ? number_format($discountPrice, 2, '.', '') : null,
+            'weight' => $variant->weight,
+            'brewing_rituals' => $this->transformBrewingRituals($variant, $variant->product),
+            'is_default' => (bool) $variant->is_default,
+            'status' => (bool) $variant->status,
+            'primary_image' => $variant->primary_image,
+        ];
+    }
+
+    private function transformIngredients(Product $product): array
+    {
+        return collect($product->ingredients ?? [])
+            ->filter(fn ($ingredient) => is_array($ingredient))
+            ->values()
+            ->map(fn (array $ingredient) => [
+                'name' => $ingredient['name'] ?? null,
+                'image' => $ingredient['image'] ?? null,
+                'image_path' => $ingredient['image'] ?? null,
+                'image_url' => $product->resolveMediaUrl($ingredient['image'] ?? null),
+            ])
+            ->all();
+    }
+
+    private function transformFaqs(Product $product): array
+    {
+        return collect($product->faqs ?? [])
+            ->filter(fn ($faq) => is_array($faq))
+            ->values()
+            ->map(fn (array $faq) => [
+                'question' => $faq['question'] ?? null,
+                'answer' => $faq['answer'] ?? null,
+            ])
+            ->all();
+    }
+
+    private function transformBrewingRituals(?ProductVariant $variant, ?Product $product): array
+    {
+        if (! $variant) {
+            return [];
         }
 
-        if (ProductSchema::hasColumn('product_variants', 'is_default')) {
-            $payload['is_default'] = false;
-        }
+        return collect($variant->brewing_rituals ?? [])
+            ->filter(fn ($ritual) => is_array($ritual))
+            ->values()
+            ->map(fn (array $ritual) => [
+                'ritual' => $ritual['ritual'] ?? null,
+                'text' => $ritual['ritual'] ?? null,
+                'image' => $ritual['image'] ?? null,
+                'image_path' => $ritual['image'] ?? null,
+                'image_url' => $product?->resolveMediaUrl($ritual['image'] ?? null),
+            ])
+            ->all();
+    }
 
-        return $payload;
+    private function transformDiscoverMoreProduct(Product $product): array
+    {
+        $defaultVariant = $product->defaultVariant ?: $product->variants()->where('status', true)->orderByDesc('is_default')->first();
+
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'slug' => $product->slug,
+            'tag_line_1' => $product->tag_line_1,
+            'tag_line_2' => $product->tag_line_2,
+            'category' => $product->category,
+            'subcategory' => $product->subcategory,
+            'default_variant' => $defaultVariant ? $this->transformVariant($defaultVariant) : null,
+            'price' => $defaultVariant?->price !== null ? (float) $defaultVariant->price : null,
+            'discount_price' => $defaultVariant?->discount_price !== null ? (float) $defaultVariant->discount_price : null,
+            'compare_price' => $defaultVariant?->discount_price !== null ? (float) $defaultVariant->discount_price : null,
+            'image_url' => collect($product->gallery)->first()['image_url'] ?? null,
+        ];
     }
 
     private function buildBreadcrumbs(Product $product): array
@@ -427,124 +350,91 @@ class ProductService
         ]));
     }
 
-    private function buildGallery(?ProductVariant $selectedVariant, Collection $variants): array
-    {
-        $images = collect();
-
-        if ($selectedVariant) {
-            $images = $images->merge($selectedVariant->images);
-        }
-
-        $images = $images->merge($variants->flatMap(fn (ProductVariant $variant) => $variant->images));
-
-        return $images
-            ->unique(fn ($image) => $image->id ?: $image->image_url)
-            ->values()
-            ->map(fn ($image) => [
-                'id' => $image->id,
-                'image_path' => $image->image_path,
-                'image_url' => $image->image_url,
-                'is_primary' => (bool) $image->is_primary,
-                'sort_order' => $image->sort_order,
-            ])
-            ->all();
-    }
-
-    private function transformVariant(ProductVariant $variant): array
-    {
-        $price = $variant->price !== null ? (float) $variant->price : null;
-
-        return [
-            'id' => $variant->id,
-            'variant_name' => $variant->variant_name,
-            'size' => $variant->size,
-            'color' => $variant->color,
-            'sku' => $variant->sku,
-            'price' => $price,
-            'formatted_price' => $price !== null ? number_format($price, 2, '.', '') : null,
-            'compare_price' => $variant->compare_price !== null ? (float) $variant->compare_price : null,
-            'formatted_compare_price' => $variant->compare_price !== null ? number_format((float) $variant->compare_price, 2, '.', '') : null,
-            'stock' => (int) ($variant->inventory?->stock ?? $variant->stock ?? 0),
-            'weight' => $variant->weight,
-            'dimensions' => $variant->dimensions,
-            'net_weight' => $variant->net_weight,
-            'tags' => $variant->tags ?? [],
-            'brewing_rituals' => $variant->brewing_rituals ?? [],
-            'is_default' => (bool) $variant->is_default,
-            'status' => (bool) $variant->status,
-            'primary_image' => $variant->primaryImage ? [
-                'id' => $variant->primaryImage->id,
-                'image_url' => $variant->primaryImage->image_url,
-                'image_path' => $variant->primaryImage->image_path,
-            ] : null,
-            'images' => $variant->images->map(fn ($image) => [
-                'id' => $image->id,
-                'image_url' => $image->image_url,
-                'image_path' => $image->image_path,
-                'is_primary' => (bool) $image->is_primary,
-                'sort_order' => $image->sort_order,
-            ])->values()->all(),
-        ];
-    }
-
-    private function transformBrewingRituals(?ProductVariant $selectedVariant): array
-    {
-        if (! $selectedVariant) {
-            return [];
-        }
-
-        return collect($selectedVariant->brewing_rituals ?? [])
-            ->filter(fn ($ritual) => is_array($ritual))
-            ->values()
-            ->map(fn (array $ritual) => [
-                'group' => $ritual['group'] ?? null,
-                'title' => $ritual['title'] ?? null,
-                'icon' => $ritual['icon'] ?? null,
-                'text' => $ritual['text'] ?? null,
-                'value' => $ritual['value'] ?? null,
-            ])
-            ->all();
-    }
-
-    private function transformDiscoverMoreProduct(Product $product): array
-    {
-        $defaultVariant = $product->defaultVariant;
-        $price = $defaultVariant?->price !== null ? (float) $defaultVariant->price : null;
-
-        return [
-            'id' => $product->id,
-            'name' => $product->name,
-            'slug' => $product->slug,
-            'short_description' => $product->short_description,
-            'category' => $product->category,
-            'subcategory' => $product->subcategory,
-            'default_variant' => $defaultVariant ? $this->transformVariant($defaultVariant) : null,
-            'price' => $price,
-            'compare_price' => $defaultVariant?->compare_price !== null ? (float) $defaultVariant->compare_price : null,
-            'image_url' => $defaultVariant?->primaryImage?->image_url,
-        ];
-    }
-
     private function generateUniqueSlug(string $name, ?int $ignoreId = null): string
     {
         $baseSlug = Str::slug($name);
         $slug = $baseSlug;
         $counter = 1;
 
-        while (
-            Product::where('slug', $slug)
-                ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
-                ->exists()
-        ) {
+        while (Product::where('slug', $slug)->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))->exists()) {
             $slug = $baseSlug.'-'.$counter;
             $counter++;
         }
 
         return $slug;
     }
+
+    private function storeOptionalFile(mixed $value, string $directory, ?string $currentPath = null): ?string
+    {
+        if (! $value instanceof UploadedFile) {
+            return is_string($value) || $value === null ? $value : $currentPath;
+        }
+
+        if ($currentPath && ! preg_match('/^https?:\/\//i', $currentPath)) {
+            Storage::disk('public')->delete($currentPath);
+        }
+
+        return $value->store($directory, 'public');
+    }
+
+    private function deleteProductMedia(Product $product): void
+    {
+        foreach (range(1, 5) as $index) {
+            $path = $product->{'image_'.$index};
+
+            if ($path && ! preg_match('/^https?:\/\//i', $path)) {
+                Storage::disk('public')->delete($path);
+            }
+        }
+
+        foreach ($product->ingredients ?? [] as $ingredient) {
+            $path = $ingredient['image'] ?? null;
+
+            if ($path && ! preg_match('/^https?:\/\//i', $path)) {
+                Storage::disk('public')->delete($path);
+            }
+        }
+
+        foreach ($product->variants as $variant) {
+            foreach ($variant->brewing_rituals ?? [] as $ritual) {
+                $path = $ritual['image'] ?? null;
+
+                if ($path && ! preg_match('/^https?:\/\//i', $path)) {
+                    Storage::disk('public')->delete($path);
+                }
+            }
+        }
+    }
+
+    private function prepareIngredients(array $ingredients, ?Product $product = null): array
+    {
+        return collect($ingredients)
+            ->filter(fn ($ingredient) => is_array($ingredient))
+            ->values()
+            ->map(function (array $ingredient, int $index) use ($product) {
+                $currentPath = $product?->ingredients[$index]['image'] ?? null;
+
+                return [
+                    'name' => trim((string) ($ingredient['name'] ?? '')),
+                    'image' => $this->storeOptionalFile($ingredient['image'] ?? null, 'products/ingredients', $currentPath),
+                ];
+            })
+            ->filter(fn ($ingredient) => $ingredient['name'] !== '' || $ingredient['image'] !== null)
+            ->values()
+            ->all();
+    }
+
+    private function prepareBrewingRituals(array $rituals): array
+    {
+        return collect($rituals)
+            ->filter(fn ($ritual) => is_array($ritual))
+            ->values()
+            ->map(fn (array $ritual) => [
+                'ritual' => trim((string) ($ritual['ritual'] ?? '')),
+                'image' => $this->storeOptionalFile($ritual['image'] ?? null, 'products/rituals'),
+            ])
+            ->filter(fn ($ritual) => $ritual['ritual'] !== '' || $ritual['image'] !== null)
+            ->values()
+            ->all();
+    }
 }
-
-
-
-
-

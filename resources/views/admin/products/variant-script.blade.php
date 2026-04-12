@@ -1,222 +1,73 @@
 <script>
-function productForm(initialVariants, initialFeatures, initialCategories) {
-    const ritualTemplate = () => ({
-        uid: `ritual-${Date.now()}-${Math.random()}`,
-        group: '',
-        title: '',
-        icon: '',
-        text: '',
-        value: '',
+function productForm(initialIngredients, initialFaqs, initialVariants) {
+    const uid = (prefix) => `${prefix}-${Date.now()}-${Math.random()}`;
+    const toPreview = (path) => {
+        if (!path) return '';
+        if (/^https?:\/\//i.test(path)) return path;
+        return `/media/public/${String(path).replace(/^\/+/, '')}`;
+    };
+    const ingredientTemplate = () => ({ uid: uid('ingredient'), name: '', existing_image: '', preview: '' });
+    const faqTemplate = () => ({ uid: uid('faq'), question: '', answer: '' });
+    const ritualTemplate = () => ({ uid: uid('ritual'), ritual: '', existing_image: '', preview: '' });
+    const variantTemplate = (isDefault = false) => ({
+        uid: uid('variant'),
+        id: '',
+        name: '',
+        sku: '',
+        price: '',
+        discount_price: '',
+        weight: '',
+        brewing_rituals: [ritualTemplate()],
+        is_default: isDefault,
+        status: true,
     });
 
-    const normalizeRituals = (rituals) => (rituals || []).length
-        ? (rituals || []).map((ritual, index) => ({
-            uid: ritual.id || `ritual-${Date.now()}-${index}`,
-            group: ritual.group || '',
-            title: ritual.title || '',
-            icon: ritual.icon || '',
-            text: ritual.text || '',
-            value: ritual.value || '',
-        }))
-        : [ritualTemplate()];
-
-    const normalizeImages = (images) => (images || []).length
-        ? (images || []).map((image, index) => ({
-            uid: image.id || `image-${Date.now()}-${index}`,
-            sort_order: image.sort_order ?? index,
-            is_primary: Boolean(Number(image.is_primary) || image.is_primary),
-        }))
-        : [{ uid: `image-${Date.now()}-0`, sort_order: 0, is_primary: true }];
-
-    const variants = (initialVariants || []).map((variant, index) => ({
-        uid: variant.id || `variant-${Date.now()}-${index}`,
-        id: variant.id || '',
-        variant_name: variant.variant_name || '',
-        size: variant.size || '',
-        color: variant.color || '',
-        sku: variant.sku || '',
-        price: variant.price || '',
-        compare_price: variant.compare_price || '',
-        stock: variant.stock ?? 0,
-        weight: variant.weight || '',
-        dimensions: variant.dimensions || '',
-        net_weight: variant.net_weight || '',
-        tags_raw: variant.tags_raw || '',
-        brewing_rituals: normalizeRituals(variant.brewing_rituals),
-        images: normalizeImages(variant.images),
-        is_default: typeof variant.is_default === 'undefined' ? index === 0 : Boolean(Number(variant.is_default) || variant.is_default),
-        status: typeof variant.status === 'undefined' ? true : Boolean(Number(variant.status) || variant.status),
-    }));
-
     return {
-        features: (initialFeatures || []).map((feature, index) => ({
-            uid: feature.id || `feature-${Date.now()}-${index}`,
-            icon: feature.icon || '',
-            text: feature.text || '',
-        })),
-        variants,
-        categories: initialCategories || [],
-        categoryModalOpen: false,
-        categorySaving: false,
-        categoryErrors: [],
-        addFeature() {
-            this.features.push({ uid: `feature-${Date.now()}-${Math.random()}`, icon: '', text: '' });
-        },
-        removeFeature(index) {
-            if (this.features.length === 1) {
-                this.features[index] = { uid: `feature-${Date.now()}-${Math.random()}`, icon: '', text: '' };
-                return;
-            }
-            this.features.splice(index, 1);
-        },
-        addVariant() {
-            this.variants.push({
-                uid: `variant-${Date.now()}-${Math.random()}`,
-                id: '',
-                variant_name: '',
-                size: '',
-                color: '',
-                sku: '',
-                price: '',
-                compare_price: '',
-                stock: 0,
-                weight: '',
-                dimensions: '',
-                net_weight: '',
-                tags_raw: '',
-                brewing_rituals: [ritualTemplate()],
-                images: [{ uid: `image-${Date.now()}-${Math.random()}`, sort_order: 0, is_primary: true }],
-                is_default: this.variants.length === 0,
-                status: true,
-            });
-            if (this.variants.length === 1) {
-                this.variants[0].is_default = true;
-            }
-        },
+        ingredients: (initialIngredients || []).length ? initialIngredients.map((ingredient) => ({
+            uid: uid('ingredient'),
+            name: ingredient.name || '',
+            existing_image: ingredient.image || ingredient.image_path || '',
+            preview: toPreview(ingredient.image || ingredient.image_path || ''),
+        })) : [ingredientTemplate()],
+        faqs: (initialFaqs || []).length ? initialFaqs.map((faq) => ({
+            uid: uid('faq'),
+            question: faq.question || '',
+            answer: faq.answer || '',
+        })) : [faqTemplate()],
+        variants: (initialVariants || []).length ? initialVariants.map((variant, index) => ({
+            uid: uid('variant'),
+            id: variant.id || '',
+            name: variant.name || variant.variant_name || '',
+            sku: variant.sku || '',
+            price: variant.price || '',
+            discount_price: variant.discount_price || variant.compare_price || '',
+            weight: variant.weight || '',
+            brewing_rituals: (variant.brewing_rituals || []).length ? variant.brewing_rituals.map((ritual) => ({
+                uid: uid('ritual'),
+                ritual: ritual.ritual || ritual.text || '',
+                existing_image: ritual.image || ritual.image_path || '',
+                preview: toPreview(ritual.image || ritual.image_path || ''),
+            })) : [ritualTemplate()],
+            is_default: typeof variant.is_default === 'undefined' ? index === 0 : Boolean(Number(variant.is_default) || variant.is_default),
+            status: typeof variant.status === 'undefined' ? true : Boolean(Number(variant.status) || variant.status),
+        })) : [variantTemplate(true)],
+        addIngredient() { this.ingredients.push(ingredientTemplate()); },
+        removeIngredient(index) { this.ingredients.length === 1 ? this.ingredients[index] = ingredientTemplate() : this.ingredients.splice(index, 1); },
+        addFaq() { this.faqs.push(faqTemplate()); },
+        removeFaq(index) { this.faqs.length === 1 ? this.faqs[index] = faqTemplate() : this.faqs.splice(index, 1); },
+        addVariant() { this.variants.push(variantTemplate(this.variants.length === 0)); },
         removeVariant(index) {
-            if (this.variants.length === 1) {
-                alert('At least one variant is required.');
-                return;
-            }
-            const removed = this.variants[index];
+            if (this.variants.length === 1) { alert('At least one variant is required.'); return; }
+            const wasDefault = this.variants[index].is_default;
             this.variants.splice(index, 1);
-            if (removed.is_default && this.variants.length) {
-                this.variants.forEach((variant, variantIndex) => {
-                    variant.is_default = variantIndex === 0;
-                });
-            }
+            if (wasDefault && this.variants.length) this.setDefaultVariant(0);
         },
-        setDefaultVariant(index) {
-            this.variants.forEach((variant, variantIndex) => {
-                variant.is_default = variantIndex === index;
-            });
-        },
-        addRitual(index) {
-            this.variants[index].brewing_rituals.push(ritualTemplate());
-        },
+        setDefaultVariant(index) { this.variants.forEach((variant, variantIndex) => variant.is_default = variantIndex === index); },
+        addRitual(index) { this.variants[index].brewing_rituals.push(ritualTemplate()); },
         removeRitual(index, ritualIndex) {
-            if (this.variants[index].brewing_rituals.length === 1) {
-                this.variants[index].brewing_rituals[ritualIndex] = ritualTemplate();
-                return;
-            }
-            this.variants[index].brewing_rituals.splice(ritualIndex, 1);
+            const rituals = this.variants[index].brewing_rituals;
+            rituals.length === 1 ? rituals[ritualIndex] = ritualTemplate() : rituals.splice(ritualIndex, 1);
         },
-        addImage(index) {
-            const images = this.variants[index].images;
-            images.push({ uid: `image-${Date.now()}-${Math.random()}`, sort_order: images.length, is_primary: images.length === 0 });
-        },
-        removeImage(index, imageIndex) {
-            const images = this.variants[index].images;
-            if (images.length === 1) {
-                images[imageIndex] = { uid: `image-${Date.now()}-${Math.random()}`, sort_order: 0, is_primary: true };
-                return;
-            }
-            const wasPrimary = images[imageIndex].is_primary;
-            images.splice(imageIndex, 1);
-            if (wasPrimary && images.length) {
-                images.forEach((image, idx) => {
-                    image.is_primary = idx === 0;
-                });
-            }
-        },
-        setPrimaryImage(index, imageIndex) {
-            this.variants[index].images.forEach((image, idx) => {
-                image.is_primary = idx === imageIndex;
-            });
-        },
-        replaceCategoryOptions(categories, selectedCategoryId = '', selectedSubcategoryId = '') {
-            this.categories = categories || [];
-            const categorySelect = this.$refs.categorySelect;
-            const subcategorySelect = this.$refs.subcategorySelect;
-
-            if (! categorySelect || ! subcategorySelect) {
-                return;
-            }
-
-            categorySelect.innerHTML = '<option value="">Select category</option>';
-            subcategorySelect.innerHTML = '<option value="">Optional subcategory</option>';
-
-            this.categories.forEach((category) => {
-                const categoryOption = document.createElement('option');
-                categoryOption.value = category.id;
-                categoryOption.textContent = category.name;
-                if (String(selectedCategoryId) === String(category.id)) {
-                    categoryOption.selected = true;
-                }
-                categorySelect.appendChild(categoryOption);
-
-                (category.children || []).forEach((child) => {
-                    const childOption = document.createElement('option');
-                    childOption.value = child.id;
-                    childOption.textContent = `${category.name} / ${child.name}`;
-                    if (String(selectedSubcategoryId) === String(child.id)) {
-                        childOption.selected = true;
-                    }
-                    subcategorySelect.appendChild(childOption);
-                });
-            });
-        },
-        async submitCategoryModal(event) {
-            const form = event.target;
-            const data = new FormData(form);
-            this.categorySaving = true;
-            this.categoryErrors = [];
-
-            try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-                        'Accept': 'application/json',
-                    },
-                    body: data,
-                });
-
-                const result = await response.json();
-
-                if (! response.ok || ! result.status) {
-                    this.categoryErrors = Object.values(result.errors || {}).flat();
-                    if (! this.categoryErrors.length && result.message) {
-                        this.categoryErrors = [result.message];
-                    }
-                    return;
-                }
-
-                const created = result.category || {};
-                const selectedCategoryId = created.parent_id ? this.$refs.categorySelect.value : created.id;
-                const selectedSubcategoryId = created.parent_id ? created.id : this.$refs.subcategorySelect.value;
-                this.replaceCategoryOptions(result.categories || [], selectedCategoryId, selectedSubcategoryId);
-                form.reset();
-                this.categoryModalOpen = false;
-            } catch (error) {
-                this.categoryErrors = ['Category save karte waqt unexpected problem aayi.'];
-            } finally {
-                this.categorySaving = false;
-            }
-        },
-        init() {
-            this.replaceCategoryOptions(this.categories, this.$refs.categorySelect?.value, this.$refs.subcategorySelect?.value);
-        }
     }
 }
 </script>

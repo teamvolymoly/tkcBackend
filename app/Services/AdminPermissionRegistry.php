@@ -44,8 +44,8 @@ class AdminPermissionRegistry
                 'label' => 'Products',
                 'permissions' => [
                     ['name' => 'products.view', 'label' => 'View products', 'description' => 'Can browse product listing and product details.'],
-                    ['name' => 'products.create', 'label' => 'Create products', 'description' => 'Can add new products, variants, ingredients, and nutrition.'],
-                    ['name' => 'products.update', 'label' => 'Edit products', 'description' => 'Can update product content and related product records.'],
+                    ['name' => 'products.create', 'label' => 'Create products', 'description' => 'Can add new products and product variants.'],
+                    ['name' => 'products.update', 'label' => 'Edit products', 'description' => 'Can update product content and variant records.'],
                     ['name' => 'products.delete', 'label' => 'Delete products', 'description' => 'Can delete products and product-related child records.'],
                 ],
             ],
@@ -57,14 +57,6 @@ class AdminPermissionRegistry
                     ['name' => 'categories.create', 'label' => 'Create categories', 'description' => 'Can add categories, including quick category creation.'],
                     ['name' => 'categories.update', 'label' => 'Edit categories', 'description' => 'Can update categories.'],
                     ['name' => 'categories.delete', 'label' => 'Delete categories', 'description' => 'Can remove categories and bulk delete them.'],
-                ],
-            ],
-            [
-                'key' => 'inventory',
-                'label' => 'Inventory',
-                'permissions' => [
-                    ['name' => 'inventory.view', 'label' => 'View inventory', 'description' => 'Can access stock overview.'],
-                    ['name' => 'inventory.update', 'label' => 'Update inventory', 'description' => 'Can update stock quantities.'],
                 ],
             ],
             [
@@ -175,14 +167,14 @@ class AdminPermissionRegistry
             'manager' => [
                 'admin.access', 'dashboard.view', 'orders.view', 'orders.update', 'payments.view', 'payments.update',
                 'products.view', 'products.create', 'products.update', 'categories.view', 'categories.create', 'categories.update',
-                'inventory.view', 'inventory.update', 'coupons.view', 'coupons.create', 'coupons.update',
+                'coupons.view', 'coupons.create', 'coupons.update',
                 'users.view', 'reviews.view', 'reviews.delete', 'carts.view', 'wishlists.view',
                 'blogs.view', 'blogs.create', 'blogs.update', 'hero_sections.view', 'hero_sections.create', 'hero_sections.update',
                 'profile.view', 'profile.update', 'roles.view',
             ],
             'staff' => [
                 'admin.access', 'dashboard.view', 'orders.view', 'payments.view', 'products.view',
-                'categories.view', 'inventory.view', 'coupons.view', 'users.view', 'reviews.view',
+                'categories.view', 'coupons.view', 'users.view', 'reviews.view',
                 'carts.view', 'wishlists.view', 'blogs.view', 'hero_sections.view', 'profile.view', 'profile.update',
             ],
             'customer' => [],

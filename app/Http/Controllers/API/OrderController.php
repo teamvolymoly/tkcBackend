@@ -35,7 +35,7 @@ class OrderController extends Controller
             return response()->json(['status' => false, 'message' => 'Selected address is invalid'], 422);
         }
 
-        $cart = Cart::with('items.variant.product', 'items.variant.inventory')->firstOrCreate(['user_id' => $user->id]);
+        $cart = Cart::with('items.variant.product')->firstOrCreate(['user_id' => $user->id]);
 
         if ($cart->items->isEmpty()) {
             return response()->json(['status' => false, 'message' => 'Cart is empty'], 422);
@@ -96,7 +96,7 @@ class OrderController extends Controller
                     'product_id' => $item->variant->product_id,
                     'variant_id' => $item->variant_id,
                     'product_name' => $item->variant->product->name,
-                    'variant_name' => $item->variant->variant_name,
+                    'variant_name' => $item->variant->name,
                     'price' => $item->variant->price,
                     'quantity' => $item->quantity,
                 ]);
@@ -179,12 +179,6 @@ class OrderController extends Controller
 
         if (! $variant->status || ! $variant->product || ! $variant->product->status) {
             return 'One or more cart items are inactive';
-        }
-
-        $availableStock = (int) ($variant->inventory->stock ?? $variant->stock ?? 0);
-
-        if ($availableStock < $quantity) {
-            return 'Requested quantity is not available for one or more cart items';
         }
 
         return null;

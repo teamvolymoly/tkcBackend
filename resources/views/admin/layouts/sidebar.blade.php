@@ -21,7 +21,6 @@
             ['route' => 'admin.orders.index', 'label' => 'Orders', 'hint' => 'Orders management', 'permission' => 'orders.view'],
             ['route' => 'admin.payments.index', 'label' => 'Payments', 'hint' => 'Payments management', 'permission' => 'payments.view'],
             ['route' => 'admin.products.index', 'label' => 'Products', 'hint' => 'Products management', 'permission' => 'products.view'],
-            ['route' => 'admin.inventory.index', 'label' => 'Inventory', 'hint' => 'Inventory management', 'permission' => 'inventory.view'],
             ['route' => 'admin.coupons.index', 'label' => 'Coupons', 'hint' => 'Coupons management', 'permission' => 'coupons.view'],
         ])->filter(fn ($link) => $canAccess($link['permission'])))
         @php($cmsLinks = collect([
@@ -44,7 +43,6 @@
             'Orders' => '<path stroke-linecap="round" stroke-linejoin="round" d="M7 7.5h3V18H7zm7-3h3V18h-3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 18h15"/>',
             'Payments' => '<path stroke-linecap="round" stroke-linejoin="round" d="M5.5 7.5h13a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5h15"/><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14h3"/>',
             'Products' => '<path stroke-linecap="round" stroke-linejoin="round" d="M6 9.5h12l1.25 8.5H4.75L6 9.5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 9.5a3 3 0 0 1 6 0"/>',
-            'Inventory' => '<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.75 18 8v8l-6 3.25L6 16V8z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.75V12m0 0 6-4M12 12 6 8"/>',
             'Coupons' => '<path stroke-linecap="round" stroke-linejoin="round" d="M8 6.75h8l1.75 3.5L12 13 6.25 10.25z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6.25 10.25V17.5H17.75v-7.25"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75v10.75"/>',
             'CMS' => '<path stroke-linecap="round" stroke-linejoin="round" d="M5.5 7.5h13v9h-13z"/><path stroke-linecap="round" stroke-linejoin="round" d="M8 18.5h8"/>',
             'More' => '<circle cx="12" cy="12" r="1.25"/><circle cx="6.75" cy="12" r="1.25"/><circle cx="17.25" cy="12" r="1.25"/>',

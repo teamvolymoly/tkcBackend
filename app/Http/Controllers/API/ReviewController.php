@@ -68,7 +68,7 @@ class ReviewController extends Controller
 
     public function adminShow($id)
     {
-        $review = Review::with(['user', 'product.defaultVariant.primaryImage', 'product.variants.images'])->findOrFail($id);
+        $review = Review::with(['user', 'product.defaultVariant', 'product.variants'])->findOrFail($id);
 
         return response()->json(['status' => true, 'data' => $review]);
     }

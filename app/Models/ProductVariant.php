@@ -2,27 +2,18 @@
 
 namespace App\Models;
 
-use App\Support\ProductSchema;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductVariant extends Model
 {
     protected $fillable = [
         'product_id',
-        'variant_name',
-        'size',
-        'color',
+        'name',
         'sku',
         'price',
-        'compare_price',
-        'stock',
+        'discount_price',
         'weight',
-        'dimensions',
-        'net_weight',
-        'tags',
         'brewing_rituals',
         'is_default',
         'status',
@@ -30,12 +21,14 @@ class ProductVariant extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
-        'compare_price' => 'decimal:2',
-        'weight' => 'decimal:2',
-        'tags' => 'array',
+        'discount_price' => 'decimal:2',
         'brewing_rituals' => 'array',
         'is_default' => 'boolean',
         'status' => 'boolean',
+    ];
+
+    protected $appends = [
+        'primary_image',
     ];
 
     public function product(): BelongsTo
@@ -43,33 +36,21 @@ class ProductVariant extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function inventory(): HasOne
+    public function getPrimaryImageAttribute(): ?array
     {
-        return $this->hasOne(Inventory::class, 'variant_id');
-    }
+        $path = $this->product?->image_1;
 
-    public function images(): HasMany
-    {
-        $relation = $this->hasMany(ProductVariantImage::class, 'variant_id');
-
-        if (ProductSchema::hasColumn('product_variant_images', 'is_primary')) {
-            $relation->orderByDesc('is_primary');
+        if (! $path && $this->product) {
+            $path = collect($this->product->gallery)->first()['image_path'] ?? null;
         }
 
-        if (ProductSchema::hasColumn('product_variant_images', 'sort_order')) {
-            $relation->orderBy('sort_order');
+        if (! $path) {
+            return null;
         }
 
-        return $relation->orderBy('id');
-    }
-
-    public function primaryImage(): HasOne
-    {
-        return $this->hasOne(ProductVariantImage::class, 'variant_id')
-            ->when(
-                ProductSchema::hasColumn('product_variant_images', 'is_primary'),
-                fn ($query) => $query->where('is_primary', true),
-                fn ($query) => $query->latest('id')
-            );
+        return [
+            'image_path' => $path,
+            'image_url' => $this->product?->resolveMediaUrl($path),
+        ];
     }
 }

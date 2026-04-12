@@ -14,7 +14,7 @@ class CartController extends Controller
     public function index(Request $request)
     {
         $cart = Cart::firstOrCreate(['user_id' => $request->user()->id]);
-        $cart->load('items.variant.product', 'items.variant.primaryImage', 'items.variant.inventory');
+        $cart->load('items.variant.product');
 
         return response()->json(['status' => true, 'data' => $cart]);
     }
@@ -30,7 +30,7 @@ class CartController extends Controller
             return response()->json(['status' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $variant = ProductVariant::with(['product', 'inventory', 'primaryImage'])->findOrFail($request->variant_id);
+        $variant = ProductVariant::with('product')->findOrFail($request->variant_id);
         $validationError = $this->validateVariant($variant, (int) $request->quantity);
 
         if ($validationError) {
@@ -44,7 +44,7 @@ class CartController extends Controller
             ['quantity' => $request->quantity]
         );
 
-        return response()->json(['status' => true, 'message' => 'Cart updated', 'data' => $item->load('variant.product', 'variant.primaryImage', 'variant.inventory')], 201);
+        return response()->json(['status' => true, 'message' => 'Cart updated', 'data' => $item->load('variant.product')], 201);
     }
 
     public function update(Request $request, $id)
@@ -58,7 +58,7 @@ class CartController extends Controller
         }
 
         $cart = Cart::firstOrCreate(['user_id' => $request->user()->id]);
-        $item = $cart->items()->with(['variant.product', 'variant.inventory', 'variant.primaryImage'])->where('id', $id)->firstOrFail();
+        $item = $cart->items()->with(['variant.product'])->where('id', $id)->firstOrFail();
         $validationError = $this->validateVariant($item->variant, (int) $request->quantity);
 
         if ($validationError) {
@@ -67,7 +67,7 @@ class CartController extends Controller
 
         $item->update(['quantity' => $request->quantity]);
 
-        return response()->json(['status' => true, 'message' => 'Cart item updated', 'data' => $item->fresh()->load('variant.product', 'variant.primaryImage', 'variant.inventory')]);
+        return response()->json(['status' => true, 'message' => 'Cart item updated', 'data' => $item->fresh()->load('variant.product')]);
     }
 
     public function destroy(Request $request, $id)
@@ -107,7 +107,7 @@ class CartController extends Controller
 
     public function adminShow($id)
     {
-        $cart = Cart::with(['user.addresses', 'items.variant.product', 'items.variant.primaryImage', 'items.variant.images', 'items.variant.inventory'])->findOrFail($id);
+        $cart = Cart::with(['user.addresses', 'items.variant.product'])->findOrFail($id);
 
         return response()->json(['status' => true, 'data' => $cart]);
     }
@@ -120,12 +120,6 @@ class CartController extends Controller
 
         if (! $variant->status || ! $variant->product || ! $variant->product->status) {
             return 'Selected variant is inactive';
-        }
-
-        $availableStock = (int) ($variant->inventory->stock ?? $variant->stock ?? 0);
-
-        if ($availableStock < $quantity) {
-            return 'Requested quantity is not available';
         }
 
         return null;

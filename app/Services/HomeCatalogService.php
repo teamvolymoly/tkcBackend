@@ -26,6 +26,7 @@ class HomeCatalogService
                     'defaultVariant' => fn ($variantQuery) => $variantQuery->where('status', true),
                 ])
                 ->withCount('reviews')
+                ->withAvg('reviews', 'rating')
                 ->where('status', true)
                 ->inRandomOrder()
                 ->limit($limit)
@@ -38,6 +39,7 @@ class HomeCatalogService
                 'defaultVariant' => fn ($variantQuery) => $variantQuery->where('status', true),
             ])
             ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
             ->where('status', true)
             ->whereIn('id', $soldProducts->keys())
             ->get();
@@ -92,15 +94,53 @@ class HomeCatalogService
     private function transformBestSellingProduct(Product $product, bool $isBestseller): array
     {
         $defaultVariant = $product->defaultVariant;
+        $price = $defaultVariant?->price !== null ? (float) $defaultVariant->price : null;
+        $discountPrice = $defaultVariant?->discount_price !== null ? (float) $defaultVariant->discount_price : null;
+        $gallery = collect($product->gallery)->values();
+        $isNew = $product->created_at?->gte(now()->subDays(30)) ?? false;
 
         return [
+            'id' => $product->id,
+            'img1' => $gallery->get(0)['image_url'] ?? null,
+            'img2' => $gallery->get(1)['image_url'] ?? null,
+            'avg_rating' => round((float) ($product->reviews_avg_rating ?? 0), 1),
+            'product_name' => $product->name,
             'name' => $product->name,
+            'price' => $price,
+            'discount_price' => $discountPrice,
+            'tag' => $this->buildBestSellingTags($product, $defaultVariant?->name, $price, $discountPrice, $isBestseller, $isNew),
             'slug' => $product->slug,
-            'price' => $defaultVariant?->price !== null ? (float) $defaultVariant->price : null,
-            'discount_price' => $defaultVariant?->compare_price !== null ? (float) $defaultVariant->compare_price : null,
             'is_bestseller' => $isBestseller,
-            'is_new' => $product->created_at?->gte(now()->subDays(30)) ?? false,
-            'review_count' => (int) $product->reviews_count,
+            'is_new' => $isNew,
         ];
+    }
+
+    private function buildBestSellingTags(Product $product, ?string $variantName, ?float $price, ?float $discountPrice, bool $isBestseller, bool $isNew): array
+    {
+        $tags = [];
+
+        if ($price !== null && $discountPrice !== null && $discountPrice < $price && $price > 0) {
+            $discountPercent = (int) round((($price - $discountPrice) / $price) * 100);
+
+            if ($discountPercent > 0) {
+                $tags[] = "{$discountPercent}% off";
+            }
+        }
+
+        if ($isBestseller) {
+            $tags[] = 'bestseller';
+        }
+
+        if ($isNew) {
+            $tags[] = 'new';
+        }
+
+        $samplerText = strtolower(trim(($product->name ?? '').' '.($variantName ?? '')));
+
+        if (str_contains($samplerText, 'sampler')) {
+            $tags[] = 'sampler';
+        }
+
+        return array_values(array_unique($tags));
     }
 }

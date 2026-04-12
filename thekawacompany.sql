@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 11, 2026 at 07:39 PM
+-- Generation Time: Apr 12, 2026 at 11:48 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -192,6 +192,23 @@ INSERT INTO `categories` (`id`, `name`, `slug`, `description`, `image_path`, `pa
 (42, 'Tea Accessories Special', 'tea-accessories-special', 'Subcategory for Tea Accessories.', 'https://picsum.photos/seed/subcategory-7/900/900', 32, 1, '2026-04-08 13:47:18', '2026-04-08 13:47:18'),
 (43, 'Seasonal Editions Special', 'seasonal-editions-special', 'Subcategory for Seasonal Editions.', 'https://picsum.photos/seed/subcategory-8/900/900', 33, 1, '2026-04-08 13:47:18', '2026-04-08 13:47:18'),
 (44, 'Signature Tea Special', 'signature-tea-special', 'Subcategory for Signature Tea.', 'https://picsum.photos/seed/subcategory-9/900/900', 34, 1, '2026-04-08 13:47:18', '2026-04-08 13:47:18');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `contact_queries`
+--
+
+CREATE TABLE `contact_queries` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  `subject` varchar(255) DEFAULT NULL,
+  `message` text NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -435,7 +452,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (34, '2026_04_05_000001_create_blog_posts_table', 8),
 (35, '2026_04_06_000001_create_hero_sections_table', 8),
 (36, '2026_04_08_000001_add_compare_price_to_product_variants_table', 9),
-(37, '2026_04_08_000002_add_image_path_to_product_ingredients_table', 9);
+(37, '2026_04_08_000002_add_image_path_to_product_ingredients_table', 9),
+(38, '2026_04_09_000001_create_contact_queries_table', 10);
 
 -- --------------------------------------------------------
 
@@ -514,22 +532,6 @@ CREATE TABLE `orders` (
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `orders`
---
-
-INSERT INTO `orders` (`id`, `user_id`, `address_id`, `order_number`, `subtotal`, `discount_amount`, `shipping_amount`, `total_amount`, `coupon_code`, `status`, `payment_status`, `notes`, `created_at`, `updated_at`) VALUES
-(5, 3, 15, 'ORD-DEMO-0001', 818.00, 0.00, 0.00, 818.00, NULL, 'confirmed', 'paid', 'Demo order for frontend API testing.', '2026-03-29 13:47:21', '2026-03-30 13:47:21'),
-(6, 16, 16, 'ORD-DEMO-0002', 759.00, 0.00, 0.00, 759.00, NULL, 'processing', 'unpaid', 'Demo order for frontend API testing.', '2026-03-30 13:47:21', '2026-03-31 13:47:21'),
-(7, 17, 17, 'ORD-DEMO-0003', 838.00, 50.00, 0.00, 788.00, 'WELCOME10', 'shipped', 'paid', 'Demo order for frontend API testing.', '2026-03-31 13:47:21', '2026-04-01 13:47:21'),
-(8, 18, 18, 'ORD-DEMO-0004', 769.00, 0.00, 0.00, 769.00, NULL, 'delivered', 'paid', 'Demo order for frontend API testing.', '2026-04-01 13:47:21', '2026-04-02 13:47:21'),
-(9, 19, 19, 'ORD-DEMO-0005', 858.00, 0.00, 0.00, 858.00, NULL, 'pending', 'unpaid', 'Demo order for frontend API testing.', '2026-04-02 13:47:21', '2026-04-03 13:47:21'),
-(10, 20, 20, 'ORD-DEMO-0006', 779.00, 50.00, 0.00, 729.00, 'WELCOME10', 'confirmed', 'paid', 'Demo order for frontend API testing.', '2026-04-03 13:47:21', '2026-04-04 13:47:21'),
-(11, 21, 21, 'ORD-DEMO-0007', 878.00, 0.00, 0.00, 878.00, NULL, 'processing', 'unpaid', 'Demo order for frontend API testing.', '2026-04-04 13:47:21', '2026-04-05 13:47:21'),
-(12, 22, 22, 'ORD-DEMO-0008', 789.00, 0.00, 0.00, 789.00, NULL, 'shipped', 'paid', 'Demo order for frontend API testing.', '2026-04-05 13:47:21', '2026-04-06 13:47:21'),
-(13, 23, 23, 'ORD-DEMO-0009', 898.00, 50.00, 0.00, 848.00, 'WELCOME10', 'delivered', 'paid', 'Demo order for frontend API testing.', '2026-04-06 13:47:21', '2026-04-07 13:47:21'),
-(14, 24, 24, 'ORD-DEMO-0010', 799.00, 0.00, 0.00, 799.00, NULL, 'pending', 'unpaid', 'Demo order for frontend API testing.', '2026-04-07 13:47:21', '2026-04-08 13:47:21');
-
 -- --------------------------------------------------------
 
 --
@@ -548,22 +550,6 @@ CREATE TABLE `order_items` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `order_items`
---
-
-INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `variant_id`, `product_name`, `variant_name`, `price`, `quantity`, `created_at`, `updated_at`) VALUES
-(5, 5, 15, 25, 'Hibiscus Kahwa', '100g', 409.00, 2, '2026-04-08 13:47:21', '2026-04-08 13:47:21'),
-(6, 6, 15, 26, 'Hibiscus Kahwa', '200g', 759.00, 1, '2026-04-08 13:47:21', '2026-04-08 13:47:21'),
-(7, 7, 16, 27, 'Mint Kahwa', '100g', 419.00, 2, '2026-04-08 13:47:21', '2026-04-08 13:47:21'),
-(8, 8, 16, 28, 'Mint Kahwa', '200g', 769.00, 1, '2026-04-08 13:47:21', '2026-04-08 13:47:21'),
-(9, 9, 17, 29, 'Kashmiri Kahwa', '100g', 429.00, 2, '2026-04-08 13:47:21', '2026-04-08 13:47:21'),
-(10, 10, 17, 30, 'Kashmiri Kahwa', '200g', 779.00, 1, '2026-04-08 13:47:21', '2026-04-08 13:47:21'),
-(11, 11, 18, 31, 'Oolong Kahwa', '100g', 439.00, 2, '2026-04-08 13:47:21', '2026-04-08 13:47:21'),
-(12, 12, 18, 32, 'Oolong Kahwa', '200g', 789.00, 1, '2026-04-08 13:47:21', '2026-04-08 13:47:21'),
-(13, 13, 19, 33, 'Chamomile Tea', '100g', 449.00, 2, '2026-04-08 13:47:21', '2026-04-08 13:47:21'),
-(14, 14, 19, 34, 'Chamomile Tea', '200g', 799.00, 1, '2026-04-08 13:47:21', '2026-04-08 13:47:21');
 
 -- --------------------------------------------------------
 
@@ -781,7 +767,8 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (46, 'App\\Models\\User', 2, 'auth_token', 'b3d495071a7c5d27a27888c4c38a800d59b6ef1a1e86826c687df9ace0ab4486', '[\"*\"]', '2026-04-07 21:56:26', NULL, '2026-04-07 20:18:32', '2026-04-07 21:56:26'),
 (47, 'App\\Models\\User', 2, 'auth_token', 'd73e37d7b6b9e480d93964023f3f15d35b3aa60213eb1c89434b366e8ead38af', '[\"*\"]', '2026-04-08 13:50:00', NULL, '2026-04-08 12:08:33', '2026-04-08 13:50:00'),
 (48, 'App\\Models\\User', 2, 'auth_token', '3abeaa8dd407f7d32ea923fefa5452cf5d112e1a57d67fce1eca46eccbcf1cd3', '[\"*\"]', '2026-04-08 22:30:15', NULL, '2026-04-08 22:30:05', '2026-04-08 22:30:15'),
-(49, 'App\\Models\\User', 2, 'auth_token', '804143dfa3702654b93b5107bb83cb6884a6d492b229c8cc5d80b821730bcc3d', '[\"*\"]', '2026-04-09 19:49:07', NULL, '2026-04-09 19:26:08', '2026-04-09 19:49:07');
+(49, 'App\\Models\\User', 2, 'auth_token', '804143dfa3702654b93b5107bb83cb6884a6d492b229c8cc5d80b821730bcc3d', '[\"*\"]', '2026-04-09 19:49:07', NULL, '2026-04-09 19:26:08', '2026-04-09 19:49:07'),
+(50, 'App\\Models\\User', 2, 'auth_token', '9aad92d139bdbad3f7c833b923bdd6edabb78af65a9e02d8f97c8f818cf4f142', '[\"*\"]', '2026-04-12 03:54:27', NULL, '2026-04-12 03:11:49', '2026-04-12 03:54:27');
 
 -- --------------------------------------------------------
 
@@ -1274,7 +1261,9 @@ CREATE TABLE `sessions` (
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
 ('2PdQhea9Gla3UxeX91k8ZZ04926CZdfFVOq9zxM0', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'YTo2OntzOjY6Il90b2tlbiI7czo0MDoiU1lYSUFmQmpRRTN6S1RBYVZ3UHlGUUdBbUw1WVVtTG1FRXl4bkI0RCI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NTQ6Imh0dHA6Ly9sb2NhbGhvc3QvdGhlS2F3YUNvbXBhbnkvcHVibGljL2FkbWluL2FuYWx5dGljcyI7czo1OiJyb3V0ZSI7czoxNToiYWRtaW4uYW5hbHl0aWNzIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czoxMToiYWRtaW5fdG9rZW4iO3M6NTE6IjQ4fHdYcDRzSEJvZUFGU05Kdm54ZG1yekt4SDV5VE12YVdhMDVlaUtLbVgzZWU5M2UwZiI7czoxMDoiYWRtaW5fdXNlciI7YTo3OntzOjI6ImlkIjtpOjI7czo0OiJuYW1lIjtzOjU6IkFkbWluIjtzOjU6ImVtYWlsIjtzOjE3OiJhZG1pbkBleGFtcGxlLmNvbSI7czo1OiJwaG9uZSI7czoxMDoiOTAwOTI1NTA4NSI7czoxMDoiY3JlYXRlZF9hdCI7czoyNzoiMjAyNi0wMy0xOVQxOToxMDo1OS4wMDAwMDBaIjtzOjEwOiJ1cGRhdGVkX2F0IjtzOjI3OiIyMDI2LTA0LTA2VDE3OjE4OjEwLjAwMDAwMFoiO3M6NToicm9sZXMiO2E6MTp7aTowO2E6Mjp7czoyOiJpZCI7aToxO3M6NDoibmFtZSI7czo1OiJhZG1pbiI7fX19czoyNDoiYWRtaW5fcHJvZmlsZV9jaGVja2VkX2F0IjtpOjE3NzU3MDcyMDY7fQ==', 1775707215),
 ('m5yjlsrty1H0MGGkYhlADstURjTXa9fCRCbuZwHV', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'YTo2OntzOjY6Il90b2tlbiI7czo0MDoiSTVhNm9aOTViUkREeUNUcTZ3b1REcXdqUTJFS2RZRlYzRlZ0S0s4byI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NTY6Imh0dHA6Ly9sb2NhbGhvc3QvdGhlS2F3YUNvbXBhbnkvcHVibGljL2FkbWluL3Byb2R1Y3RzLzE1IjtzOjU6InJvdXRlIjtzOjE5OiJhZG1pbi5wcm9kdWN0cy5zaG93Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czoxMToiYWRtaW5fdG9rZW4iO3M6NTE6IjQ3fGs1ZXdTN0lFWllIM0thOGZIT0pnOWtLMm5TemVkZ1V4UGJ6eFRDWXo3NDYyNzlmNSI7czoxMDoiYWRtaW5fdXNlciI7YTo3OntzOjI6ImlkIjtpOjI7czo0OiJuYW1lIjtzOjU6IkFkbWluIjtzOjU6ImVtYWlsIjtzOjE3OiJhZG1pbkBleGFtcGxlLmNvbSI7czo1OiJwaG9uZSI7czoxMDoiOTAwOTI1NTA4NSI7czoxMDoiY3JlYXRlZF9hdCI7czoyNzoiMjAyNi0wMy0xOVQxOToxMDo1OS4wMDAwMDBaIjtzOjEwOiJ1cGRhdGVkX2F0IjtzOjI3OiIyMDI2LTA0LTA2VDE3OjE4OjEwLjAwMDAwMFoiO3M6NToicm9sZXMiO2E6MTp7aTowO2E6Mjp7czoyOiJpZCI7aToxO3M6NDoibmFtZSI7czo1OiJhZG1pbiI7fX19czoyNDoiYWRtaW5fcHJvZmlsZV9jaGVja2VkX2F0IjtpOjE3NzU2NzU5MTc7fQ==', 1775676000),
+('RHBfyx5eB5Z7TrM7KwkIcoHzJMF9ZnLEVvusWHQF', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'YTozOntzOjY6Il90b2tlbiI7czo0MDoia05sUU9COTNCYkNVbzRKQ0Y5Y01rNUd5b2lPV1RvbHhlMVVMU21QcSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NTA6Imh0dHA6Ly9sb2NhbGhvc3QvdGhlS2F3YUNvbXBhbnkvcHVibGljL2FkbWluL2xvZ2luIjtzOjU6InJvdXRlIjtzOjExOiJhZG1pbi5sb2dpbiI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1775982609),
 ('sacSHdtKLGD7eBXIbhzpodk1GgBf6nIEmLUb5DE4', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'YTo2OntzOjY6Il90b2tlbiI7czo0MDoiNlVRMUpPZnZVcGE3bWIwUTQ4ZjA1NXhIS0pKTDMyTWREUm91UzJEYiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NjU6Imh0dHA6Ly9sb2NhbGhvc3QvdGhlS2F3YUNvbXBhbnkvcHVibGljL2FkbWluL2hlcm8tc2VjdGlvbnMvMS9lZGl0IjtzOjU6InJvdXRlIjtzOjI0OiJhZG1pbi5oZXJvLXNlY3Rpb25zLmVkaXQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjExOiJhZG1pbl90b2tlbiI7czo1MToiNDZ8c2dlMjJwZ0dIR0pBT3oyeUNWVlRNTk1rdlFHQ1J0YXZ2aUxxZFNMb2U4NWUzNGM0IjtzOjEwOiJhZG1pbl91c2VyIjthOjc6e3M6MjoiaWQiO2k6MjtzOjQ6Im5hbWUiO3M6NToiQWRtaW4iO3M6NToiZW1haWwiO3M6MTc6ImFkbWluQGV4YW1wbGUuY29tIjtzOjU6InBob25lIjtzOjEwOiI5MDA5MjU1MDg1IjtzOjEwOiJjcmVhdGVkX2F0IjtzOjI3OiIyMDI2LTAzLTE5VDE5OjEwOjU5LjAwMDAwMFoiO3M6MTA6InVwZGF0ZWRfYXQiO3M6Mjc6IjIwMjYtMDQtMDZUMTc6MTg6MTAuMDAwMDAwWiI7czo1OiJyb2xlcyI7YToxOntpOjA7YToyOntzOjI6ImlkIjtpOjE7czo0OiJuYW1lIjtzOjU6ImFkbWluIjt9fX1zOjI0OiJhZG1pbl9wcm9maWxlX2NoZWNrZWRfYXQiO2k6MTc3NTYxODc2MDt9', 1775618786),
+('sKRylCHN5OWzS6KlI0hqAGv4cZMiBgrdfR4no4SE', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'YTo2OntzOjY6Il90b2tlbiI7czo0MDoieWN3QkJicGJ1WGxxalJzSTl4dUpBSTloZEdTWldEU3JFZFhsSVNtSiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NjA6Imh0dHA6Ly9sb2NhbGhvc3QvdGhlS2F3YUNvbXBhbnkvcHVibGljL2FkbWluL3Byb2R1Y3RzL2NyZWF0ZSI7czo1OiJyb3V0ZSI7czoyMToiYWRtaW4ucHJvZHVjdHMuY3JlYXRlIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czoxMToiYWRtaW5fdG9rZW4iO3M6NTE6IjUwfDRqbDlscUlldll5MWJXem5wUTZDY0VkYmNxTmpoNUtCUllWcHpCcXBkNmE1MDgyMSI7czoxMDoiYWRtaW5fdXNlciI7YTo3OntzOjI6ImlkIjtpOjI7czo0OiJuYW1lIjtzOjU6IkFkbWluIjtzOjU6ImVtYWlsIjtzOjE3OiJhZG1pbkBleGFtcGxlLmNvbSI7czo1OiJwaG9uZSI7czoxMDoiOTAwOTI1NTA4NSI7czoxMDoiY3JlYXRlZF9hdCI7czoyNzoiMjAyNi0wMy0xOVQxOToxMDo1OS4wMDAwMDBaIjtzOjEwOiJ1cGRhdGVkX2F0IjtzOjI3OiIyMDI2LTA0LTA2VDE3OjE4OjEwLjAwMDAwMFoiO3M6NToicm9sZXMiO2E6MTp7aTowO2E6Mjp7czoyOiJpZCI7aToxO3M6NDoibmFtZSI7czo1OiJhZG1pbiI7fX19czoyNDoiYWRtaW5fcHJvZmlsZV9jaGVja2VkX2F0IjtpOjE3NzU5ODU4Njc7fQ==', 1775985872),
 ('T8715hL8LZCQjVygGRG5rJP2Ay1uteOvFuFYuIyZ', NULL, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'YTo2OntzOjY6Il90b2tlbiI7czo0MDoidGpCNDZCWXlEZER1OE9RTzVjRzFrbFNGNjdwOHg5dzBRc3FWSnZQeiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6NTQ6Imh0dHA6Ly9sb2NhbGhvc3QvdGhlS2F3YUNvbXBhbnkvcHVibGljL2FkbWluL2ludmVudG9yeSI7czo1OiJyb3V0ZSI7czoyMToiYWRtaW4uaW52ZW50b3J5LmluZGV4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czoxMToiYWRtaW5fdG9rZW4iO3M6NTE6IjQ5fGd1d0NuQXc1U1B0Mm1zZzJ3WDZtdnB2SExwTUNoN1pzUmJ3cWxzRDc3Mjc2NTZhZCI7czoxMDoiYWRtaW5fdXNlciI7YTo3OntzOjI6ImlkIjtpOjI7czo0OiJuYW1lIjtzOjU6IkFkbWluIjtzOjU6ImVtYWlsIjtzOjE3OiJhZG1pbkBleGFtcGxlLmNvbSI7czo1OiJwaG9uZSI7czoxMDoiOTAwOTI1NTA4NSI7czoxMDoiY3JlYXRlZF9hdCI7czoyNzoiMjAyNi0wMy0xOVQxOToxMDo1OS4wMDAwMDBaIjtzOjEwOiJ1cGRhdGVkX2F0IjtzOjI3OiIyMDI2LTA0LTA2VDE3OjE4OjEwLjAwMDAwMFoiO3M6NToicm9sZXMiO2E6MTp7aTowO2E6Mjp7czoyOiJpZCI7aToxO3M6NDoibmFtZSI7czo1OiJhZG1pbiI7fX19czoyNDoiYWRtaW5fcHJvZmlsZV9jaGVja2VkX2F0IjtpOjE3NzU3ODM5NDY7fQ==', 1775783948);
 
 -- --------------------------------------------------------
@@ -1424,6 +1413,12 @@ ALTER TABLE `categories`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `categories_slug_unique` (`slug`),
   ADD KEY `categories_parent_id_foreign` (`parent_id`);
+
+--
+-- Indexes for table `contact_queries`
+--
+ALTER TABLE `contact_queries`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `coupons`
@@ -1663,6 +1658,12 @@ ALTER TABLE `categories`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
+-- AUTO_INCREMENT for table `contact_queries`
+--
+ALTER TABLE `contact_queries`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `coupons`
 --
 ALTER TABLE `coupons`
@@ -1702,7 +1703,7 @@ ALTER TABLE `jobs`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `orders`
@@ -1732,7 +1733,7 @@ ALTER TABLE `permissions`
 -- AUTO_INCREMENT for table `personal_access_tokens`
 --
 ALTER TABLE `personal_access_tokens`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `products`

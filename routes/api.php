@@ -16,14 +16,10 @@ use App\Http\Controllers\API\HomeBestSellingProductController;
 use App\Http\Controllers\API\HomeBlogPostController;
 use App\Http\Controllers\API\HomeHeroSectionController;
 use App\Http\Controllers\API\HomeShopByCategoryController;
-use App\Http\Controllers\API\InventoryController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\ProductController;
-use App\Http\Controllers\API\ProductIngredientController;
-use App\Http\Controllers\API\ProductNutritionController;
 use App\Http\Controllers\API\ProductVariantController;
-use App\Http\Controllers\API\ProductVariantImageController;
 use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\SearchController;
 use App\Http\Controllers\API\WishlistController;
@@ -55,9 +51,6 @@ Route::get('/categories/{category}/subcategories', [CategoryController::class, '
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/products/{id}/variants', [ProductVariantController::class, 'index']);
-Route::get('/variants/{id}/images', [ProductVariantImageController::class, 'index']);
-Route::get('/products/{id}/ingredients', [ProductIngredientController::class, 'index']);
-Route::get('/products/{id}/nutrition', [ProductNutritionController::class, 'index']);
 Route::get('/products/{id}/reviews', [ReviewController::class, 'productReviews']);
 Route::get('/search', [SearchController::class, 'index']);
 Route::get('/coupons', [CouponController::class, 'index']);
@@ -85,18 +78,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/variants', [ProductVariantController::class, 'store'])->middleware('admin.api_permission:products.update');
     Route::put('/variants/{id}', [ProductVariantController::class, 'update'])->middleware('admin.api_permission:products.update');
     Route::delete('/variants/{id}', [ProductVariantController::class, 'destroy'])->middleware('admin.api_permission:products.delete');
-
-    Route::post('/variant-images', [ProductVariantImageController::class, 'store'])->middleware('admin.api_permission:products.update');
-    Route::put('/variant-images/{id}', [ProductVariantImageController::class, 'update'])->middleware('admin.api_permission:products.update');
-    Route::delete('/variant-images/{id}', [ProductVariantImageController::class, 'destroy'])->middleware('admin.api_permission:products.delete');
-
-    Route::post('/products/{id}/ingredients', [ProductIngredientController::class, 'store'])->middleware('admin.api_permission:products.update');
-    Route::put('/ingredients/{id}', [ProductIngredientController::class, 'update'])->middleware('admin.api_permission:products.update');
-    Route::delete('/ingredients/{id}', [ProductIngredientController::class, 'destroy'])->middleware('admin.api_permission:products.delete');
-
-    Route::post('/products/{id}/nutrition', [ProductNutritionController::class, 'store'])->middleware('admin.api_permission:products.update');
-    Route::put('/nutrition/{id}', [ProductNutritionController::class, 'update'])->middleware('admin.api_permission:products.update');
-    Route::delete('/nutrition/{id}', [ProductNutritionController::class, 'destroy'])->middleware('admin.api_permission:products.delete');
 
     Route::get('/cart', [CartController::class, 'index']);
     Route::post('/cart', [CartController::class, 'store']);
@@ -148,9 +129,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/blog-posts', [BlogPostController::class, 'store'])->middleware('admin.api_permission:blogs.create');
     Route::put('/blog-posts/{blogPost}', [BlogPostController::class, 'update'])->middleware('admin.api_permission:blogs.update');
     Route::delete('/blog-posts/{blogPost}', [BlogPostController::class, 'destroy'])->middleware('admin.api_permission:blogs.delete');
-
-    Route::get('/inventory', [InventoryController::class, 'index'])->middleware('admin.api_permission:inventory.view');
-    Route::put('/inventory/{variant_id}', [InventoryController::class, 'update'])->middleware('admin.api_permission:inventory.update');
 
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->middleware('admin.api_permission:dashboard.view');
     Route::get('/admin/analytics', [AdminController::class, 'analytics'])->middleware('admin.api_permission:dashboard.view');

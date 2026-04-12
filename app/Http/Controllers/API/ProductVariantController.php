@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductVariant;
-use App\Support\ProductSchema;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -12,9 +11,10 @@ class ProductVariantController extends Controller
 {
     public function index($id)
     {
-        $variants = ProductVariant::with(['inventory', 'primaryImage', 'images'])
+        $variants = ProductVariant::with('product')
             ->where('product_id', $id)
             ->where('status', true)
+            ->orderByDesc('is_default')
             ->latest()
             ->get();
 
@@ -25,17 +25,11 @@ class ProductVariantController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'product_id' => 'required|exists:products,id',
-            'variant_name' => 'required|string|max:255',
-            'size' => 'nullable|string|max:100',
-            'color' => 'nullable|string|max:100',
+            'name' => 'required|string|max:255',
             'sku' => 'required|string|max:100|unique:product_variants,sku',
             'price' => 'required|numeric|min:0',
-            'compare_price' => 'nullable|numeric|min:0',
-            'stock' => 'nullable|integer|min:0',
-            'weight' => 'nullable|numeric|min:0',
-            'dimensions' => 'nullable|string|max:255',
-            'net_weight' => 'nullable|string|max:255',
-            'tags' => 'nullable|array',
+            'discount_price' => 'nullable|numeric|min:0',
+            'weight' => 'nullable|string|max:255',
             'brewing_rituals' => 'nullable|array',
             'is_default' => 'nullable|boolean',
             'status' => 'nullable|boolean',
@@ -47,45 +41,27 @@ class ProductVariantController extends Controller
 
         $payload = [
             'product_id' => $request->product_id,
-            'variant_name' => $request->variant_name,
-            'size' => $request->size,
-            'color' => $request->color,
+            'name' => $request->name,
             'sku' => $request->sku,
             'price' => $request->price,
-            'stock' => $request->integer('stock', 0),
+            'discount_price' => $request->discount_price,
             'weight' => $request->weight,
-            'dimensions' => $request->dimensions,
-            'net_weight' => $request->net_weight,
-            'tags' => $request->tags,
             'brewing_rituals' => $request->brewing_rituals,
+            'is_default' => false,
             'status' => $request->boolean('status', true),
         ];
 
-        if (ProductSchema::hasColumn('product_variants', 'compare_price')) {
-            $payload['compare_price'] = $request->compare_price;
-        }
-
-        if (ProductSchema::hasColumn('product_variants', 'is_default')) {
-            $payload['is_default'] = false;
-        }
-
         $variant = ProductVariant::create($payload);
 
-        if (ProductSchema::hasColumn('product_variants', 'is_default') && $request->boolean('is_default')) {
+        if ($request->boolean('is_default')) {
             ProductVariant::where('product_id', $variant->product_id)->update(['is_default' => false]);
             $variant->update(['is_default' => true]);
         }
 
-        $variant->inventory()->create([
-            'stock' => $variant->stock,
-            'reserved_stock' => 0,
-            'warehouse' => 'default',
-        ]);
-
         return response()->json([
             'status' => true,
             'message' => 'Variant created',
-            'data' => $variant->fresh()->load(['inventory', 'primaryImage', 'images']),
+            'data' => $variant->fresh()->load('product'),
         ], 201);
     }
 
@@ -94,17 +70,11 @@ class ProductVariantController extends Controller
         $variant = ProductVariant::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
-            'variant_name' => 'sometimes|required|string|max:255',
-            'size' => 'nullable|string|max:100',
-            'color' => 'nullable|string|max:100',
+            'name' => 'sometimes|required|string|max:255',
             'sku' => 'sometimes|required|string|max:100|unique:product_variants,sku,'.$variant->id,
             'price' => 'sometimes|required|numeric|min:0',
-            'compare_price' => 'nullable|numeric|min:0',
-            'stock' => 'nullable|integer|min:0',
-            'weight' => 'nullable|numeric|min:0',
-            'dimensions' => 'nullable|string|max:255',
-            'net_weight' => 'nullable|string|max:255',
-            'tags' => 'nullable|array',
+            'discount_price' => 'nullable|numeric|min:0',
+            'weight' => 'nullable|string|max:255',
             'brewing_rituals' => 'nullable|array',
             'is_default' => 'nullable|boolean',
             'status' => 'nullable|boolean',
@@ -114,27 +84,19 @@ class ProductVariantController extends Controller
             return response()->json(['status' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $payload = $request->only(['variant_name', 'size', 'color', 'sku', 'price', 'stock', 'weight', 'dimensions', 'net_weight', 'tags', 'brewing_rituals', 'status']);
-
-        if (ProductSchema::hasColumn('product_variants', 'compare_price')) {
-            $payload['compare_price'] = $request->compare_price;
-        }
+        $payload = $request->only(['name', 'sku', 'price', 'discount_price', 'weight', 'brewing_rituals', 'status']);
 
         $variant->update($payload);
 
-        if (ProductSchema::hasColumn('product_variants', 'is_default') && $request->has('is_default') && $request->boolean('is_default')) {
+        if ($request->has('is_default') && $request->boolean('is_default')) {
             ProductVariant::where('product_id', $variant->product_id)->update(['is_default' => false]);
             $variant->update(['is_default' => true]);
-        }
-
-        if ($request->has('stock') && $variant->inventory) {
-            $variant->inventory->update(['stock' => $request->stock]);
         }
 
         return response()->json([
             'status' => true,
             'message' => 'Variant updated',
-            'data' => $variant->fresh()->load(['inventory', 'primaryImage', 'images']),
+            'data' => $variant->fresh()->load('product'),
         ]);
     }
 

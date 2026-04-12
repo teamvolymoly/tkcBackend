@@ -11,7 +11,7 @@ class WishlistController extends Controller
 {
     public function index(Request $request)
     {
-        $items = Wishlist::with(['product.defaultVariant.primaryImage', 'product.variants.images'])
+        $items = Wishlist::with(['product.defaultVariant', 'product.variants'])
             ->where('user_id', $request->user()->id)
             ->latest()
             ->get();
@@ -37,7 +37,7 @@ class WishlistController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Wishlist updated',
-            'data' => $wishlist->load(['product.defaultVariant.primaryImage', 'product.variants.images']),
+            'data' => $wishlist->load(['product.defaultVariant', 'product.variants']),
         ], 201);
     }
 
@@ -51,7 +51,7 @@ class WishlistController extends Controller
 
     public function adminIndex(Request $request)
     {
-        $wishlists = Wishlist::with(['user', 'product.defaultVariant.primaryImage', 'product.variants.images'])
+        $wishlists = Wishlist::with(['user', 'product.defaultVariant', 'product.variants'])
             ->when($request->filled('q'), function ($query) use ($request) {
                 $term = $request->q;
                 $query->where(function ($inner) use ($term) {

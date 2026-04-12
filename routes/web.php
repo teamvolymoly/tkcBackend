@@ -8,7 +8,6 @@ use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\HeroSectionController as AdminHeroSectionController;
-use App\Http\Controllers\Admin\InventoryController as AdminInventoryController;
 use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
@@ -54,18 +53,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 Route::resource('products', AdminProductController::class);
             });
             Route::post('/products/bulk-delete', [AdminProductController::class, 'bulkDestroy'])->middleware('admin.permission:products.delete')->name('products.bulk-delete');
-            Route::post('/products/{product}/variants/{variant}/images', [AdminProductController::class, 'storeVariantImage'])->middleware('admin.permission:products.update')->name('products.variants.images.store');
-            Route::put('/products/{product}/variants/{variant}/images/{image}', [AdminProductController::class, 'updateVariantImage'])->middleware('admin.permission:products.update')->name('products.variants.images.update');
-            Route::delete('/products/{product}/variants/{variant}/images/{image}', [AdminProductController::class, 'destroyVariantImage'])->middleware('admin.permission:products.delete')->name('products.variants.images.destroy');
-            Route::post('/products/{product}/ingredients', [AdminProductController::class, 'storeIngredient'])->middleware('admin.permission:products.update')->name('products.ingredients.store');
-            Route::put('/products/{product}/ingredients/{ingredient}', [AdminProductController::class, 'updateIngredient'])->middleware('admin.permission:products.update')->name('products.ingredients.update');
-            Route::delete('/products/{product}/ingredients/{ingredient}', [AdminProductController::class, 'destroyIngredient'])->middleware('admin.permission:products.delete')->name('products.ingredients.destroy');
-            Route::post('/products/{product}/nutrition', [AdminProductController::class, 'storeNutrition'])->middleware('admin.permission:products.update')->name('products.nutrition.store');
-            Route::put('/products/{product}/nutrition/{nutrition}', [AdminProductController::class, 'updateNutrition'])->middleware('admin.permission:products.update')->name('products.nutrition.update');
-            Route::delete('/products/{product}/nutrition/{nutrition}', [AdminProductController::class, 'destroyNutrition'])->middleware('admin.permission:products.delete')->name('products.nutrition.destroy');
-
-            Route::get('/inventory', [AdminInventoryController::class, 'index'])->middleware('admin.permission:inventory.view')->name('inventory.index');
-            Route::put('/inventory/{variant}', [AdminInventoryController::class, 'update'])->middleware('admin.permission:inventory.update')->name('inventory.update');
 
             Route::resource('coupons', AdminCouponController::class)->middleware('admin.permission:coupons.view');
             Route::resource('users', AdminUserController::class)->only(['index', 'store', 'show', 'edit', 'update', 'destroy'])->middleware('admin.permission:users.view');

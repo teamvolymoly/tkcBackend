@@ -14,11 +14,12 @@ class SearchController extends Controller
             'q' => 'required|string|min:1',
         ]);
 
-        $results = Product::with('images', 'variants')
+        $results = Product::with('variants')
             ->where('status', true)
             ->where(function ($query) use ($request) {
                 $query->where('name', 'like', '%'.$request->q.'%')
-                    ->orWhere('short_description', 'like', '%'.$request->q.'%')
+                    ->orWhere('tag_line_1', 'like', '%'.$request->q.'%')
+                    ->orWhere('tag_line_2', 'like', '%'.$request->q.'%')
                     ->orWhere('description', 'like', '%'.$request->q.'%');
             })
             ->latest()

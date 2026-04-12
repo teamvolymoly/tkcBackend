@@ -27,9 +27,9 @@
                         @foreach (($cart['items'] ?? []) as $item)
                             <tr>
                                 <td class="px-4 py-4 font-medium">{{ $item['variant']['product']['name'] ?? 'Product' }}</td>
-                                <td class="px-4 py-4">{{ $item['variant']['variant_name'] ?? 'Variant' }}</td>
+                                <td class="px-4 py-4">{{ $item['variant']['name'] ?? ($item['variant']['variant_name'] ?? 'Variant') }}</td>
                                 <td class="px-4 py-4">{{ $item['quantity'] }}</td>
-                                <td class="px-4 py-4">{{ $item['variant']['inventory']['stock'] ?? ($item['variant']['stock'] ?? 0) }}</td>
+                                <td class="px-4 py-4">Available</td>
                             </tr>
                         @endforeach
                     </tbody>

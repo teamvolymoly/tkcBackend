@@ -21,7 +21,16 @@ class HomeCatalogService
             ->pluck('total_sold', 'product_id');
 
         if ($soldProducts->isEmpty()) {
-            return collect();
+            return Product::query()
+                ->with([
+                    'defaultVariant' => fn ($variantQuery) => $variantQuery->where('status', true),
+                ])
+                ->withCount('reviews')
+                ->where('status', true)
+                ->inRandomOrder()
+                ->limit($limit)
+                ->get()
+                ->map(fn (Product $product) => $this->transformBestSellingProduct($product, false));
         }
 
         $products = Product::query()
@@ -37,19 +46,7 @@ class HomeCatalogService
             ->sortByDesc(fn (Product $product) => (int) ($soldProducts[$product->id] ?? 0))
             ->take($limit)
             ->values()
-            ->map(function (Product $product) {
-                $defaultVariant = $product->defaultVariant;
-
-                return [
-                    'name' => $product->name,
-                    'slug' => $product->slug,
-                    'price' => $defaultVariant?->price !== null ? (float) $defaultVariant->price : null,
-                    'discount_price' => $defaultVariant?->compare_price !== null ? (float) $defaultVariant->compare_price : null,
-                    'is_bestseller' => true,
-                    'is_new' => $product->created_at?->gte(now()->subDays(30)) ?? false,
-                    'review_count' => (int) $product->reviews_count,
-                ];
-            });
+            ->map(fn (Product $product) => $this->transformBestSellingProduct($product, true));
     }
 
     public function popularCategories(int $limit = 6): Collection
@@ -90,5 +87,20 @@ class HomeCatalogService
                     'sold_quantity' => (int) ($soldCategories[$category->id] ?? 0),
                 ];
             });
+    }
+
+    private function transformBestSellingProduct(Product $product, bool $isBestseller): array
+    {
+        $defaultVariant = $product->defaultVariant;
+
+        return [
+            'name' => $product->name,
+            'slug' => $product->slug,
+            'price' => $defaultVariant?->price !== null ? (float) $defaultVariant->price : null,
+            'discount_price' => $defaultVariant?->compare_price !== null ? (float) $defaultVariant->compare_price : null,
+            'is_bestseller' => $isBestseller,
+            'is_new' => $product->created_at?->gte(now()->subDays(30)) ?? false,
+            'review_count' => (int) $product->reviews_count,
+        ];
     }
 }

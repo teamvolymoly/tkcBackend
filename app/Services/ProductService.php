@@ -64,16 +64,6 @@ class ProductService
         $activeVariants = $product->variants->values();
         $selectedVariant = $activeVariants->firstWhere('is_default', true) ?? $activeVariants->first();
 
-        $discoverMore = Product::query()
-            ->with(['category', 'subcategory', 'defaultVariant'])
-            ->where('status', true)
-            ->where('id', '!=', $product->id)
-            ->latest()
-            ->get()
-            ->map(fn (Product $discoverProduct) => $this->transformDiscoverMoreProduct($discoverProduct))
-            ->values()
-            ->all();
-
         return [
             'id' => $product->id,
             'tag_line_1' => $product->tag_line_1,
@@ -81,19 +71,26 @@ class ProductService
             'slug' => $product->slug,
             'tag_line_2' => $product->tag_line_2,
             'description' => $product->description,
-            'category' => $product->category,
-            'subcategory' => $product->subcategory,
-            'breadcrumbs' => $this->buildBreadcrumbs($product),
-            'gallery' => $product->gallery,
-            'images' => $product->gallery,
-            'ingredients' => $this->transformIngredients($product),
+            'category' => [
+                'id' => $product->category?->id,
+            ],
+            'subcategory' => [
+                'id' => $product->subcategory?->id,
+            ],
+            'images' => collect($product->gallery)
+                ->filter()
+                ->values()
+                ->map(fn (array $image, int $index) => [
+                    'name' => $product->name.' Image '.($index + 1),
+                    'image_url' => $image['image_url'] ?? null,
+                ])
+                ->filter(fn (array $image) => ! empty($image['image_url']))
+                ->values()
+                ->all(),
             'ingredients_list' => $this->transformIngredients($product),
             'faqs' => $this->transformFaqs($product),
             'variants' => $activeVariants->map(fn (ProductVariant $variant) => $this->transformVariant($variant))->all(),
             'default_variant_id' => $selectedVariant?->id,
-            'default_variant' => $selectedVariant ? $this->transformVariant($selectedVariant) : null,
-            'defaultVariant' => $selectedVariant ? $this->transformVariant($selectedVariant) : null,
-            'selected_variant' => $selectedVariant ? $this->transformVariant($selectedVariant) : null,
             'price' => $selectedVariant?->price !== null ? (float) $selectedVariant->price : null,
             'discount_price' => $selectedVariant?->discount_price !== null ? (float) $selectedVariant->discount_price : null,
             'compare_price' => $selectedVariant?->discount_price !== null ? (float) $selectedVariant->discount_price : null,
@@ -118,8 +115,6 @@ class ProductService
                     ])
                     ->all(),
             ],
-            'discover_more' => $discoverMore,
-            'discoverMore' => $discoverMore,
         ];
     }
 
@@ -272,7 +267,9 @@ class ProductService
             'brewing_rituals' => $this->transformBrewingRituals($variant, $variant->product),
             'is_default' => (bool) $variant->is_default,
             'status' => (bool) $variant->status,
-            'primary_image' => $variant->primary_image,
+            'primary_image' => $variant->primary_image ? [
+                'image_url' => $variant->primary_image['image_url'] ?? null,
+            ] : null,
         ];
     }
 
@@ -283,8 +280,6 @@ class ProductService
             ->values()
             ->map(fn (array $ingredient) => [
                 'name' => $ingredient['name'] ?? null,
-                'image' => $ingredient['image'] ?? null,
-                'image_path' => $ingredient['image'] ?? null,
                 'image_url' => $product->resolveMediaUrl($ingredient['image'] ?? null),
             ])
             ->all();
@@ -314,8 +309,6 @@ class ProductService
             ->map(fn (array $ritual) => [
                 'ritual' => $ritual['ritual'] ?? null,
                 'text' => $ritual['ritual'] ?? null,
-                'image' => $ritual['image'] ?? null,
-                'image_path' => $ritual['image'] ?? null,
                 'image_url' => $product?->resolveMediaUrl($ritual['image'] ?? null),
             ])
             ->all();

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Http\UploadedFile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -119,7 +120,9 @@ class ProductController extends BaseAdminController
             'image_5' => ['nullable', 'file', 'image', 'max:5120'],
             'ingredients' => ['nullable', 'array'],
             'ingredients.*.name' => ['nullable', 'string', 'max:255'],
-            'ingredients.*.image' => ['nullable', 'file', 'image', 'max:5120'],
+            'ingredients.*.image' => ['nullable', function (string $attribute, mixed $value, \Closure $fail) {
+                $this->validateOptionalImageValue($attribute, $value, $fail);
+            }],
             'faqs' => ['nullable', 'array'],
             'faqs.*.question' => ['nullable', 'string'],
             'faqs.*.answer' => ['nullable', 'string'],
@@ -133,7 +136,9 @@ class ProductController extends BaseAdminController
             'variants.*.weight' => ['nullable', 'string', 'max:255'],
             'variants.*.brewing_rituals' => ['nullable', 'array'],
             'variants.*.brewing_rituals.*.ritual' => ['nullable', 'string', 'max:255'],
-            'variants.*.brewing_rituals.*.image' => ['nullable', 'file', 'image', 'max:5120'],
+            'variants.*.brewing_rituals.*.image' => ['nullable', function (string $attribute, mixed $value, \Closure $fail) {
+                $this->validateOptionalImageValue($attribute, $value, $fail);
+            }],
             'variants.*.is_default' => ['nullable'],
             'variants.*.status' => ['nullable'],
         ]);
@@ -187,5 +192,32 @@ class ProductController extends BaseAdminController
         })->values()->all();
 
         return $validated;
+    }
+
+    private function validateOptionalImageValue(string $attribute, mixed $value, \Closure $fail): void
+    {
+        if ($value === null || $value === '') {
+            return;
+        }
+
+        if (is_string($value)) {
+            return;
+        }
+
+        if (! $value instanceof UploadedFile) {
+            $fail("The {$attribute} field must be an image.");
+
+            return;
+        }
+
+        if (! str_starts_with((string) $value->getMimeType(), 'image/')) {
+            $fail("The {$attribute} field must be an image.");
+
+            return;
+        }
+
+        if ($value->getSize() > 5 * 1024 * 1024) {
+            $fail("The {$attribute} field must not be greater than 5120 kilobytes.");
+        }
     }
 }

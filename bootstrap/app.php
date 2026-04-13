@@ -23,6 +23,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(HandleCors::class);
+        $middleware->redirectGuestsTo(function (Request $request) {
+            return $request->is('api/*') ? null : route('admin.login');
+        });
         $middleware->alias([
             'admin.session' => \App\Http\Middleware\EnsureAdminSession::class,
             'admin.permission' => \App\Http\Middleware\EnsureAdminPermission::class,

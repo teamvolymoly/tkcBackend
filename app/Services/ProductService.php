@@ -27,6 +27,7 @@ class ProductService
         $query = Product::with([
             'category',
             'subcategory',
+            'reviews.user',
             'defaultVariant',
             'variants' => fn ($variantQuery) => $variantQuery->where('status', true)->orderByDesc('is_default')->orderBy('id'),
         ])->where('status', true);
@@ -49,7 +50,13 @@ class ProductService
             $query->where('status', filter_var($filters['status'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? (bool) $filters['status']);
         }
 
-        return $query->latest()->paginate(20)->withQueryString();
+        $paginator = $query->latest()->paginate(20)->withQueryString();
+
+        $paginator->setCollection(
+            $paginator->getCollection()->map(fn (Product $product) => $this->transformPublicProduct($product))
+        );
+
+        return $paginator;
     }
 
     public function publicDetailBySlug(string $slug): array
@@ -61,6 +68,11 @@ class ProductService
             'variants' => fn ($variantQuery) => $variantQuery->where('status', true)->orderByDesc('is_default')->orderBy('id'),
         ])->where('status', true)->where('slug', $slug)->firstOrFail();
 
+        return $this->transformPublicProduct($product);
+    }
+
+    private function transformPublicProduct(Product $product): array
+    {
         $activeVariants = $product->variants->values();
         $selectedVariant = $activeVariants->firstWhere('is_default', true) ?? $activeVariants->first();
 

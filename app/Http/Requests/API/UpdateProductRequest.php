@@ -23,6 +23,8 @@ class UpdateProductRequest extends FormRequest
             'name' => 'sometimes|required|string|max:255',
             'tag_line_2' => 'nullable|string|max:255',
             'description' => 'nullable|string',
+            'caffeine' => 'nullable|in:low,medium,caffeine_free',
+            'collection' => 'nullable|string',
             'image_1' => 'nullable|image|max:5120',
             'image_2' => 'nullable|image|max:5120',
             'image_3' => 'nullable|image|max:5120',

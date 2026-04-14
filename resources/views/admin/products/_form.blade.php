@@ -41,6 +41,34 @@
                 <div><label class="mb-2 block text-sm font-medium">Category</label><select name="category_id" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950"><option value="">Select category</option>@foreach ($categories as $categoryOption)<option value="{{ $categoryOption['id'] }}" @selected((string) $selectedCategory === (string) $categoryOption['id'])>{{ $categoryOption['name'] }}</option>@endforeach</select></div>
                 <div><label class="mb-2 block text-sm font-medium">Subcategory</label><select name="subcategory_id" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950"><option value="">Optional subcategory</option>@foreach ($categories as $categoryOption)@foreach ($categoryOption['children'] ?? [] as $child)<option value="{{ $child['id'] }}" @selected((string) $selectedSubcategory === (string) $child['id'])>{{ $categoryOption['name'] }} / {{ $child['name'] }}</option>@endforeach @endforeach</select></div>
                 <div class="lg:col-span-2"><label class="mb-2 block text-sm font-medium">Description</label><textarea name="description" rows="5" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">{{ old('description', $product['description'] ?? '') }}</textarea></div>
+                <div class="lg:col-span-2 rounded-[1.5rem] border border-slate-200 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-950/60">
+                    <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Filter Section</h3>
+                    <div class="mt-4 grid gap-5 lg:grid-cols-2">
+                        <div>
+                            <label class="mb-3 block text-sm font-medium">Caffeine</label>
+                            @php($selectedCaffeine = old('caffeine', $product['caffeine'] ?? ''))
+                            <div class="flex flex-wrap gap-3">
+                                <label class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm dark:border-slate-700 dark:bg-slate-900">
+                                    <input type="radio" name="caffeine" value="low" class="h-4 w-4 border-slate-300 text-sky-600 focus:ring-sky-500" @checked($selectedCaffeine === 'low')>
+                                    <span>Low</span>
+                                </label>
+                                <label class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm dark:border-slate-700 dark:bg-slate-900">
+                                    <input type="radio" name="caffeine" value="medium" class="h-4 w-4 border-slate-300 text-sky-600 focus:ring-sky-500" @checked($selectedCaffeine === 'medium')>
+                                    <span>Medium</span>
+                                </label>
+                                <label class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm dark:border-slate-700 dark:bg-slate-900">
+                                    <input type="radio" name="caffeine" value="caffeine_free" class="h-4 w-4 border-slate-300 text-sky-600 focus:ring-sky-500" @checked($selectedCaffeine === 'caffeine_free')>
+                                    <span>Caffeine Free</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-medium">Collection</label>
+                            <input type="text" name="collection" value="{{ old('collection', $product['collection'] ?? '') }}" placeholder="Summer Special, Limited Batch" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">
+                            <p class="mt-2 text-xs text-slate-500">Comma separated values likhiye.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 

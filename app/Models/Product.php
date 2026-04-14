@@ -17,6 +17,8 @@ class Product extends Model
         'slug',
         'tag_line_2',
         'description',
+        'caffeine',
+        'collection',
         'image_1',
         'image_2',
         'image_3',

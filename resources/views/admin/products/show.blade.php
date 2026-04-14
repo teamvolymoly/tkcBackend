@@ -25,6 +25,23 @@
             <div>
                 <h2 class="text-lg font-semibold">Description</h2>
                 <p class="mt-4 text-sm text-slate-600 dark:text-slate-300">{{ $product['description'] ?? 'No description added.' }}</p>
+                <div class="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                    <div class="rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60">
+                        <span class="block text-xs uppercase tracking-[0.2em] text-slate-400">Caffeine</span>
+                        <span class="mt-1 block font-medium">
+                            {{ match($product['caffeine'] ?? null) {
+                                'low' => 'Low',
+                                'medium' => 'Medium',
+                                'caffeine_free' => 'Caffeine Free',
+                                default => 'Not set',
+                            } }}
+                        </span>
+                    </div>
+                    <div class="rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60">
+                        <span class="block text-xs uppercase tracking-[0.2em] text-slate-400">Collection</span>
+                        <span class="mt-1 block font-medium">{{ $product['collection'] ?? 'Not set' }}</span>
+                    </div>
+                </div>
             </div>
             <div class="grid gap-3 text-sm">
                 <div class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span>Category</span><span class="font-medium">{{ $product['category']['name'] ?? 'Uncategorized' }}</span></div>

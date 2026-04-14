@@ -20,7 +20,16 @@ class ProductController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Products fetched successfully',
-            'data' => $this->productService->paginatedCatalog($request->only(['category_id', 'q', 'status'])),
+            'data' => $this->productService->catalog($request->all()),
+        ]);
+    }
+
+    public function filters()
+    {
+        return response()->json([
+            'status' => true,
+            'message' => 'Filters fetched',
+            'data' => $this->productService->catalogFilters(),
         ]);
     }
 

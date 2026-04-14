@@ -12,9 +12,17 @@ class ProductController extends BaseAdminController
     public function index(Request $request): View
     {
         $filters = $request->only(['q', 'category_id', 'status', 'page']);
+        $productResponse = $this->apiService->get('products', array_filter([
+            'search' => $filters['q'] ?? null,
+            'category' => $filters['category_id'] ?? null,
+            'status' => $filters['status'] ?? null,
+            'page' => $filters['page'] ?? null,
+            'limit' => 20,
+            'include' => 'category,variants',
+        ], fn ($value) => $value !== null && $value !== ''));
 
         return view('admin.products.index', [
-            'products' => $this->apiService->get('products', array_filter($filters, fn ($value) => $value !== null && $value !== ''))['data'] ?? [],
+            'products' => $this->normalizeProductListing($productResponse['data'] ?? []),
             'categories' => $this->apiService->get('categories', ['include_inactive' => 1])['data'] ?? [],
             'filters' => $filters,
         ]);
@@ -113,6 +121,8 @@ class ProductController extends BaseAdminController
             'name' => ['required', 'string', 'max:255'],
             'tag_line_2' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
+            'caffeine' => ['nullable', 'in:low,medium,caffeine_free'],
+            'collection' => ['nullable', 'string'],
             'image_1' => ['nullable', 'file', 'image', 'max:5120'],
             'image_2' => ['nullable', 'file', 'image', 'max:5120'],
             'image_3' => ['nullable', 'file', 'image', 'max:5120'],
@@ -146,6 +156,11 @@ class ProductController extends BaseAdminController
         $validated['category_id'] = $validated['category_id'] ?: null;
         $validated['subcategory_id'] = $validated['subcategory_id'] ?: null;
         $validated['status'] = $request->boolean('status');
+        $validated['caffeine'] = $validated['caffeine'] ?: null;
+        $validated['collection'] = collect(explode(',', (string) ($validated['collection'] ?? '')))
+            ->map(fn ($item) => trim((string) $item))
+            ->filter()
+            ->implode(', ') ?: null;
 
         $validated['ingredients'] = collect($validated['ingredients'] ?? [])
             ->map(function ($ingredient, $index) use ($request) {
@@ -219,5 +234,50 @@ class ProductController extends BaseAdminController
         if ($value->getSize() > 5 * 1024 * 1024) {
             $fail("The {$attribute} field must not be greater than 5120 kilobytes.");
         }
+    }
+
+    private function normalizeProductListing(mixed $payload): array
+    {
+        if (! is_array($payload) || ! array_key_exists('items', $payload) || ! array_key_exists('pagination', $payload)) {
+            return is_array($payload) ? $payload : [];
+        }
+
+        $pagination = $payload['pagination'];
+        $currentPage = max(1, (int) ($pagination['page'] ?? 1));
+        $lastPage = max(1, (int) ($pagination['total_pages'] ?? 1));
+
+        return [
+            'data' => $payload['items'] ?? [],
+            'current_page' => $currentPage,
+            'last_page' => $lastPage,
+            'per_page' => (int) ($pagination['limit'] ?? 20),
+            'total' => (int) ($pagination['total_items'] ?? count($payload['items'] ?? [])),
+            'links' => $this->buildPaginationLinks($currentPage, $lastPage),
+        ];
+    }
+
+    private function buildPaginationLinks(int $currentPage, int $lastPage): array
+    {
+        $links = [[
+            'url' => $currentPage > 1 ? request()->fullUrlWithQuery(['page' => $currentPage - 1]) : null,
+            'label' => '&laquo; Previous',
+            'active' => false,
+        ]];
+
+        for ($page = 1; $page <= $lastPage; $page++) {
+            $links[] = [
+                'url' => request()->fullUrlWithQuery(['page' => $page]),
+                'label' => (string) $page,
+                'active' => $page === $currentPage,
+            ];
+        }
+
+        $links[] = [
+            'url' => $currentPage < $lastPage ? request()->fullUrlWithQuery(['page' => $currentPage + 1]) : null,
+            'label' => 'Next &raquo;',
+            'active' => false,
+        ];
+
+        return $links;
     }
 }

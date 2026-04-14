@@ -2,10 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Category;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -22,41 +25,118 @@ class ProductService
         return $this->homeCatalogService->bestSellingProducts($limit);
     }
 
-    public function paginatedCatalog(array $filters): LengthAwarePaginator
+    public function catalog(array $filters): array
     {
-        $query = Product::with([
-            'category',
-            'subcategory',
-            'reviews.user',
-            'defaultVariant',
-            'variants' => fn ($variantQuery) => $variantQuery->where('status', true)->orderByDesc('is_default')->orderBy('id'),
-        ])->where('status', true);
+        $page = max(1, (int) ($filters['page'] ?? 1));
+        $limit = min(48, max(1, (int) ($filters['limit'] ?? 12)));
+        $includes = $this->parseIncludes($filters['include'] ?? null);
+        $query = $this->catalogQuery($filters, $includes);
+        $paginator = $query->paginate($limit, ['products.*'], 'page', $page)->withQueryString();
 
-        if (! empty($filters['category_id'])) {
-            $query->where('category_id', $filters['category_id']);
-        }
+        return [
+            'items' => $paginator->getCollection()
+                ->map(fn (Product $product) => $this->transformCatalogProduct($product, $includes))
+                ->all(),
+            'pagination' => [
+                'page' => $paginator->currentPage(),
+                'limit' => $paginator->perPage(),
+                'total_items' => $paginator->total(),
+                'total_pages' => $paginator->lastPage(),
+            ],
+        ];
+    }
 
-        if (! empty($filters['q'])) {
-            $term = $filters['q'];
-            $query->where(function ($inner) use ($term) {
-                $inner->where('name', 'like', "%{$term}%")
-                    ->orWhere('tag_line_1', 'like', "%{$term}%")
-                    ->orWhere('tag_line_2', 'like', "%{$term}%")
-                    ->orWhere('description', 'like', "%{$term}%");
-            });
-        }
+    public function catalogFilters(): array
+    {
+        return Cache::remember('api.products.filters.v1', now()->addHours(12), function () {
+            $categories = Category::query()
+                ->whereNull('parent_id')
+                ->where('status', true)
+                ->orderBy('name')
+                ->get(['id', 'name', 'slug'])
+                ->map(fn (Category $category) => [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'slug' => $category->slug,
+                ])
+                ->values()
+                ->all();
 
-        if (array_key_exists('status', $filters) && $filters['status'] !== '') {
-            $query->where('status', filter_var($filters['status'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? (bool) $filters['status']);
-        }
+            $subcategories = Category::query()
+                ->whereNotNull('parent_id')
+                ->where('status', true)
+                ->orderBy('name')
+                ->get(['id', 'parent_id', 'name', 'slug'])
+                ->map(fn (Category $category) => [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'slug' => $category->slug,
+                    'category_id' => $category->parent_id,
+                ])
+                ->values()
+                ->all();
 
-        $paginator = $query->latest()->paginate(20)->withQueryString();
+            $priceStats = ProductVariant::query()
+                ->join('products', 'products.id', '=', 'product_variants.product_id')
+                ->where('products.status', true)
+                ->where('product_variants.status', true)
+                ->selectRaw('MIN(CASE WHEN discount_price IS NOT NULL AND discount_price > 0 AND discount_price < price THEN discount_price ELSE price END) as min_price')
+                ->selectRaw('MAX(CASE WHEN discount_price IS NOT NULL AND discount_price > 0 AND discount_price < price THEN discount_price ELSE price END) as max_price')
+                ->first();
 
-        $paginator->setCollection(
-            $paginator->getCollection()->map(fn (Product $product) => $this->transformPublicProduct($product))
-        );
+            $discountTags = ProductVariant::query()
+                ->join('products', 'products.id', '=', 'product_variants.product_id')
+                ->where('products.status', true)
+                ->where('product_variants.status', true)
+                ->whereNotNull('product_variants.discount_price')
+                ->whereColumn('product_variants.discount_price', '<', 'product_variants.price')
+                ->selectRaw('ROUND(((product_variants.price - product_variants.discount_price) / product_variants.price) * 100) as discount_percent')
+                ->pluck('discount_percent')
+                ->filter(fn ($value) => $value !== null && (int) $value > 0)
+                ->map(fn ($value) => (int) $value.'% OFF')
+                ->unique()
+                ->sort()
+                ->values()
+                ->all();
 
-        return $paginator;
+            $caffeine = Product::query()
+                ->where('status', true)
+                ->whereNotNull('caffeine')
+                ->pluck('caffeine')
+                ->map(fn ($value) => trim((string) $value))
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+
+            $collections = Product::query()
+                ->where('status', true)
+                ->whereNotNull('collection')
+                ->pluck('collection')
+                ->flatMap(fn ($value) => $this->splitCollectionValues($value))
+                ->unique()
+                ->values()
+                ->all();
+
+            $tags = collect(['Bestseller', 'New'])
+                ->merge($discountTags)
+                ->unique()
+                ->values()
+                ->all();
+
+            return [
+                'categories' => $categories,
+                'subcategories' => $subcategories,
+                'price_range' => [
+                    'min' => isset($priceStats?->min_price) ? (float) $priceStats->min_price : 0.0,
+                    'max' => isset($priceStats?->max_price) ? (float) $priceStats->max_price : 0.0,
+                ],
+                'rating_options' => [5, 4, 3],
+                'tags' => $tags,
+                'caffeine' => $caffeine,
+                'collections' => $collections,
+            ];
+        });
     }
 
     public function publicDetailBySlug(string $slug): array
@@ -71,6 +151,335 @@ class ProductService
         return $this->transformPublicProduct($product);
     }
 
+    private function catalogQuery(array $filters, array $includes): Builder
+    {
+        $salesSubQuery = OrderItem::query()
+            ->selectRaw('product_id, SUM(quantity) as total_sold')
+            ->whereNotNull('product_id')
+            ->whereHas('order', fn ($query) => $query->whereIn('status', ['delivered', 'completed']))
+            ->groupBy('product_id');
+
+        $displayPriceSubQuery = ProductVariant::query()
+            ->selectRaw('CASE WHEN discount_price IS NOT NULL AND discount_price > 0 AND discount_price < price THEN discount_price ELSE price END')
+            ->whereColumn('product_id', 'products.id')
+            ->where('status', true)
+            ->orderByDesc('is_default')
+            ->orderBy('id')
+            ->limit(1);
+
+        $comparePriceSubQuery = ProductVariant::query()
+            ->select('price')
+            ->whereColumn('product_id', 'products.id')
+            ->where('status', true)
+            ->orderByDesc('is_default')
+            ->orderBy('id')
+            ->limit(1);
+
+        $isAdminRequest = request()->user()?->hasRole('admin') ?? false;
+
+        $query = Product::query()
+            ->select('products.*')
+            ->leftJoinSub($salesSubQuery, 'sales_stats', fn ($join) => $join->on('sales_stats.product_id', '=', 'products.id'))
+            ->selectRaw('COALESCE(sales_stats.total_sold, 0) as total_sold')
+            ->selectSub($displayPriceSubQuery, 'display_price')
+            ->selectSub($comparePriceSubQuery, 'compare_price')
+            ->withAvg('reviews as average_rating', 'rating')
+            ->withCount(['variants as active_variants_count' => fn ($variantQuery) => $variantQuery->where('status', true)]);
+
+        if ($isAdminRequest) {
+            if (array_key_exists('status', $filters) && $filters['status'] !== '') {
+                $query->where('products.status', filter_var($filters['status'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? (bool) $filters['status']);
+            }
+        } else {
+            $query->where('products.status', true);
+        }
+
+        $relations = [];
+
+        if (in_array('category', $includes, true)) {
+            $relations[] = 'category';
+        }
+
+        if (in_array('subcategory', $includes, true)) {
+            $relations[] = 'subcategory';
+        }
+
+        if (in_array('variants', $includes, true)) {
+            $relations['variants'] = fn ($variantQuery) => $variantQuery
+                ->where('status', true)
+                ->orderByDesc('is_default')
+                ->orderBy('id');
+        }
+
+        if ($relations !== []) {
+            $query->with($relations);
+        }
+
+        $categoryId = $this->resolveCategoryIdentifier($filters['category'] ?? $filters['category_id'] ?? null, false);
+        if (($filters['category'] ?? $filters['category_id'] ?? null) !== null) {
+            $categoryId ? $query->where('products.category_id', $categoryId) : $query->whereRaw('1 = 0');
+        }
+
+        $subcategoryId = $this->resolveCategoryIdentifier($filters['subcategory'] ?? $filters['subcategory_id'] ?? null, true);
+        if (($filters['subcategory'] ?? $filters['subcategory_id'] ?? null) !== null) {
+            $subcategoryId ? $query->where('products.subcategory_id', $subcategoryId) : $query->whereRaw('1 = 0');
+        }
+
+        $search = trim((string) ($filters['search'] ?? $filters['q'] ?? ''));
+        if ($search !== '') {
+            $query->where(function ($inner) use ($search) {
+                $inner->where('products.name', 'like', "%{$search}%")
+                    ->orWhere('products.tag_line_1', 'like', "%{$search}%")
+                    ->orWhere('products.tag_line_2', 'like', "%{$search}%")
+                    ->orWhere('products.description', 'like', "%{$search}%");
+            });
+        }
+
+        if (($filters['caffeine'] ?? null) !== null && $filters['caffeine'] !== '') {
+            $query->where('products.caffeine', trim((string) $filters['caffeine']));
+        }
+
+        if (($filters['collection'] ?? null) !== null && $filters['collection'] !== '') {
+            $query->whereRaw('FIND_IN_SET(?, REPLACE(products.collection, ", ", ",")) > 0', [trim((string) $filters['collection'])]);
+        }
+
+        if (($filters['price_min'] ?? null) !== null && $filters['price_min'] !== '') {
+            $priceMin = (float) $filters['price_min'];
+            $query->whereHas('variants', function ($variantQuery) use ($priceMin) {
+                $variantQuery->where('status', true)
+                    ->whereRaw('CASE WHEN discount_price IS NOT NULL AND discount_price > 0 AND discount_price < price THEN discount_price ELSE price END >= ?', [$priceMin]);
+            });
+        }
+
+        if (($filters['price_max'] ?? null) !== null && $filters['price_max'] !== '') {
+            $priceMax = (float) $filters['price_max'];
+            $query->whereHas('variants', function ($variantQuery) use ($priceMax) {
+                $variantQuery->where('status', true)
+                    ->whereRaw('CASE WHEN discount_price IS NOT NULL AND discount_price > 0 AND discount_price < price THEN discount_price ELSE price END <= ?', [$priceMax]);
+            });
+        }
+
+        if (($filters['rating_min'] ?? null) !== null && $filters['rating_min'] !== '') {
+            $query->having('average_rating', '>=', (float) $filters['rating_min']);
+        }
+
+        if (array_key_exists('in_stock', $filters) && $filters['in_stock'] !== '') {
+            $inStock = filter_var($filters['in_stock'], FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+            if ($inStock !== null) {
+                $inStock
+                    ? $query->whereHas('variants', fn ($variantQuery) => $variantQuery->where('status', true))
+                    : $query->whereDoesntHave('variants', fn ($variantQuery) => $variantQuery->where('status', true));
+            }
+        }
+
+        if (($filters['tag'] ?? null) !== null && $filters['tag'] !== '') {
+            $this->applyTagFilter($query, (string) $filters['tag']);
+        }
+
+        $this->applyCatalogSorting($query, (string) ($filters['sort'] ?? 'relevance'), $search);
+
+        return $query;
+    }
+
+    private function transformCatalogProduct(Product $product, array $includes): array
+    {
+        $price = $product->display_price !== null ? (float) $product->display_price : null;
+        $comparePrice = $product->compare_price !== null ? (float) $product->compare_price : null;
+        $rating = round((float) ($product->average_rating ?? 0), 1);
+        $isInStock = (int) ($product->active_variants_count ?? 0) > 0;
+
+        $item = [
+            'id' => $product->id,
+            'name' => $product->name,
+            'slug' => $product->slug,
+            'price' => $price,
+            'compare_price' => $comparePrice,
+            'badge' => $this->buildBadge($product),
+            'rating' => $rating,
+            'in_stock' => $isInStock,
+            'status' => (bool) $product->status,
+            'caffeine' => $product->caffeine,
+            'collection' => $this->splitCollectionValues($product->collection),
+            'images' => [
+                'image_1' => $product->resolveMediaUrl($product->image_1),
+                'image_2' => $product->resolveMediaUrl($product->image_2),
+            ],
+        ];
+
+        if (in_array('category', $includes, true)) {
+            $item['category'] = $product->category ? [
+                'id' => $product->category->id,
+                'name' => $product->category->name,
+                'slug' => $product->category->slug,
+            ] : null;
+        }
+
+        if (in_array('subcategory', $includes, true)) {
+            $item['subcategory'] = $product->subcategory ? [
+                'id' => $product->subcategory->id,
+                'name' => $product->subcategory->name,
+                'slug' => $product->subcategory->slug,
+                'category_id' => $product->subcategory->parent_id,
+            ] : null;
+        }
+
+        if (in_array('variants', $includes, true)) {
+            $item['variants'] = $product->variants->map(function (ProductVariant $variant) {
+                $effectivePrice = $variant->discount_price !== null && (float) $variant->discount_price > 0 && (float) $variant->discount_price < (float) $variant->price
+                    ? (float) $variant->discount_price
+                    : (float) $variant->price;
+
+                return [
+                    'id' => $variant->id,
+                    'name' => $variant->name,
+                    'price' => $effectivePrice,
+                    'compare_price' => $variant->price !== null ? (float) $variant->price : null,
+                ];
+            })->values()->all();
+        }
+
+        return $item;
+    }
+
+    private function applyCatalogSorting(Builder $query, string $sort, string $search = ''): void
+    {
+        $sort = strtolower(trim($sort));
+
+        match ($sort) {
+            'newest' => $query->latest('products.created_at'),
+            'price_asc' => $query->orderBy('display_price')->orderByDesc('products.created_at'),
+            'price_desc' => $query->orderByDesc('display_price')->orderByDesc('products.created_at'),
+            'rating_desc' => $query->orderByDesc('average_rating')->orderByDesc('products.created_at'),
+            'best_selling' => $query->orderByDesc('total_sold')->orderByDesc('products.created_at'),
+            default => $this->applyRelevanceSorting($query, $search),
+        };
+    }
+
+    private function applyRelevanceSorting(Builder $query, string $search = ''): void
+    {
+        if ($search !== '') {
+            $escaped = addcslashes($search, '%_');
+            $query->orderByRaw(
+                'CASE
+                    WHEN products.name LIKE ? THEN 1
+                    WHEN products.name LIKE ? THEN 2
+                    WHEN products.tag_line_1 LIKE ? THEN 3
+                    WHEN products.tag_line_2 LIKE ? THEN 4
+                    ELSE 5
+                END',
+                [$escaped, "%{$escaped}%", "%{$escaped}%", "%{$escaped}%"]
+            );
+        }
+
+        $query->orderByDesc('products.created_at');
+    }
+
+    private function applyTagFilter(Builder $query, string $tag): void
+    {
+        $normalizedTag = strtolower(trim($tag));
+
+        if ($normalizedTag === 'bestseller') {
+            $query->havingRaw('COALESCE(total_sold, 0) > 0');
+
+            return;
+        }
+
+        if ($normalizedTag === 'new') {
+            $query->where('products.created_at', '>=', now()->subDays(30));
+
+            return;
+        }
+
+        if (preg_match('/(\d+)\s*%\s*off/', $normalizedTag, $matches)) {
+            $discountPercent = (int) $matches[1];
+
+            $query->whereHas('variants', function ($variantQuery) use ($discountPercent) {
+                $variantQuery->where('status', true)
+                    ->whereNotNull('discount_price')
+                    ->whereColumn('discount_price', '<', 'price')
+                    ->whereRaw('ROUND(((price - discount_price) / price) * 100) = ?', [$discountPercent]);
+            });
+
+            return;
+        }
+
+        $query->whereRaw('1 = 0');
+    }
+
+    private function buildBadge(Product $product): ?string
+    {
+        $price = $product->display_price !== null ? (float) $product->display_price : null;
+        $comparePrice = $product->compare_price !== null ? (float) $product->compare_price : null;
+
+        if ($price !== null && $comparePrice !== null && $comparePrice > $price && $comparePrice > 0) {
+            $discountPercent = (int) round((($comparePrice - $price) / $comparePrice) * 100);
+
+            if ($discountPercent > 0) {
+                return $discountPercent.'% OFF';
+            }
+        }
+
+        if ((int) ($product->total_sold ?? 0) > 0) {
+            return 'Bestseller';
+        }
+
+        if ($product->created_at?->gte(now()->subDays(30))) {
+            return 'New';
+        }
+
+        return null;
+    }
+
+    private function parseIncludes(null|string|array $includes): array
+    {
+        if (is_array($includes)) {
+            $includes = implode(',', $includes);
+        }
+
+        return collect(explode(',', (string) $includes))
+            ->map(fn ($include) => trim((string) $include))
+            ->filter(fn ($include) => in_array($include, ['variants', 'category', 'subcategory'], true))
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    private function resolveCategoryIdentifier(mixed $value, bool $isSubcategory): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_numeric($value)) {
+            return Category::query()
+                ->when($isSubcategory, fn ($query) => $query->whereNotNull('parent_id'), fn ($query) => $query->whereNull('parent_id'))
+                ->where('id', (int) $value)
+                ->value('id');
+        }
+
+        return Category::query()
+            ->when($isSubcategory, fn ($query) => $query->whereNotNull('parent_id'), fn ($query) => $query->whereNull('parent_id'))
+            ->where('slug', trim((string) $value))
+            ->value('id');
+    }
+
+    private function splitCollectionValues(null|string|array $collection): array
+    {
+        if (is_array($collection)) {
+            return collect($collection)
+                ->map(fn ($item) => trim((string) $item))
+                ->filter()
+                ->values()
+                ->all();
+        }
+
+        return collect(explode(',', (string) $collection))
+            ->map(fn ($item) => trim((string) $item))
+            ->filter()
+            ->values()
+            ->all();
+    }
+
     private function transformPublicProduct(Product $product): array
     {
         $activeVariants = $product->variants->values();
@@ -83,6 +492,8 @@ class ProductService
             'slug' => $product->slug,
             'tag_line_2' => $product->tag_line_2,
             'description' => $product->description,
+            'caffeine' => $product->caffeine,
+            'collection' => $product->collection,
             'category' => [
                 'id' => $product->category?->id,
             ],
@@ -179,6 +590,8 @@ class ProductService
             'name' => $payload['name'] ?? $product?->name,
             'tag_line_2' => $payload['tag_line_2'] ?? $product?->tag_line_2,
             'description' => $payload['description'] ?? $product?->description,
+            'caffeine' => $payload['caffeine'] ?? $product?->caffeine,
+            'collection' => $this->normalizeCollection($payload['collection'] ?? $product?->collection),
             'ingredients' => $this->prepareIngredients($payload['ingredients'] ?? ($product?->ingredients ?? []), $product),
             'faqs' => $payload['faqs'] ?? $product?->faqs ?? [],
             'status' => array_key_exists('status', $payload) ? (bool) $payload['status'] : ($product?->status ?? true),
@@ -199,6 +612,20 @@ class ProductService
         }
 
         return $data;
+    }
+
+    private function normalizeCollection(null|string|array $collection): ?string
+    {
+        if (is_array($collection)) {
+            $collection = implode(', ', $collection);
+        }
+
+        $items = collect(explode(',', (string) $collection))
+            ->map(fn ($item) => trim((string) $item))
+            ->filter()
+            ->values();
+
+        return $items->isNotEmpty() ? $items->implode(', ') : null;
     }
 
     private function syncVariants(Product $product, array $variants, bool $syncDeletes = false): void

@@ -11,6 +11,35 @@ use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
+    public function header()
+    {
+        $categories = Category::query()
+            ->whereNull('parent_id')
+            ->where('status', 1)
+            ->with(['children' => fn ($query) => $query
+                ->where('status', 1)
+                ->select(['id', 'name', 'slug', 'parent_id'])])
+            ->select(['id', 'name', 'slug'])
+            ->get()
+            ->map(fn (Category $category) => [
+                'id' => $category->id,
+                'slug' => $category->slug,
+                'name' => $category->name,
+                'subcategories' => $category->children->map(fn (Category $subcategory) => [
+                    'id' => $subcategory->id,
+                    'slug' => $subcategory->slug,
+                    'name' => $subcategory->name,
+                ])->values()->all(),
+            ])
+            ->values();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Header data fetched successfully',
+            'data' => $categories,
+        ]);
+    }
+
     public function index(Request $request)
     {
         $showInactive = $request->boolean('include_inactive') && $request->user()?->hasRole('admin');

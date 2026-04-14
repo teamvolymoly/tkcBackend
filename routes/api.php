@@ -45,6 +45,7 @@ Route::prefix('home')->group(function () {
     Route::get('/blogs', [HomeBlogPostController::class, 'index']);
 });
 
+Route::get('/header', [CategoryController::class, 'header']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{category}', [CategoryController::class, 'show']);
 Route::get('/categories/{category}/subcategories', [CategoryController::class, 'subcategories']);

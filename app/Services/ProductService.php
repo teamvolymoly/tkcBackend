@@ -742,14 +742,35 @@ class ProductService
             return [];
         }
 
-        return collect($variant->brewing_rituals ?? [])
-            ->filter(fn ($ritual) => is_array($ritual))
+        $ritualDefinitions = [
+            ['key' => 'hot_brew', 'title' => 'Hot Brew'],
+            ['key' => 'iced_brew', 'title' => 'Iced Brew'],
+        ];
+
+        return collect($ritualDefinitions)
+            ->map(function (array $definition, int $index) use ($variant, $product) {
+                $ritual = $variant->brewing_rituals[$index] ?? null;
+
+                if (! is_array($ritual)) {
+                    return null;
+                }
+
+                $text = $ritual['ritual'] ?? null;
+                $imageUrl = $product?->resolveMediaUrl($ritual['image'] ?? null);
+
+                return [
+                    'key' => $definition['key'],
+                    'title' => $definition['title'],
+                    'items' => array_values(array_filter([
+                        (! empty($text) || ! empty($imageUrl)) ? [
+                            'text' => $text,
+                            'image_url' => $imageUrl,
+                        ] : null,
+                    ])),
+                ];
+            })
+            ->filter(fn (?array $ritual) => $ritual !== null && ! empty($ritual['items']))
             ->values()
-            ->map(fn (array $ritual) => [
-                'ritual' => $ritual['ritual'] ?? null,
-                'text' => $ritual['ritual'] ?? null,
-                'image_url' => $product?->resolveMediaUrl($ritual['image'] ?? null),
-            ])
             ->all();
     }
 

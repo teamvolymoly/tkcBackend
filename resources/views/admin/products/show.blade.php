@@ -114,13 +114,19 @@
                         <div class="rounded-2xl bg-white px-4 py-3 dark:bg-slate-900"><span class="block text-xs uppercase tracking-[0.2em] text-slate-400">Default</span><span class="mt-1 block font-medium">{{ !empty($variant['is_default']) ? 'Yes' : 'No' }}</span></div>
                     </div>
                     <div class="mt-4 space-y-3">
-                        @foreach (($variant['brewing_rituals'] ?? []) as $ritual)
-                            <div class="flex items-center gap-3 rounded-2xl bg-white px-4 py-3 dark:bg-slate-900">
-                                @if (!empty($ritual['image_url']))
-                                    <img src="{{ $ritual['image_url'] }}" alt="{{ $ritual['ritual'] ?? 'Ritual' }}" class="h-12 w-12 rounded-xl object-cover">
-                                @endif
-                                <span class="text-sm font-medium">{{ $ritual['ritual'] ?? $ritual['text'] ?? 'Ritual' }}</span>
-                            </div>
+                        @foreach (['Hot Brew', 'Iced Brew'] as $ritualIndex => $ritualLabel)
+                            @php $ritual = $variant['brewing_rituals'][$ritualIndex] ?? null; @endphp
+                            @if (!empty($ritual['ritual'] ?? $ritual['text'] ?? null) || !empty($ritual['image_url'] ?? null))
+                                <div class="rounded-2xl bg-white px-4 py-3 dark:bg-slate-900">
+                                    <span class="block text-xs uppercase tracking-[0.2em] text-slate-400">{{ $ritualLabel }}</span>
+                                    <div class="mt-2 flex items-center gap-3">
+                                        @if (!empty($ritual['image_url']))
+                                            <img src="{{ $ritual['image_url'] }}" alt="{{ $ritualLabel }}" class="h-12 w-12 rounded-xl object-cover">
+                                        @endif
+                                        <span class="text-sm font-medium">{{ $ritual['ritual'] ?? $ritual['text'] ?? '-' }}</span>
+                                    </div>
+                                </div>
+                            @endif
                         @endforeach
                     </div>
                 </article>

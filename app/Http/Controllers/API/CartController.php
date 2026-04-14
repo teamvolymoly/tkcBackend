@@ -11,12 +11,19 @@ use Illuminate\Support\Facades\Validator;
 
 class CartController extends Controller
 {
+    private const FREE_SHIPPING_THRESHOLD = 500;
+    private const SHIPPING_AMOUNT = 50;
+
     public function index(Request $request)
     {
         $cart = Cart::firstOrCreate(['user_id' => $request->user()->id]);
         $cart->load('items.variant.product');
 
-        return response()->json(['status' => true, 'data' => $cart]);
+        return response()->json([
+            'status' => true,
+            'message' => 'Cart fetched successfully',
+            'data' => $this->transformCart($cart),
+        ]);
     }
 
     public function store(Request $request)
@@ -44,7 +51,13 @@ class CartController extends Controller
             ['quantity' => $request->quantity]
         );
 
-        return response()->json(['status' => true, 'message' => 'Cart updated', 'data' => $item->load('variant.product')], 201);
+        $item->load('variant.product');
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Cart updated',
+            'data' => $this->transformCartItem($item),
+        ], 201);
     }
 
     public function update(Request $request, $id)
@@ -123,5 +136,64 @@ class CartController extends Controller
         }
 
         return null;
+    }
+
+    private function transformCart(Cart $cart): array
+    {
+        $items = $cart->items
+            ->filter(fn (CartItem $item) => $item->variant && $item->variant->product)
+            ->values()
+            ->map(fn (CartItem $item) => $this->transformCartItem($item))
+            ->all();
+
+        $subtotal = collect($items)->sum('subtotal');
+        $shipping = $subtotal > self::FREE_SHIPPING_THRESHOLD ? 0.0 : ($subtotal > 0 ? self::SHIPPING_AMOUNT : 0.0);
+
+        return [
+            'items' => $items,
+            'summary' => [
+                'subtotal' => (float) $subtotal,
+                'shipping' => (float) $shipping,
+                'total' => (float) ($subtotal + $shipping),
+                'free_shipping_threshold' => self::FREE_SHIPPING_THRESHOLD,
+            ],
+        ];
+    }
+
+    private function transformCartItem(CartItem $item): array
+    {
+        $variant = $item->variant;
+        $product = $variant?->product;
+        $unitPrice = $this->resolveVariantPrice($variant);
+        $subtotal = $unitPrice * (int) $item->quantity;
+        $shipping = $subtotal > self::FREE_SHIPPING_THRESHOLD ? 0.0 : self::SHIPPING_AMOUNT;
+
+        return [
+            'id' => $item->id,
+            'quantity' => (int) $item->quantity,
+            'product_name' => $product?->name,
+            'variant_name' => $variant?->name,
+            'product_image' => $product?->resolveMediaUrl($product?->image_1),
+            'price' => (float) $unitPrice,
+            'subtotal' => (float) $subtotal,
+            'shipping' => (float) $shipping,
+            'total' => (float) ($subtotal + $shipping),
+        ];
+    }
+
+    private function resolveVariantPrice(?ProductVariant $variant): float
+    {
+        if (! $variant) {
+            return 0.0;
+        }
+
+        $discountPrice = $variant->discount_price !== null ? (float) $variant->discount_price : null;
+        $price = $variant->price !== null ? (float) $variant->price : 0.0;
+
+        if ($discountPrice !== null && $discountPrice > 0 && $discountPrice < $price) {
+            return $discountPrice;
+        }
+
+        return $price;
     }
 }

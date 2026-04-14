@@ -9,7 +9,10 @@
         'price' => '',
         'discount_price' => '',
         'weight' => '',
-        'brewing_rituals' => [['ritual' => '', 'image' => null]],
+        'brewing_rituals' => [
+            ['ritual' => '', 'image' => null],
+            ['ritual' => '', 'image' => null],
+        ],
         'is_default' => 1,
         'status' => 1,
     ]]);
@@ -168,31 +171,37 @@
                         </div>
 
                         <div class="rounded-[1.25rem] border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-                            <div class="flex items-center justify-between gap-3">
+                            <div>
                                 <div>
                                     <h4 class="font-semibold">Brewing Rituals</h4>
-                                    <p class="mt-1 text-sm text-slate-500">Ritual text with optional image.</p>
+                                    <p class="mt-1 text-sm text-slate-500">Add separate text for hot brew and iced brew.</p>
                                 </div>
-                                <button type="button" @click="addRitual(index)" class="rounded-2xl border border-slate-200 px-3 py-2 text-xs font-semibold dark:border-slate-700">Add Ritual</button>
                             </div>
-                            <div class="mt-4 space-y-4">
-                                <template x-for="(ritual, ritualIndex) in variant.brewing_rituals" :key="ritual.uid">
-                                    <div class="grid gap-4 rounded-2xl border border-slate-200 p-4 md:grid-cols-[1fr_1fr_auto] dark:border-slate-700">
-                                        <div>
-                                            <label class="mb-2 block text-sm font-medium">Ritual</label>
-                                            <input type="text" :name="`variants[${index}][brewing_rituals][${ritualIndex}][ritual]`" x-model="ritual.ritual" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">
-                                            <input type="hidden" :name="`variants[${index}][brewing_rituals][${ritualIndex}][existing_image]`" x-model="ritual.existing_image">
-                                        </div>
-                                        <div>
-                                            <label class="mb-2 block text-sm font-medium">Image</label>
-                                            <template x-if="ritual.preview"><img :src="ritual.preview" class="mb-3 h-24 w-24 rounded-2xl object-cover"></template>
-                                            <input type="file" :name="`variants[${index}][brewing_rituals][${ritualIndex}][image]`" accept="image/*" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">
-                                        </div>
-                                        <div class="flex items-end">
-                                            <button type="button" @click="removeRitual(index, ritualIndex)" class="rounded-2xl border border-rose-200 px-4 py-3 text-sm font-semibold text-rose-600">Remove</button>
-                                        </div>
+                            <div class="mt-4 grid gap-4 md:grid-cols-2">
+                                <div class="rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
+                                    <label class="mb-2 block text-sm font-medium">Hot Brew</label>
+                                    <input type="text" :name="`variants[${index}][brewing_rituals][0][ritual]`" x-model="variant.brewing_rituals[0].ritual" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Enter hot brew text">
+                                    <input type="hidden" :name="`variants[${index}][brewing_rituals][0][existing_image]`" x-model="variant.brewing_rituals[0].existing_image">
+                                    <div class="mt-4">
+                                        <label class="mb-2 block text-sm font-medium">Image</label>
+                                        <template x-if="variant.brewing_rituals[0].preview">
+                                            <img :src="variant.brewing_rituals[0].preview" alt="Hot Brew" class="mb-3 h-24 w-24 rounded-2xl object-cover">
+                                        </template>
+                                        <input type="file" :name="`variants[${index}][brewing_rituals][0][image]`" accept="image/*" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">
                                     </div>
-                                </template>
+                                </div>
+                                <div class="rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
+                                    <label class="mb-2 block text-sm font-medium">Iced Brew</label>
+                                    <input type="text" :name="`variants[${index}][brewing_rituals][1][ritual]`" x-model="variant.brewing_rituals[1].ritual" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Enter iced brew text">
+                                    <input type="hidden" :name="`variants[${index}][brewing_rituals][1][existing_image]`" x-model="variant.brewing_rituals[1].existing_image">
+                                    <div class="mt-4">
+                                        <label class="mb-2 block text-sm font-medium">Image</label>
+                                        <template x-if="variant.brewing_rituals[1].preview">
+                                            <img :src="variant.brewing_rituals[1].preview" alt="Iced Brew" class="mb-3 h-24 w-24 rounded-2xl object-cover">
+                                        </template>
+                                        <input type="file" :name="`variants[${index}][brewing_rituals][1][image]`" accept="image/*" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

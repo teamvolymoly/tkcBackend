@@ -8,7 +8,21 @@ function productForm(initialIngredients, initialFaqs, initialVariants) {
     };
     const ingredientTemplate = () => ({ uid: uid('ingredient'), name: '', existing_image: '', preview: '' });
     const faqTemplate = () => ({ uid: uid('faq'), question: '', answer: '' });
-    const ritualTemplate = () => ({ uid: uid('ritual'), ritual: '', existing_image: '', preview: '' });
+    const ritualTemplate = (ritual = '') => ({ uid: uid('ritual'), ritual, existing_image: '', preview: '' });
+    const normalizeRituals = (rituals = []) => {
+        const items = (rituals || []).slice(0, 2).map((ritual) => ({
+            uid: uid('ritual'),
+            ritual: ritual.ritual || ritual.text || '',
+            existing_image: ritual.image || ritual.image_path || '',
+            preview: toPreview(ritual.image || ritual.image_path || ''),
+        }));
+
+        while (items.length < 2) {
+            items.push(ritualTemplate());
+        }
+
+        return items;
+    };
     const variantTemplate = (isDefault = false) => ({
         uid: uid('variant'),
         id: '',
@@ -17,7 +31,7 @@ function productForm(initialIngredients, initialFaqs, initialVariants) {
         price: '',
         discount_price: '',
         weight: '',
-        brewing_rituals: [ritualTemplate()],
+        brewing_rituals: normalizeRituals(),
         is_default: isDefault,
         status: true,
     });
@@ -42,12 +56,7 @@ function productForm(initialIngredients, initialFaqs, initialVariants) {
             price: variant.price || '',
             discount_price: variant.discount_price || variant.compare_price || '',
             weight: variant.weight || '',
-            brewing_rituals: (variant.brewing_rituals || []).length ? variant.brewing_rituals.map((ritual) => ({
-                uid: uid('ritual'),
-                ritual: ritual.ritual || ritual.text || '',
-                existing_image: ritual.image || ritual.image_path || '',
-                preview: toPreview(ritual.image || ritual.image_path || ''),
-            })) : [ritualTemplate()],
+            brewing_rituals: normalizeRituals(variant.brewing_rituals || []),
             is_default: typeof variant.is_default === 'undefined' ? index === 0 : Boolean(Number(variant.is_default) || variant.is_default),
             status: typeof variant.status === 'undefined' ? true : Boolean(Number(variant.status) || variant.status),
         })) : [variantTemplate(true)],
@@ -63,11 +72,6 @@ function productForm(initialIngredients, initialFaqs, initialVariants) {
             if (wasDefault && this.variants.length) this.setDefaultVariant(0);
         },
         setDefaultVariant(index) { this.variants.forEach((variant, variantIndex) => variant.is_default = variantIndex === index); },
-        addRitual(index) { this.variants[index].brewing_rituals.push(ritualTemplate()); },
-        removeRitual(index, ritualIndex) {
-            const rituals = this.variants[index].brewing_rituals;
-            rituals.length === 1 ? rituals[ritualIndex] = ritualTemplate() : rituals.splice(ritualIndex, 1);
-        },
     }
 }
 </script>

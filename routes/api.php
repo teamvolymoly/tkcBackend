@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AddressController;
+use App\Http\Controllers\API\AdvertisementController;
 use App\Http\Controllers\API\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\API\Admin\UserManagementController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogPostController;
 use App\Http\Controllers\API\CartController;
 use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\CheckoutController;
 use App\Http\Controllers\API\ContactQueryController;
 use App\Http\Controllers\API\CouponController;
 use App\Http\Controllers\API\CustomerDashboardController;
@@ -46,6 +48,8 @@ Route::prefix('home')->group(function () {
 });
 
 Route::get('/header', [CategoryController::class, 'header']);
+Route::get('/header/advertisement', [AdvertisementController::class, 'header']);
+Route::get('/shop/advertisement', [AdvertisementController::class, 'shop']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{category}', [CategoryController::class, 'show']);
 Route::get('/categories/{category}/subcategories', [CategoryController::class, 'subcategories']);
@@ -86,19 +90,28 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/cart/{id}', [CartController::class, 'update']);
     Route::delete('/cart/{id}', [CartController::class, 'destroy']);
     Route::delete('/cart', [CartController::class, 'clear']);
+    Route::get('/checkout/summary', [CheckoutController::class, 'summary']);
 
     Route::post('/wishlist', [WishlistController::class, 'store']);
     Route::get('/wishlist', [WishlistController::class, 'index']);
     Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy']);
 
     Route::post('/orders', [OrderController::class, 'store']);
+    Route::get('/user/dashboard', [CustomerDashboardController::class, 'index']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::get('/orders/{id}', [OrderController::class, 'show']);
     Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
     Route::get('/orders/{id}/track', [OrderController::class, 'track']);
+    Route::get('/orders/{id}/tracking', [OrderController::class, 'track']);
+    Route::post('/orders/{id}/return', [OrderController::class, 'requestReturn']);
 
     Route::post('/payments', [PaymentController::class, 'store']);
     Route::get('/payments/{order_id}', [PaymentController::class, 'show']);
+    Route::post('/razorpay/order', [PaymentController::class, 'createOrder']);
+    Route::post('/razorpay/verify', [PaymentController::class, 'verify']);
+    Route::get('/payment/success/{order_id}', [PaymentController::class, 'success']);
+    Route::post('/payment/failure', [PaymentController::class, 'logFailure']);
+    Route::post('/payment/retry', [PaymentController::class, 'retry']);
 
     Route::post('/coupons/apply', [CouponController::class, 'apply']);
     Route::post('/coupons', [CouponController::class, 'store'])->middleware('admin.api_permission:coupons.create');

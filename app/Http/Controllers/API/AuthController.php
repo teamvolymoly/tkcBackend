@@ -17,6 +17,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'phone' => 'nullable|string|max:20',
+            'delivery_phone' => 'nullable|string|max:20',
             'password' => 'required|string|min:6|confirmed',
         ]);
 
@@ -28,6 +29,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
+            'delivery_phone' => $request->delivery_phone,
             'password' => $request->password,
         ]);
 
@@ -108,6 +110,7 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
             'phone' => 'nullable|string|max:20',
+            'delivery_phone' => 'nullable|string|max:20',
             'email' => 'sometimes|required|email|unique:users,email,'.$user->id,
         ]);
 
@@ -115,7 +118,7 @@ class AuthController extends Controller
             return response()->json(['status' => false, 'errors' => $validator->errors()], 422);
         }
 
-        $user->update($request->only(['name', 'email', 'phone']));
+        $user->update($request->only(['name', 'email', 'phone', 'delivery_phone']));
 
         $freshUser = $user->fresh();
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Services\CustomerCheckoutService;
 use App\Models\Coupon;
 use App\Models\Order;
 use Carbon\Carbon;
@@ -11,6 +12,10 @@ use Illuminate\Validation\Rule;
 
 class CouponController extends Controller
 {
+    public function __construct(private readonly CustomerCheckoutService $checkoutService)
+    {
+    }
+
     public function index(Request $request)
     {
         $coupons = $this->baseQuery($request)
@@ -78,28 +83,33 @@ class CouponController extends Controller
     {
         $request->validate([
             'code' => 'required|string|exists:coupons,code',
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'nullable|numeric|min:0',
         ]);
 
         $coupon = Coupon::where('code', $request->code)
             ->where('is_active', true)
             ->firstOrFail();
 
-        $validationError = $this->validateCouponForAmount($coupon, (float) $request->amount, $request->user()?->id);
+        $amount = $request->filled('amount')
+            ? (float) $request->amount
+            : (float) ($request->user() ? $this->checkoutService->checkoutSummary($request->user())['total'] : 0);
+
+        $validationError = $this->validateCouponForAmount($coupon, $amount, $request->user()?->id);
 
         if ($validationError) {
             return response()->json(['status' => false, 'message' => $validationError], 422);
         }
 
-        $discount = $this->calculateDiscount($coupon, (float) $request->amount);
-        $finalAmount = max(0, $request->amount - $discount);
+        $discount = $this->calculateDiscount($coupon, $amount);
+        $finalAmount = max(0, $amount - $discount);
 
         return response()->json([
             'status' => true,
             'data' => [
-                'coupon' => $coupon,
                 'discount' => round($discount, 2),
+                'new_total' => round($finalAmount, 2),
                 'final_amount' => round($finalAmount, 2),
+                'coupon' => $coupon,
             ],
         ]);
     }

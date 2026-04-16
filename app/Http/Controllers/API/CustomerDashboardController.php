@@ -3,50 +3,43 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Services\CustomerCheckoutService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CustomerDashboardController extends Controller
 {
+    public function __construct(private readonly CustomerCheckoutService $checkoutService)
+    {
+    }
+
     public function index(Request $request): JsonResponse
     {
         $user = $request->user()->load([
-            'addresses',
-            'cart.items',
-            'orders' => fn ($query) => $query->with('payments')->latest()->limit(5),
+            'orders' => fn ($query) => $query->with(['items', 'payments'])->latest()->limit(5),
         ]);
 
-        $wishlistCount = $user->wishlistItems()->count();
         $totalOrdersCount = $user->orders()->count();
-        $activeSubscriptionsCount = 0;
-        $loyaltyPoints = 0;
+        $inTransitOrders = $user->orders()->whereIn('status', ['confirmed', 'processing', 'shipped'])->count();
+        $deliveredOrders = $user->orders()->where('status', 'delivered')->count();
+        $amountSpent = (float) $user->orders()->where('payment_status', 'paid')->sum('total_amount');
 
-        $recentOrders = $user->orders->map(function ($order) {
-            return [
-                'id' => $order->id,
-                'order_number' => $order->order_number,
-                'status' => $order->status,
-                'payment_status' => $order->payment_status,
-                'total_amount' => $order->total_amount,
-                'ordered_at' => $order->created_at,
-                'ordered_at_label' => $order->created_at?->format('M d, Y'),
-            ];
-        })->values();
+        $recentOrders = $user->orders
+            ->map(fn ($order) => $this->checkoutService->buildOrderListItem($order))
+            ->values();
 
         return response()->json([
             'status' => true,
-            'message' => 'Customer dashboard fetched successfully',
+            'message' => 'Dashboard data fetched successfully',
             'data' => [
-                'profile' => $user->customerProfileData(),
                 'stats' => [
                     'total_orders' => $totalOrdersCount,
-                    'active_subscriptions' => $activeSubscriptionsCount,
-                    'loyalty_points' => $loyaltyPoints,
-                    'saved_blends' => $wishlistCount,
+                    'orders_in_transit' => $inTransitOrders,
+                    'delivered_orders' => $deliveredOrders,
+                    'amount_spent' => round($amountSpent, 2),
+                    'currency' => CustomerCheckoutService::CURRENCY,
                 ],
                 'recent_orders' => $recentOrders,
-                'subscriptions' => [],
-                'default_address' => $user->addresses->firstWhere('is_default', true),
             ],
         ]);
     }

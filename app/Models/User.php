@@ -16,6 +16,7 @@ class User extends Authenticatable
         'name',
         'email',
         'phone',
+        'delivery_phone',
         'password',
     ];
 
@@ -69,6 +70,7 @@ class User extends Authenticatable
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
+            'delivery_phone' => $this->delivery_phone,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'roles' => $this->roles()
@@ -90,6 +92,7 @@ class User extends Authenticatable
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
+            'delivery_phone' => $this->delivery_phone,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'email_verified_at' => $this->email_verified_at,

@@ -17,6 +17,12 @@ class Order extends Model
         'coupon_code',
         'status',
         'payment_status',
+        'tracking_id',
+        'cancel_reason',
+        'return_reason',
+        'return_items',
+        'return_requested_at',
+        'delivery_date',
         'notes',
     ];
 
@@ -25,6 +31,9 @@ class Order extends Model
         'discount_amount' => 'decimal:2',
         'shipping_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'return_items' => 'array',
+        'return_requested_at' => 'datetime',
+        'delivery_date' => 'date',
     ];
 
     public function user()

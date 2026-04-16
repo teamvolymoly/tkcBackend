@@ -12,7 +12,10 @@ class SearchController extends Controller
     {
         $request->validate([
             'q' => 'required|string|min:1',
+            'limit' => 'nullable|integer|min:1|max:20',
         ]);
+
+        $limit = (int) $request->integer('limit', 5);
 
         $results = Product::with('variants')
             ->where('status', true)
@@ -23,7 +26,23 @@ class SearchController extends Controller
                     ->orWhere('description', 'like', '%'.$request->q.'%');
             })
             ->latest()
-            ->paginate(20);
+            ->limit($limit)
+            ->get()
+            ->map(function (Product $product) {
+                $variant = $product->variants->sortByDesc('is_default')->first();
+                $image = $variant?->primary_image['image_url'] ?? $product->resolveMediaUrl($product->image_1);
+
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'image' => $image,
+                    'price' => (float) ($variant?->discount_price && $variant->discount_price > 0
+                        ? $variant->discount_price
+                        : $variant?->price),
+                ];
+            })
+            ->values();
 
         return response()->json(['status' => true, 'data' => $results]);
     }

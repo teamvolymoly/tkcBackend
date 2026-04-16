@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Cart;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
 use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\ProductVariant;
+use App\Services\CustomerCheckoutService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +14,10 @@ use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
+    public function __construct(private readonly CustomerCheckoutService $checkoutService)
+    {
+    }
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -35,27 +37,14 @@ class OrderController extends Controller
             return response()->json(['status' => false, 'message' => 'Selected address is invalid'], 422);
         }
 
-        $cart = Cart::with('items.variant.product')->firstOrCreate(['user_id' => $user->id]);
+        $summary = $this->checkoutService->checkoutSummary($user);
 
-        if ($cart->items->isEmpty()) {
+        if (empty($summary['items'])) {
             return response()->json(['status' => false, 'message' => 'Cart is empty'], 422);
         }
 
-        foreach ($cart->items as $item) {
-            $validationError = $this->validatePurchasableVariant($item->variant, (int) $item->quantity);
-
-            if ($validationError) {
-                return response()->json(['status' => false, 'message' => $validationError], 422);
-            }
-        }
-
-        $subtotal = $cart->items->sum(function ($item) {
-            return $item->quantity * $item->variant->price;
-        });
-
         $discount = 0;
         $coupon = null;
-        $shippingAmount = 0;
 
         if ($request->filled('coupon_code')) {
             $coupon = Coupon::where('code', $request->coupon_code)->where('is_active', true)->first();
@@ -64,43 +53,24 @@ class OrderController extends Controller
                 return response()->json(['status' => false, 'message' => 'Invalid or expired coupon'], 422);
             }
 
-            $validationError = $this->validateCouponForOrder($coupon, $subtotal, $user->id);
+            $validationError = $this->validateCouponForOrder($coupon, (float) $summary['total'], $user->id);
 
             if ($validationError) {
                 return response()->json(['status' => false, 'message' => $validationError], 422);
             }
 
-            $discount = $this->calculateDiscount($coupon, $subtotal);
+            $discount = $this->calculateDiscount($coupon, (float) $summary['total']);
         }
 
-        $total = max(0, ($subtotal - $discount) + $shippingAmount);
-
-        $order = DB::transaction(function () use ($user, $request, $cart, $subtotal, $discount, $shippingAmount, $total, $coupon) {
-            $order = Order::create([
-                'user_id' => $user->id,
-                'address_id' => $request->address_id,
-                'order_number' => 'ORD-'.now()->format('YmdHis').'-'.rand(1000, 9999),
-                'subtotal' => $subtotal,
-                'discount_amount' => $discount,
-                'shipping_amount' => $shippingAmount,
-                'total_amount' => $total,
+        $order = DB::transaction(function () use ($user, $address, $request, $coupon, $summary, $discount) {
+            $order = $this->checkoutService->createPendingOrderFromCart($user, $address, [
                 'coupon_code' => $coupon?->code,
-                'status' => 'pending',
-                'payment_status' => 'unpaid',
+                'discount_amount' => $discount,
+                'total_amount' => max(0, (float) $summary['total'] - $discount),
                 'notes' => $request->notes,
+                'status' => 'confirmed',
+                'payment_status' => 'unpaid',
             ]);
-
-            foreach ($cart->items as $item) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $item->variant->product_id,
-                    'variant_id' => $item->variant_id,
-                    'product_name' => $item->variant->product->name,
-                    'variant_name' => $item->variant->name,
-                    'price' => $item->variant->price,
-                    'quantity' => $item->quantity,
-                ]);
-            }
 
             if ($coupon) {
                 CouponUsage::create([
@@ -111,77 +81,139 @@ class OrderController extends Controller
                 ]);
             }
 
-            $cart->items()->delete();
+            $this->checkoutService->clearCart($user);
 
-            return $order;
+            return $order->fresh(['items.variant.product', 'payments', 'address']);
         });
 
         return response()->json([
             'status' => true,
             'message' => 'Order created successfully',
-            'data' => $order->load('items.variant', 'address'),
+            'data' => $this->checkoutService->buildOrderDetail($order),
         ], 201);
     }
 
     public function index(Request $request)
     {
-        $orders = Order::with('items', 'payments')
-            ->where('user_id', $request->user()->id)
-            ->latest()
-            ->paginate(20);
+        $limit = min(max((int) $request->integer('limit', 10), 1), 50);
 
-        return response()->json(['status' => true, 'data' => $orders]);
+        $orders = Order::with(['items', 'payments'])
+            ->where('user_id', $request->user()->id)
+            ->when($request->filled('status'), function ($query) use ($request) {
+                $status = match (strtolower((string) $request->status)) {
+                    'delivered' => 'delivered',
+                    'in transit' => 'shipped',
+                    'packed' => 'processing',
+                    'confirmed' => 'confirmed',
+                    'cancelled' => 'cancelled',
+                    'pending' => 'pending',
+                    default => strtolower((string) $request->status),
+                };
+
+                $query->where('status', $status);
+            })
+            ->when($request->filled('from'), fn ($query) => $query->whereDate('created_at', '>=', $request->from))
+            ->when($request->filled('to'), fn ($query) => $query->whereDate('created_at', '<=', $request->to))
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+                $query->where(function ($inner) use ($search) {
+                    $inner->where('order_number', 'like', '%'.$search.'%')
+                        ->orWhereHas('items', fn ($itemQuery) => $itemQuery->where('product_name', 'like', '%'.$search.'%'));
+                });
+            })
+            ->latest()
+            ->paginate($limit)
+            ->withQueryString();
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'items' => collect($orders->items())
+                    ->map(fn (Order $order) => $this->checkoutService->buildOrderListItem($order))
+                    ->values(),
+                'pagination' => [
+                    'page' => $orders->currentPage(),
+                    'limit' => $orders->perPage(),
+                    'total_items' => $orders->total(),
+                    'total_pages' => $orders->lastPage(),
+                ],
+            ],
+        ]);
     }
 
     public function show(Request $request, $id)
     {
-        $order = Order::with('items.variant.product', 'payments', 'address')
-            ->where('user_id', $request->user()->id)
-            ->findOrFail($id);
+        $order = $this->resolveUserOrder($request, $id, ['items.variant.product', 'payments', 'address']);
 
-        return response()->json(['status' => true, 'data' => $order]);
+        return response()->json([
+            'status' => true,
+            'data' => $this->checkoutService->buildOrderDetail($order),
+        ]);
     }
 
     public function cancel(Request $request, $id)
     {
-        $order = Order::where('user_id', $request->user()->id)->findOrFail($id);
+        $order = $this->resolveUserOrder($request, $id);
 
         if (in_array($order->status, ['shipped', 'delivered', 'cancelled'], true)) {
             return response()->json(['status' => false, 'message' => 'Order cannot be cancelled'], 422);
         }
 
-        $order->update(['status' => 'cancelled']);
+        $order->update([
+            'status' => 'cancelled',
+            'cancel_reason' => $request->input('reason'),
+        ]);
 
-        return response()->json(['status' => true, 'message' => 'Order cancelled', 'data' => $order]);
+        return response()->json(['status' => true, 'message' => 'Order cancelled']);
     }
 
     public function track(Request $request, $id)
     {
-        $order = Order::where('user_id', $request->user()->id)->findOrFail($id);
+        $order = $this->resolveUserOrder($request, $id);
 
         return response()->json([
             'status' => true,
             'data' => [
-                'order_id' => $order->id,
-                'order_number' => $order->order_number,
-                'status' => $order->status,
-                'payment_status' => $order->payment_status,
-                'updated_at' => $order->updated_at,
+                'order_id' => $order->order_number,
+                'events' => $this->checkoutService->trackingEvents($order),
             ],
         ]);
     }
 
-    private function validatePurchasableVariant(?ProductVariant $variant, int $quantity): ?string
+    public function requestReturn(Request $request, $id)
     {
-        if (! $variant) {
-            return 'One or more cart items are no longer available';
+        $request->validate([
+            'reason' => 'required|string|max:1000',
+            'items' => 'nullable|array',
+        ]);
+
+        $order = $this->resolveUserOrder($request, $id);
+
+        if (! in_array($order->status, ['delivered', 'confirmed', 'processing', 'shipped'], true)) {
+            return response()->json(['status' => false, 'message' => 'Return cannot be requested for this order'], 422);
         }
 
-        if (! $variant->status || ! $variant->product || ! $variant->product->status) {
-            return 'One or more cart items are inactive';
-        }
+        $order->update([
+            'return_reason' => $request->reason,
+            'return_items' => $request->input('items', []),
+            'return_requested_at' => now(),
+        ]);
 
-        return null;
+        return response()->json(['status' => true, 'message' => 'Return requested']);
+    }
+
+    private function resolveUserOrder(Request $request, string|int $identifier, array $with = [])
+    {
+        return Order::with($with)
+            ->where('user_id', $request->user()->id)
+            ->where(function ($query) use ($identifier) {
+                $query->where('order_number', $identifier);
+
+                if (is_numeric($identifier)) {
+                    $query->orWhere('id', (int) $identifier);
+                }
+            })
+            ->firstOrFail();
     }
 
     private function validateCouponForOrder(Coupon $coupon, float $subtotal, int $userId): ?string

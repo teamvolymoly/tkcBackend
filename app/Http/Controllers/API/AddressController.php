@@ -18,6 +18,7 @@ class AddressController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'label' => 'nullable|string|max:100',
             'address_line1' => 'required|string|max:255',
             'address_line2' => 'nullable|string|max:255',
             'city' => 'required|string|max:100',
@@ -36,6 +37,7 @@ class AddressController extends Controller
         }
 
         $address = $request->user()->addresses()->create([
+            'label' => $request->label,
             'address_line1' => $request->address_line1,
             'address_line2' => $request->address_line2,
             'city' => $request->city,
@@ -59,6 +61,7 @@ class AddressController extends Controller
         $address = $request->user()->addresses()->findOrFail($id);
 
         $validator = Validator::make($request->all(), [
+            'label' => 'nullable|string|max:100',
             'address_line1' => 'sometimes|required|string|max:255',
             'address_line2' => 'nullable|string|max:255',
             'city' => 'sometimes|required|string|max:100',
@@ -76,7 +79,7 @@ class AddressController extends Controller
             $request->user()->addresses()->update(['is_default' => false]);
         }
 
-        $address->update($request->only(['address_line1', 'address_line2', 'city', 'state', 'pincode', 'country', 'is_default']));
+        $address->update($request->only(['label', 'address_line1', 'address_line2', 'city', 'state', 'pincode', 'country', 'is_default']));
 
         return response()->json(['status' => true, 'message' => 'Address updated', 'data' => $address->fresh()]);
     }

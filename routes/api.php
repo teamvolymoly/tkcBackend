@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\API\AddressController;
-use App\Http\Controllers\API\AdvertisementController;
 use App\Http\Controllers\API\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\API\Admin\UserManagementController;
@@ -9,21 +8,13 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogPostController;
 use App\Http\Controllers\API\CartController;
 use App\Http\Controllers\API\CategoryController;
-use App\Http\Controllers\API\CheckoutController;
-use App\Http\Controllers\API\ContactQueryController;
 use App\Http\Controllers\API\CouponController;
-use App\Http\Controllers\API\CustomerDashboardController;
 use App\Http\Controllers\API\HeroSectionController;
-use App\Http\Controllers\API\HomeBestSellingProductController;
 use App\Http\Controllers\API\HomeBlogPostController;
 use App\Http\Controllers\API\HomeHeroSectionController;
-use App\Http\Controllers\API\HomeShopByCategoryController;
-use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\ProductController;
-use App\Http\Controllers\API\ProductVariantController;
 use App\Http\Controllers\API\ReviewController;
-use App\Http\Controllers\API\SearchController;
 use App\Http\Controllers\API\WishlistController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,25 +33,16 @@ Route::prefix('auth')->group(function () {
 
 Route::prefix('home')->group(function () {
     Route::get('/hero-sections', [HomeHeroSectionController::class, 'index']);
-    Route::get('/bestselling-products', [HomeBestSellingProductController::class, 'index']);
-    Route::get('/shop-by-category', [HomeShopByCategoryController::class, 'index']);
     Route::get('/blogs', [HomeBlogPostController::class, 'index']);
 });
 
 Route::get('/header', [CategoryController::class, 'header']);
-Route::get('/header/advertisement', [AdvertisementController::class, 'header']);
-Route::get('/shop/advertisement', [AdvertisementController::class, 'shop']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{category}', [CategoryController::class, 'show']);
 Route::get('/categories/{category}/subcategories', [CategoryController::class, 'subcategories']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/filters', [ProductController::class, 'filters']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
-Route::get('/products/{id}/variants', [ProductVariantController::class, 'index']);
-Route::get('/products/{id}/reviews', [ReviewController::class, 'productReviews']);
-Route::get('/search', [SearchController::class, 'index']);
-Route::get('/coupons', [CouponController::class, 'index']);
-Route::post('/contact-queries', [ContactQueryController::class, 'store']);
 Route::post('/payments/webhook', [PaymentController::class, 'webhook']);
 Route::get('/blog-posts', [BlogPostController::class, 'index']);
 Route::get('/blog-posts/{blogPost}', [BlogPostController::class, 'show']);
@@ -68,7 +50,6 @@ Route::get('/blog-posts/{blogPost}', [BlogPostController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/addresses', [AddressController::class, 'store']);
     Route::get('/addresses', [AddressController::class, 'index']);
-    Route::get('/addresses/{id}', [AddressController::class, 'show']);
     Route::put('/addresses/{id}', [AddressController::class, 'update']);
     Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
     Route::post('/addresses/{id}/set-default', [AddressController::class, 'setDefault']);
@@ -81,46 +62,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/products/{id}', [ProductController::class, 'update'])->middleware('admin.api_permission:products.update');
     Route::delete('/products/{id}', [ProductController::class, 'destroy'])->middleware('admin.api_permission:products.delete');
 
-    Route::post('/variants', [ProductVariantController::class, 'store'])->middleware('admin.api_permission:products.update');
-    Route::put('/variants/{id}', [ProductVariantController::class, 'update'])->middleware('admin.api_permission:products.update');
-    Route::delete('/variants/{id}', [ProductVariantController::class, 'destroy'])->middleware('admin.api_permission:products.delete');
-
     Route::get('/cart', [CartController::class, 'index']);
     Route::post('/cart', [CartController::class, 'store']);
     Route::put('/cart/{id}', [CartController::class, 'update']);
     Route::delete('/cart/{id}', [CartController::class, 'destroy']);
-    Route::delete('/cart', [CartController::class, 'clear']);
-    Route::get('/checkout/summary', [CheckoutController::class, 'summary']);
-
-    Route::post('/wishlist', [WishlistController::class, 'store']);
-    Route::get('/wishlist', [WishlistController::class, 'index']);
-    Route::delete('/wishlist/{id}', [WishlistController::class, 'destroy']);
-
-    Route::post('/orders', [OrderController::class, 'store']);
-    Route::get('/user/dashboard', [CustomerDashboardController::class, 'index']);
-    Route::get('/orders', [OrderController::class, 'index']);
-    Route::get('/orders/{id}', [OrderController::class, 'show']);
-    Route::post('/orders/{id}/cancel', [OrderController::class, 'cancel']);
-    Route::get('/orders/{id}/track', [OrderController::class, 'track']);
-    Route::get('/orders/{id}/tracking', [OrderController::class, 'track']);
-    Route::post('/orders/{id}/return', [OrderController::class, 'requestReturn']);
-
-    Route::post('/payments', [PaymentController::class, 'store']);
-    Route::get('/payments/{order_id}', [PaymentController::class, 'show']);
     Route::post('/razorpay/order', [PaymentController::class, 'createOrder']);
     Route::post('/razorpay/verify', [PaymentController::class, 'verify']);
-    Route::get('/payment/success/{order_id}', [PaymentController::class, 'success']);
-    Route::post('/payment/failure', [PaymentController::class, 'logFailure']);
-    Route::post('/payment/retry', [PaymentController::class, 'retry']);
-
-    Route::post('/coupons/apply', [CouponController::class, 'apply']);
     Route::post('/coupons', [CouponController::class, 'store'])->middleware('admin.api_permission:coupons.create');
     Route::get('/coupons/{coupon}', [CouponController::class, 'show'])->middleware('admin.api_permission:coupons.view');
     Route::put('/coupons/{coupon}', [CouponController::class, 'update'])->middleware('admin.api_permission:coupons.update');
     Route::delete('/coupons/{coupon}', [CouponController::class, 'destroy'])->middleware('admin.api_permission:coupons.delete');
-
-    Route::post('/reviews', [ReviewController::class, 'store']);
-    Route::delete('/reviews/{id}', [ReviewController::class, 'destroy']);
 
     Route::get('/users', [UserManagementController::class, 'index'])->middleware('admin.api_permission:users.view');
     Route::post('/users', [UserManagementController::class, 'store'])->middleware('admin.api_permission:users.create');
@@ -147,7 +98,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->middleware('admin.api_permission:dashboard.view');
     Route::get('/admin/analytics', [AdminController::class, 'analytics'])->middleware('admin.api_permission:dashboard.view');
-    Route::get('/admin/customers', [AdminController::class, 'customers'])->middleware('admin.api_permission:users.view');
     Route::get('/admin/products/{id}', [ProductController::class, 'adminShow'])->middleware('admin.api_permission:products.view');
     Route::get('/admin/coupons', [CouponController::class, 'adminIndex'])->middleware('admin.api_permission:coupons.view');
     Route::get('/admin/orders', [AdminController::class, 'orders'])->middleware('admin.api_permission:orders.view');

@@ -17,47 +17,6 @@ class PaymentController extends Controller
     {
     }
 
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'order_id' => 'required',
-            'payment_method' => 'required|string|max:100',
-            'transaction_id' => 'nullable|string|max:255|unique:payments,transaction_id',
-            'status' => 'nullable|in:initiated,success,failed,refunded',
-            'gateway_payload' => 'nullable|array',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['status' => false, 'errors' => $validator->errors()], 422);
-        }
-
-        $order = $this->resolveUserOrder($request->user()->id, $request->order_id, ['payments']);
-        $status = $request->status ?? 'initiated';
-
-        if ($order->payment_status === 'paid' && in_array($status, ['initiated', 'success'], true)) {
-            return response()->json(['status' => false, 'message' => 'Payment has already been completed for this order'], 422);
-        }
-
-        if ($order->payments()->whereIn('status', ['initiated', 'success'])->exists() && in_array($status, ['initiated', 'success'], true)) {
-            return response()->json(['status' => false, 'message' => 'A payment attempt already exists for this order'], 422);
-        }
-
-        $payment = Payment::create([
-            'order_id' => $order->id,
-            'payment_method' => $request->payment_method,
-            'transaction_id' => $request->transaction_id,
-            'amount' => $order->total_amount,
-            'currency' => CustomerCheckoutService::CURRENCY,
-            'status' => $status,
-            'gateway_payload' => $request->gateway_payload,
-            'paid_at' => $status === 'success' ? now() : null,
-        ]);
-
-        $this->syncOrderFromPayment($order, $payment);
-
-        return response()->json(['status' => true, 'message' => 'Payment recorded', 'data' => $payment], 201);
-    }
-
     public function createOrder(Request $request)
     {
         $validated = $request->validate([
@@ -162,106 +121,6 @@ class PaymentController extends Controller
         ]);
     }
 
-    public function success(Request $request, $orderId)
-    {
-        $order = $this->resolveUserOrder($request->user()->id, $orderId, ['items.variant.product', 'address', 'payments']);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Payment successful',
-            'data' => $this->checkoutService->buildPaymentSuccess($order),
-        ]);
-    }
-
-    public function logFailure(Request $request)
-    {
-        $validated = $request->validate([
-            'razorpay_order_id' => 'required|string',
-            'razorpay_payment_id' => 'nullable|string',
-            'reason' => 'required|string|max:1000',
-            'code' => 'nullable|string|max:255',
-            'order_id' => 'nullable',
-        ]);
-
-        $payment = Payment::with('order')
-            ->where('gateway_order_id', $validated['razorpay_order_id'])
-            ->first();
-
-        if (! $payment && ! empty($validated['order_id'])) {
-            $order = $this->resolveUserOrder($request->user()->id, $validated['order_id'], ['payments']);
-            $payment = $order->payments()->latest()->first();
-        }
-
-        if (! $payment) {
-            return response()->json(['status' => false, 'message' => 'Payment attempt not found'], 404);
-        }
-
-        $payment->update([
-            'transaction_id' => $validated['razorpay_payment_id'] ?? $payment->transaction_id,
-            'status' => 'failed',
-            'failure_code' => $validated['code'] ?? null,
-            'failure_reason' => $validated['reason'],
-            'gateway_payload' => array_merge($payment->gateway_payload ?? [], $validated),
-        ]);
-
-        $payment->order->update(['payment_status' => 'failed']);
-
-        return response()->json(['status' => true, 'message' => 'Failure logged']);
-    }
-
-    public function retry(Request $request)
-    {
-        $validated = $request->validate([
-            'order_id' => 'required',
-            'amount' => 'required|numeric|min:0',
-            'currency' => 'nullable|string|max:10',
-            'address_id' => 'required|exists:user_addresses,id',
-            'contact' => 'nullable|string|max:20',
-            'name' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
-        ]);
-
-        $user = $request->user();
-        $order = $this->resolveUserOrder($user->id, $validated['order_id'], ['payments']);
-        $address = $user->addresses()->find($validated['address_id']);
-
-        if (! $address) {
-            return response()->json(['status' => false, 'message' => 'Selected address is invalid'], 422);
-        }
-
-        $gatewayOrderId = $this->checkoutService->generateGatewayOrderId();
-
-        $payment = Payment::create([
-            'order_id' => $order->id,
-            'payment_method' => 'razorpay',
-            'amount' => (float) $validated['amount'],
-            'currency' => $validated['currency'] ?? CustomerCheckoutService::CURRENCY,
-            'gateway_order_id' => $gatewayOrderId,
-            'status' => 'initiated',
-            'gateway_payload' => [
-                'contact' => $validated['contact'] ?? $user->delivery_phone ?? $user->phone,
-                'name' => $validated['name'] ?? $user->name,
-                'email' => $validated['email'] ?? $user->email,
-                'address_id' => $address->id,
-                'retry' => true,
-            ],
-        ]);
-
-        $order->update([
-            'payment_status' => 'unpaid',
-            'address_id' => $address->id,
-        ]);
-
-        return response()->json([
-            'status' => true,
-            'data' => [
-                'id' => $payment->gateway_order_id,
-                'amount' => round((float) $payment->amount, 2),
-                'currency' => $payment->currency,
-            ],
-        ]);
-    }
-
     public function webhook(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -283,13 +142,6 @@ class PaymentController extends Controller
         $this->syncOrderFromPayment($payment->order, $payment);
 
         return response()->json(['status' => true, 'message' => 'Webhook processed']);
-    }
-
-    public function show(Request $request, $orderId)
-    {
-        $order = $this->resolveUserOrder($request->user()->id, $orderId);
-
-        return response()->json(['status' => true, 'data' => $order->payments()->latest()->get()]);
     }
 
     public function adminIndex(Request $request)

@@ -50,12 +50,6 @@ class AddressController extends Controller
         return response()->json(['status' => true, 'message' => 'Address created', 'data' => $address], 201);
     }
 
-    public function show(Request $request, $id)
-    {
-        $address = $request->user()->addresses()->findOrFail($id);
-        return response()->json(['status' => true, 'data' => $address]);
-    }
-
     public function update(Request $request, $id)
     {
         $address = $request->user()->addresses()->findOrFail($id);

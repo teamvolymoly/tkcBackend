@@ -92,14 +92,6 @@ class CartController extends Controller
         return response()->json(['status' => true, 'message' => 'Cart item removed']);
     }
 
-    public function clear(Request $request)
-    {
-        $cart = Cart::firstOrCreate(['user_id' => $request->user()->id]);
-        $cart->items()->delete();
-
-        return response()->json(['status' => true, 'message' => 'Cart cleared']);
-    }
-
     public function adminIndex(Request $request)
     {
         $carts = Cart::with(['user', 'items.variant.product'])

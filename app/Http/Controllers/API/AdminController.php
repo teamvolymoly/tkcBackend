@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\UpdateOrderStatusRequest;
 use App\Models\Order;
-use App\Models\User;
 use App\Services\AnalyticsService;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
@@ -32,28 +31,6 @@ class AdminController extends Controller
             'status' => true,
             'message' => 'Analytics fetched successfully',
             'data' => $this->analyticsService->adminAnalytics($request->only(['year', 'range'])),
-        ]);
-    }
-
-    public function customers(Request $request)
-    {
-        $customers = User::with('roles')
-            ->role('customer')
-            ->when($request->q, function ($query, $term) {
-                $query->where(function ($inner) use ($term) {
-                    $inner->where('name', 'like', '%'.$term.'%')
-                        ->orWhere('email', 'like', '%'.$term.'%')
-                        ->orWhere('phone', 'like', '%'.$term.'%');
-                });
-            })
-            ->latest()
-            ->paginate(20)
-            ->withQueryString();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Customers fetched successfully',
-            'data' => $customers,
         ]);
     }
 

@@ -4,12 +4,14 @@ namespace App\Services;
 
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Coupon;
+use App\Models\CouponUsage;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Payment;
 use App\Models\ProductVariant;
 use App\Models\User;
 use App\Models\UserAddress;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -22,44 +24,76 @@ class CustomerCheckoutService
     public function currentCart(User $user): Cart
     {
         $cart = Cart::firstOrCreate(['user_id' => $user->id]);
-        $cart->load('items.variant.product');
+        $cart->load(['items.variant.product', 'appliedCoupon']);
 
         return $cart;
     }
 
-    public function checkoutSummary(User $user): array
+    public function applyCoupon(User $user, string $couponCode): array
     {
         $cart = $this->currentCart($user);
-        $items = $cart->items
-            ->filter(fn (CartItem $item) => $item->variant && $item->variant->product)
-            ->values()
-            ->map(function (CartItem $item) {
-                $variant = $item->variant;
-                $product = $variant?->product;
-                $price = $this->resolveVariantPrice($variant);
+        $coupon = $this->resolveApplicableCoupon($couponCode, $this->cartSubtotal($cart), $user->id);
 
-                return [
-                    'id' => $item->id,
-                    'name' => $product?->name,
-                    'variant' => $variant?->name,
-                    'qty' => (int) $item->quantity,
-                    'price' => round($price, 2),
-                    'image' => $variant?->primary_image['image_url']
-                        ?? $product?->resolveMediaUrl($product?->image_1),
-                ];
-            })
-            ->all();
+        $cart->forceFill(['applied_coupon_id' => $coupon->id])->save();
+        $cart->setRelation('appliedCoupon', $coupon);
 
-        $subtotal = round(collect($items)->sum(fn (array $item) => $item['qty'] * $item['price']), 2);
+        return $this->checkoutSummary($user, true);
+    }
+
+    public function removeCoupon(User $user): array
+    {
+        $cart = $this->currentCart($user);
+
+        if ($cart->applied_coupon_id !== null) {
+            $cart->forceFill(['applied_coupon_id' => null])->save();
+            $cart->unsetRelation('appliedCoupon');
+        }
+
+        return $this->checkoutSummary($user);
+    }
+
+    public function checkoutSummary(User $user, bool $strictCouponValidation = false): array
+    {
+        $cart = $this->currentCart($user);
+        $items = $this->transformCartItems($cart);
+        $subtotal = round(collect($items)->sum(fn (array $item) => $item['line_total']), 2);
         $shipping = $subtotal > self::FREE_SHIPPING_THRESHOLD ? 0.0 : ($subtotal > 0 ? self::SHIPPING_AMOUNT : 0.0);
-        $taxes = 0.0;
+        $tax = 0.0;
+        $discount = 0.0;
+        $coupon = null;
+        $couponNotice = null;
+
+        if ($cart->appliedCoupon) {
+            try {
+                $coupon = $this->resolveApplicableCoupon($cart->appliedCoupon->code, $subtotal, $user->id);
+                $discount = round($this->calculateDiscount($coupon, $subtotal), 2);
+            } catch (ValidationException $exception) {
+                if ($strictCouponValidation) {
+                    throw $exception;
+                }
+
+                $cart->forceFill(['applied_coupon_id' => null])->save();
+                $cart->unsetRelation('appliedCoupon');
+                $couponNotice = data_get($exception->errors(), 'code.0') ?? 'Applied coupon has been removed.';
+            }
+        }
+
+        $finalTotal = round(max(0, $subtotal - $discount) + $shipping + $tax, 2);
 
         return [
             'items' => $items,
-            'subtotal' => $subtotal,
-            'shipping' => round($shipping, 2),
-            'taxes' => round($taxes, 2),
-            'total' => round($subtotal + $shipping + $taxes, 2),
+            'summary' => [
+                'subtotal' => $subtotal,
+                'shipping' => round($shipping, 2),
+                'tax' => round($tax, 2),
+                'discount_amount' => round($discount, 2),
+                'total' => $finalTotal,
+                'final_total' => $finalTotal,
+                'currency' => self::CURRENCY,
+                'free_shipping_threshold' => self::FREE_SHIPPING_THRESHOLD,
+            ],
+            'coupon' => $coupon ? $this->transformCoupon($coupon, $discount) : null,
+            'messages' => array_values(array_filter([$couponNotice])),
         ];
     }
 
@@ -69,7 +103,7 @@ class CustomerCheckoutService
 
         if ($cart->items->isEmpty()) {
             throw ValidationException::withMessages([
-                'cart' => ['Cart is empty'],
+                'cart' => ['Cart is empty.'],
             ]);
         }
 
@@ -83,18 +117,20 @@ class CustomerCheckoutService
             }
         }
 
-        $summary = $this->checkoutSummary($user);
+        $checkout = $this->checkoutSummary($user, true);
+        $summary = $checkout['summary'];
+        $coupon = $checkout['coupon'];
 
-        return DB::transaction(function () use ($user, $address, $attributes, $cart, $summary) {
+        return DB::transaction(function () use ($user, $address, $attributes, $cart, $summary, $coupon) {
             $order = Order::create([
                 'user_id' => $user->id,
                 'address_id' => $address->id,
                 'order_number' => $attributes['order_number'] ?? $this->generateOrderNumber(),
                 'subtotal' => $summary['subtotal'],
-                'discount_amount' => (float) ($attributes['discount_amount'] ?? 0),
+                'discount_amount' => $attributes['discount_amount'] ?? $summary['discount_amount'],
                 'shipping_amount' => $summary['shipping'],
-                'total_amount' => (float) ($attributes['total_amount'] ?? $summary['total']),
-                'coupon_code' => $attributes['coupon_code'] ?? null,
+                'total_amount' => $attributes['total_amount'] ?? $summary['final_total'],
+                'coupon_code' => $attributes['coupon_code'] ?? ($coupon['code'] ?? null),
                 'status' => $attributes['status'] ?? 'pending',
                 'payment_status' => $attributes['payment_status'] ?? 'unpaid',
                 'notes' => $attributes['notes'] ?? null,
@@ -127,6 +163,59 @@ class CustomerCheckoutService
         }
     }
 
+    public function clearAppliedCoupon(User $user): void
+    {
+        $cart = Cart::where('user_id', $user->id)->first();
+
+        if ($cart && $cart->applied_coupon_id !== null) {
+            $cart->forceFill(['applied_coupon_id' => null])->save();
+        }
+    }
+
+    public function resolveApplicableCoupon(string $couponCode, float $amount, int $userId): Coupon
+    {
+        $coupon = Coupon::where('code', $couponCode)
+            ->where('is_active', true)
+            ->first();
+
+        if (! $coupon) {
+            throw ValidationException::withMessages([
+                'code' => ['Invalid or inactive coupon code.'],
+            ]);
+        }
+
+        $validationError = $this->validateCouponForAmount($coupon, $amount, $userId);
+
+        if ($validationError !== null) {
+            throw ValidationException::withMessages([
+                'code' => [$validationError],
+            ]);
+        }
+
+        return $coupon;
+    }
+
+    public function recordCouponUsage(Order $order): void
+    {
+        if (! $order->coupon_code || (float) $order->discount_amount <= 0) {
+            return;
+        }
+
+        $coupon = Coupon::where('code', $order->coupon_code)->first();
+
+        if (! $coupon) {
+            return;
+        }
+
+        CouponUsage::firstOrCreate(
+            ['coupon_id' => $coupon->id, 'order_id' => $order->id],
+            [
+                'user_id' => $order->user_id,
+                'used_at' => now(),
+            ]
+        );
+    }
+
     public function buildOrderListItem(Order $order): array
     {
         $firstItem = $order->items->first();
@@ -155,8 +244,11 @@ class CustomerCheckoutService
             'payment_status' => $this->humanPaymentStatus($order->payment_status),
             'tracking_id' => $order->tracking_id,
             'subtotal' => round((float) $order->subtotal, 2),
+            'discount' => round((float) $order->discount_amount, 2),
             'shipping' => round((float) $order->shipping_amount, 2),
+            'tax' => 0.0,
             'total' => round((float) $order->total_amount, 2),
+            'coupon_code' => $order->coupon_code,
             'items' => $order->items->map(function (OrderItem $item) {
                 return [
                     'product_name' => $item->product_name,
@@ -174,16 +266,91 @@ class CustomerCheckoutService
     public function buildPaymentSuccess(Order $order): array
     {
         $payment = $order->payments->sortByDesc('id')->first();
+        $detail = $this->buildOrderDetail($order);
 
         return [
-            'order_id' => $order->order_number,
-            'payment_id' => $payment?->transaction_id,
-            'status' => $this->humanPaymentStatus($order->payment_status),
-            'amount' => round((float) ($payment?->amount ?? $order->total_amount), 2),
-            'currency' => $payment?->currency ?? self::CURRENCY,
-            'paid_at' => $payment?->paid_at?->toISOString(),
-            'items' => $this->buildOrderDetail($order)['items'],
-            'shipping_address' => $order->address ? $this->transformAddress($order->address) : null,
+            'order' => [
+                'id' => $order->order_number,
+                'placed_on' => optional($order->created_at)->toDateString(),
+                'expected_delivery' => [
+                    'date' => optional($order->delivery_date ?? $order->created_at?->copy()->addDays(4))->toDateString(),
+                    'time_window' => '10 AM - 7 PM',
+                ],
+                'status' => $this->humanStatus($order->status),
+            ],
+            'payment' => [
+                'payment_id' => $payment?->transaction_id,
+                'gateway_order_id' => $payment?->gateway_order_id,
+                'method' => $payment ? strtoupper((string) $payment->payment_method) : null,
+                'status' => $this->humanPaymentStatus($order->payment_status),
+                'amount_paid' => round((float) ($payment?->amount ?? $order->total_amount), 2),
+                'currency' => $payment?->currency ?? self::CURRENCY,
+                'paid_at' => $payment?->paid_at?->toISOString(),
+            ],
+            'customer' => [
+                'name' => $order->user?->name,
+                'email' => $order->user?->email,
+                'phone' => $payment?->gateway_payload['contact']
+                    ?? $order->user?->delivery_phone
+                    ?? $order->user?->phone,
+            ],
+            'items' => $detail['items'],
+            'shipping_address' => $detail['shipping_address'],
+            'summary' => [
+                'subtotal' => $detail['subtotal'],
+                'shipping' => $detail['shipping'],
+                'tax' => $detail['tax'],
+                'discount' => $detail['discount'],
+                'total' => $detail['total'],
+                'currency' => $payment?->currency ?? self::CURRENCY,
+                'coupon_code' => $detail['coupon_code'],
+            ],
+            'invoice' => [
+                'number' => 'INV-'.preg_replace('/[^A-Za-z0-9]/', '', (string) $order->order_number),
+                'issued_on' => optional($payment?->paid_at ?? $order->created_at)->toDateString(),
+            ],
+        ];
+    }
+
+    public function buildPaymentFailure(Order $order): array
+    {
+        $payment = $order->payments->sortByDesc('id')->first();
+        $detail = $this->buildOrderDetail($order);
+
+        return [
+            'order' => [
+                'id' => $order->order_number,
+                'attempted_on' => optional($payment?->updated_at ?? $payment?->created_at ?? $order->updated_at ?? $order->created_at)->toDateString(),
+                'status' => $this->humanStatus($order->status),
+            ],
+            'payment' => [
+                'payment_id' => $payment?->transaction_id,
+                'gateway_order_id' => $payment?->gateway_order_id,
+                'method' => $payment ? strtoupper((string) $payment->payment_method) : null,
+                'status' => $this->humanPaymentStatus($order->payment_status),
+                'amount' => round((float) ($payment?->amount ?? $order->total_amount), 2),
+                'currency' => $payment?->currency ?? self::CURRENCY,
+                'failure_code' => $payment?->failure_code,
+                'failure_reason' => $payment?->failure_reason ?: 'Payment could not be processed. Please try again.',
+            ],
+            'customer' => [
+                'name' => $order->user?->name,
+                'email' => $order->user?->email,
+                'phone' => $payment?->gateway_payload['contact']
+                    ?? $order->user?->delivery_phone
+                    ?? $order->user?->phone,
+            ],
+            'items' => $detail['items'],
+            'summary' => [
+                'subtotal' => $detail['subtotal'],
+                'shipping' => $detail['shipping'],
+                'tax' => $detail['tax'],
+                'discount' => $detail['discount'],
+                'total' => $detail['total'],
+                'currency' => $payment?->currency ?? self::CURRENCY,
+                'coupon_code' => $detail['coupon_code'],
+            ],
+            'can_retry' => $this->canRetryPayment($order),
         ];
     }
 
@@ -257,6 +424,52 @@ class CustomerCheckoutService
         };
     }
 
+    public function canRetryPayment(Order $order): bool
+    {
+        return in_array($order->payment_status, ['unpaid', 'failed'], true)
+            && in_array($order->status, ['pending', 'confirmed'], true);
+    }
+
+    private function transformCartItems(Cart $cart): array
+    {
+        return $cart->items
+            ->filter(fn (CartItem $item) => $item->variant && $item->variant->product)
+            ->values()
+            ->map(function (CartItem $item) {
+                $variant = $item->variant;
+                $product = $variant?->product;
+                $unitPrice = $this->resolveVariantPrice($variant);
+                $lineTotal = round($unitPrice * (int) $item->quantity, 2);
+
+                return [
+                    'id' => $item->id,
+                    'variant_id' => $item->variant_id,
+                    'name' => $product?->name,
+                    'product_name' => $product?->name,
+                    'variant' => $variant?->name,
+                    'variant_name' => $variant?->name,
+                    'qty' => (int) $item->quantity,
+                    'quantity' => (int) $item->quantity,
+                    'price' => round($unitPrice, 2),
+                    'line_total' => $lineTotal,
+                    'image' => $variant?->primary_image['image_url']
+                        ?? $product?->resolveMediaUrl($product?->image_1),
+                ];
+            })
+            ->all();
+    }
+
+    private function transformCoupon(Coupon $coupon, float $discount): array
+    {
+        return [
+            'id' => $coupon->id,
+            'code' => $coupon->code,
+            'discount_type' => $coupon->discount_type,
+            'discount_value' => round((float) $coupon->discount_value, 2),
+            'discount_amount' => round($discount, 2),
+        ];
+    }
+
     private function transformAddress(UserAddress $address): array
     {
         return [
@@ -286,17 +499,72 @@ class CustomerCheckoutService
         return $price;
     }
 
+    private function cartSubtotal(Cart $cart): float
+    {
+        return round($cart->items
+            ->filter(fn (CartItem $item) => $item->variant && $item->variant->product)
+            ->sum(fn (CartItem $item) => $item->quantity * $this->resolveVariantPrice($item->variant)), 2);
+    }
+
     private function validatePurchasableVariant(?ProductVariant $variant): ?string
     {
         if (! $variant) {
-            return 'One or more cart items are no longer available';
+            return 'One or more cart items are no longer available.';
         }
 
         if (! $variant->status || ! $variant->product || ! $variant->product->status) {
-            return 'One or more cart items are inactive';
+            return 'One or more cart items are inactive.';
         }
 
         return null;
+    }
+
+    private function validateCouponForAmount(Coupon $coupon, float $amount, int $userId): ?string
+    {
+        if ($coupon->expiry_date && Carbon::today()->gt($coupon->expiry_date)) {
+            return 'Coupon expired.';
+        }
+
+        if ($coupon->min_order_amount && $amount < $coupon->min_order_amount) {
+            return 'Minimum cart value not met for this coupon.';
+        }
+
+        if ($coupon->required_completed_orders !== null) {
+            $completedOrdersCount = Order::where('user_id', $userId)
+                ->whereIn('status', ['delivered', 'completed'])
+                ->count();
+
+            if ($completedOrdersCount < $coupon->required_completed_orders) {
+                return 'Required completed orders not reached for this coupon.';
+            }
+        }
+
+        if ($coupon->usage_limit !== null && $coupon->usages()->count() >= $coupon->usage_limit) {
+            return 'Coupon usage limit reached.';
+        }
+
+        if ($coupon->per_user_limit !== null) {
+            $userUsageCount = $coupon->usages()->where('user_id', $userId)->count();
+
+            if ($userUsageCount >= $coupon->per_user_limit) {
+                return 'Per-user coupon limit reached.';
+            }
+        }
+
+        return null;
+    }
+
+    private function calculateDiscount(Coupon $coupon, float $amount): float
+    {
+        $discount = $coupon->discount_type === 'percent'
+            ? ($amount * (float) $coupon->discount_value) / 100
+            : min($amount, (float) $coupon->discount_value);
+
+        if ($coupon->max_discount) {
+            $discount = min($discount, (float) $coupon->max_discount);
+        }
+
+        return $discount;
     }
 
     private function generateOrderNumber(): string

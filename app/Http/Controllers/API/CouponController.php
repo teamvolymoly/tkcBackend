@@ -4,11 +4,16 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Coupon;
+use App\Services\CustomerCheckoutService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class CouponController extends Controller
 {
+    public function __construct(private readonly CustomerCheckoutService $checkoutService)
+    {
+    }
+
     public function adminIndex(Request $request)
     {
         $coupons = $this->baseQuery($request)
@@ -57,6 +62,40 @@ class CouponController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Coupon deleted successfully',
+        ]);
+    }
+
+    public function apply(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string|max:255',
+        ]);
+
+        try {
+            $summary = $this->checkoutService->applyCoupon($request->user(), $request->string('code')->value());
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            return response()->json([
+                'status' => false,
+                'message' => data_get($exception->errors(), 'code.0') ?? 'Unable to apply coupon.',
+                'errors' => $exception->errors(),
+            ], 422);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Coupon applied successfully',
+            'data' => $summary,
+        ]);
+    }
+
+    public function remove(Request $request)
+    {
+        $summary = $this->checkoutService->removeCoupon($request->user());
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Coupon removed successfully',
+            'data' => $summary,
         ]);
     }
 

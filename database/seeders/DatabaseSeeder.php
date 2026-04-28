@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(AdminRolePermissionSeeder::class);
 
-        $admin = User::firstOrCreate(
+        $admin = User::updateOrCreate(
             ['email' => 'admin@example.com'],
             [
                 'name' => 'Admin User',
@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
         );
         $admin->syncRoles(['admin']);
 
-        $customer = User::firstOrCreate(
+        $customer = User::updateOrCreate(
             ['email' => 'test@example.com'],
             [
                 'name' => 'Test User',

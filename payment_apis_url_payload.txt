@@ -1,0 +1,102 @@
+Payment APIs URL And Payload
+
+Common Headers
+Authorization: Bearer <token>
+Accept: application/json
+Content-Type: application/json
+
+1. Checkout Data
+Method: GET
+URL:
+http://localhost/theKawaCompany/public/api/checkout
+
+Payload:
+No body
+
+
+2. Create Razorpay Order
+Method: POST
+URL:
+http://localhost/theKawaCompany/public/api/razorpay/order
+
+Payload:
+{
+  "address_id": 1,
+  "name": "Deepika",
+  "email": "deepika@gmail.com",
+  "contact": "9009255095"
+}
+
+
+3. Retry Razorpay Order
+Method: POST
+URL:
+http://localhost/theKawaCompany/public/api/razorpay/order
+
+Payload:
+{
+  "order_id": "TKC-2049",
+  "address_id": 1,
+  "name": "Deepika",
+  "email": "deepika@gmail.com",
+  "contact": "9009255095"
+}
+
+
+4. Verify Razorpay Payment
+Method: POST
+URL:
+http://localhost/theKawaCompany/public/api/razorpay/verify
+
+Payload:
+{
+  "razorpay_order_id": "order_ABC123",
+  "razorpay_payment_id": "pay_123456",
+  "razorpay_signature": "signature_here"
+}
+
+
+5. Payment Success Page Data
+Method: GET
+URL:
+http://localhost/theKawaCompany/public/api/payments/success/TKC-2049
+
+Payload:
+No body
+
+
+6. Payment Failed Page Data
+Method: GET
+URL:
+http://localhost/theKawaCompany/public/api/payments/failed/TKC-2049
+
+Payload:
+No body
+
+
+7. Razorpay Webhook
+Method: POST
+URL:
+http://localhost/theKawaCompany/public/api/payments/webhook
+
+Payload:
+This is not called by frontend.
+This is called by Razorpay server webhook.
+
+How To Use:
+- frontend developer should not call this API from UI
+- do not test this API with empty Postman request
+- Razorpay server sends this automatically after payment events
+- backend checks X-Razorpay-Signature header
+- without valid signature this API will return:
+  Invalid webhook signature
+- this API is only for server-to-server notification
+
+Frontend Developer Note:
+- use these APIs from frontend:
+  - GET /api/checkout
+  - POST /api/razorpay/order
+  - POST /api/razorpay/verify
+  - GET /api/payments/success/{order_id}
+  - GET /api/payments/failed/{order_id}
+- do not use /api/payments/webhook in frontend code

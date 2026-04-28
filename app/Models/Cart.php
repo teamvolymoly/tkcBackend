@@ -8,6 +8,11 @@ class Cart extends Model
 {
     protected $fillable = [
         'user_id',
+        'applied_coupon_id',
+    ];
+
+    protected $casts = [
+        'applied_coupon_id' => 'integer',
     ];
 
     public function user()
@@ -18,5 +23,10 @@ class Cart extends Model
     public function items()
     {
         return $this->hasMany(CartItem::class);
+    }
+
+    public function appliedCoupon()
+    {
+        return $this->belongsTo(Coupon::class, 'applied_coupon_id');
     }
 }

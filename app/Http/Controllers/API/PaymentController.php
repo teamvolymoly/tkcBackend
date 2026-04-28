@@ -6,21 +6,24 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Services\CustomerCheckoutService;
+use App\Services\RazorpayService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use RuntimeException;
 
 class PaymentController extends Controller
 {
-    public function __construct(private readonly CustomerCheckoutService $checkoutService)
+    public function __construct(
+        private readonly CustomerCheckoutService $checkoutService,
+        private readonly RazorpayService $razorpayService,
+    )
     {
     }
 
     public function createOrder(Request $request)
     {
         $validated = $request->validate([
-            'amount' => 'required|numeric|min:0',
             'currency' => 'nullable|string|max:10',
             'address_id' => 'required|exists:user_addresses,id',
             'contact' => 'nullable|string|max:20',
@@ -37,45 +40,132 @@ class PaymentController extends Controller
         }
 
         try {
-            [$order, $gatewayOrderId] = DB::transaction(function () use ($validated, $user, $address) {
-                $order = ! empty($validated['order_id'])
-                    ? $this->resolveUserOrder($user->id, $validated['order_id'], ['payments'])
-                    : $this->checkoutService->createPendingOrderFromCart($user, $address, [
+            [$order, $checkout] = DB::transaction(function () use ($validated, $user, $address) {
+                $checkout = $this->checkoutService->checkoutSummary($user, true);
+                $summary = $checkout['summary'];
+                $coupon = $checkout['coupon'];
+                $order = null;
+
+                if (! empty($validated['order_id'])) {
+                    $order = $this->resolveUserOrder($user->id, $validated['order_id'], ['payments']);
+                    $this->ensureRetryableOrder($order);
+                } else {
+                    $order = $this->checkoutService->createPendingOrderFromCart($user, $address, [
+                        'coupon_code' => $coupon['code'] ?? null,
+                        'discount_amount' => (float) ($summary['discount_amount'] ?? 0),
+                        'total_amount' => (float) ($summary['final_total'] ?? 0),
                         'status' => 'pending',
                         'payment_status' => 'unpaid',
                     ]);
+                }
 
-                $gatewayOrderId = $this->checkoutService->generateGatewayOrderId();
-
-                Payment::create([
-                    'order_id' => $order->id,
-                    'payment_method' => 'razorpay',
-                    'amount' => (float) $validated['amount'],
-                    'currency' => $validated['currency'] ?? CustomerCheckoutService::CURRENCY,
-                    'gateway_order_id' => $gatewayOrderId,
-                    'status' => 'initiated',
-                    'gateway_payload' => [
-                        'contact' => $validated['contact'] ?? $user->delivery_phone ?? $user->phone,
-                        'name' => $validated['name'] ?? $user->name,
-                        'email' => $validated['email'] ?? $user->email,
+                if (! empty($validated['order_id'])) {
+                    $order->update([
                         'address_id' => $address->id,
-                    ],
-                ]);
+                        'coupon_code' => $coupon['code'] ?? null,
+                        'discount_amount' => (float) ($summary['discount_amount'] ?? 0),
+                        'shipping_amount' => (float) ($summary['shipping'] ?? 0),
+                        'subtotal' => (float) ($summary['subtotal'] ?? 0),
+                        'total_amount' => (float) ($summary['final_total'] ?? 0),
+                        'status' => 'pending',
+                        'payment_status' => 'unpaid',
+                    ]);
+                }
 
-                return [$order->fresh(['payments']), $gatewayOrderId];
+                return [$order->fresh(['payments']), $checkout];
             });
         } catch (ValidationException $exception) {
-            return response()->json(['status' => false, 'errors' => $exception->errors()], 422);
+            return response()->json([
+                'status' => false,
+                'message' => collect($exception->errors())->flatten()->first() ?: 'Unable to create payment order.',
+                'errors' => $exception->errors(),
+            ], 422);
         }
+
+        $summary = $checkout['summary'];
+        $currency = $validated['currency'] ?? CustomerCheckoutService::CURRENCY;
+        $amountInPaise = $this->toPaise((float) ($summary['final_total'] ?? 0));
+
+        try {
+            $gatewayOrder = $this->razorpayService->createOrder(
+                $order->order_number,
+                $amountInPaise,
+                $currency,
+                [
+                    'internal_order_id' => $order->order_number,
+                    'user_id' => (string) $user->id,
+                ]
+            );
+        } catch (RuntimeException $exception) {
+            return response()->json([
+                'status' => false,
+                'message' => $exception->getMessage(),
+            ], 422);
+        }
+
+        Payment::create([
+            'order_id' => $order->id,
+            'payment_method' => 'razorpay',
+            'amount' => (float) ($summary['final_total'] ?? 0),
+            'currency' => $currency,
+            'gateway_order_id' => $gatewayOrder['id'],
+            'status' => 'initiated',
+            'gateway_payload' => [
+                'contact' => $validated['contact'] ?? $user->delivery_phone ?? $user->phone,
+                'name' => $validated['name'] ?? $user->name,
+                'email' => $validated['email'] ?? $user->email,
+                'address_id' => $address->id,
+                'coupon_code' => $checkout['coupon']['code'] ?? null,
+                'razorpay_order' => $gatewayOrder,
+            ],
+        ]);
 
         return response()->json([
             'status' => true,
             'data' => [
-                'id' => $gatewayOrderId,
-                'amount' => round((float) $validated['amount'], 2),
-                'currency' => $validated['currency'] ?? CustomerCheckoutService::CURRENCY,
+                'razorpay_order_id' => $gatewayOrder['id'],
+                'amount' => $amountInPaise,
+                'display_amount' => round((float) ($summary['final_total'] ?? 0), 2),
+                'currency' => $currency,
                 'order_id' => $order->order_number,
+                'discount' => round((float) ($summary['discount_amount'] ?? 0), 2),
+                'subtotal' => round((float) ($summary['subtotal'] ?? 0), 2),
+                'shipping' => round((float) ($summary['shipping'] ?? 0), 2),
+                'tax' => round((float) ($summary['tax'] ?? 0), 2),
+                'final_total' => round((float) ($summary['final_total'] ?? 0), 2),
+                'coupon' => $checkout['coupon'] ?? null,
+                'key' => $this->razorpayService->key(),
             ],
+        ]);
+    }
+
+    public function success(Request $request, string $orderId)
+    {
+        $order = $this->resolveUserOrder(
+            $request->user()->id,
+            $orderId,
+            ['user', 'address', 'items.variant.product', 'payments']
+        );
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Payment success details fetched successfully.',
+            'data' => $this->checkoutService->buildPaymentSuccess($order),
+        ]);
+    }
+
+    public function failed(Request $request, string $orderId)
+    {
+        $order = $this->resolveUserOrder(
+            $request->user()->id,
+            $orderId,
+            ['user', 'address', 'items.variant.product', 'payments']
+        );
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Payment failure details fetched successfully.',
+            'data' => $this->checkoutService->buildPaymentFailure($order),
         ]);
     }
 
@@ -91,6 +181,28 @@ class PaymentController extends Controller
             ->where('gateway_order_id', $validated['razorpay_order_id'])
             ->firstOrFail();
 
+        if (! $this->razorpayService->verifyPaymentSignature(
+            $validated['razorpay_order_id'],
+            $validated['razorpay_payment_id'],
+            $validated['razorpay_signature']
+        )) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid Razorpay signature.',
+            ], 422);
+        }
+
+        if ($payment->status === 'success') {
+            return response()->json([
+                'status' => true,
+                'message' => 'Payment already verified',
+                'data' => [
+                    'order_id' => $payment->order->order_number,
+                    'payment_id' => $payment->transaction_id ?: $validated['razorpay_payment_id'],
+                ],
+            ]);
+        }
+
         DB::transaction(function () use ($payment, $validated) {
             $payment->update([
                 'transaction_id' => $validated['razorpay_payment_id'],
@@ -104,42 +216,78 @@ class PaymentController extends Controller
                 ]),
             ]);
 
-            $order = $payment->order;
-            $order->update([
-                'payment_status' => 'paid',
-                'status' => 'confirmed',
-                'tracking_id' => $order->tracking_id ?: $this->checkoutService->generateTrackingId(),
-                'delivery_date' => $order->delivery_date ?: now()->addDays(4)->toDateString(),
-            ]);
-
-            $this->checkoutService->clearCart($order->user);
+            $this->finalizeSuccessfulPayment($payment->fresh(['order.user', 'order.items.variant.product', 'order.address', 'order.payments']));
         });
 
         return response()->json([
             'status' => true,
             'message' => 'Payment verified',
+            'data' => [
+                'order_id' => $payment->order->order_number,
+                'payment_id' => $validated['razorpay_payment_id'],
+            ],
         ]);
     }
 
     public function webhook(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'transaction_id' => 'required|string',
-            'status' => 'required|in:success,failed,refunded',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['status' => false, 'errors' => $validator->errors()], 422);
+        if (! $this->razorpayService->verifyWebhookSignature($request->getContent(), $request->header('X-Razorpay-Signature'))) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid webhook signature.',
+            ], 422);
         }
 
-        $payment = Payment::where('transaction_id', $request->transaction_id)->firstOrFail();
+        $payload = $request->all();
+        $event = (string) ($payload['event'] ?? '');
+        $gatewayOrderId = data_get($payload, 'payload.payment.entity.order_id')
+            ?? data_get($payload, 'payload.order.entity.id');
+        $transactionId = data_get($payload, 'payload.payment.entity.id');
+        $failureCode = data_get($payload, 'payload.payment.entity.error_code');
+        $failureReason = data_get($payload, 'payload.payment.entity.error_description')
+            ?? data_get($payload, 'payload.payment.entity.error_reason');
+
+        if (! $gatewayOrderId) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unable to resolve Razorpay order from webhook payload.',
+            ], 422);
+        }
+
+        $payment = Payment::with(['order.user', 'order.items.variant.product', 'order.address', 'order.payments'])
+            ->where('gateway_order_id', $gatewayOrderId)
+            ->firstOrFail();
+
+        $status = match ($event) {
+            'payment.captured', 'order.paid' => 'success',
+            'payment.failed' => 'failed',
+            'refund.processed', 'payment.refunded' => 'refunded',
+            default => null,
+        };
+
+        if (! $status) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Webhook acknowledged.',
+            ]);
+        }
+
         $payment->update([
-            'status' => $request->status,
-            'gateway_payload' => $request->all(),
-            'paid_at' => $request->status === 'success' ? now() : $payment->paid_at,
+            'transaction_id' => $transactionId ?: $payment->transaction_id,
+            'status' => $status,
+            'failure_code' => $status === 'failed' ? $failureCode : null,
+            'failure_reason' => $status === 'failed' ? $failureReason : null,
+            'gateway_payload' => $payload,
+            'paid_at' => $status === 'success' ? ($payment->paid_at ?? now()) : $payment->paid_at,
         ]);
 
-        $this->syncOrderFromPayment($payment->order, $payment);
+        if ($status === 'success') {
+            DB::transaction(function () use ($payment) {
+                $this->finalizeSuccessfulPayment($payment->fresh(['order.user', 'order.items.variant.product', 'order.address', 'order.payments']));
+            });
+        } else {
+            $this->syncOrderFromPayment($payment->order, $payment);
+        }
 
         return response()->json(['status' => true, 'message' => 'Webhook processed']);
     }
@@ -205,7 +353,13 @@ class PaymentController extends Controller
             'paid_at' => $validated['status'] === 'success' ? ($payment->paid_at ?? now()) : $payment->paid_at,
         ]);
 
-        $this->syncOrderFromPayment($payment->order, $payment);
+        if ($validated['status'] === 'success') {
+            DB::transaction(function () use ($payment) {
+                $this->finalizeSuccessfulPayment($payment->fresh(['order.user', 'order.items.variant.product', 'order.address', 'order.payments']));
+            });
+        } else {
+            $this->syncOrderFromPayment($payment->order, $payment);
+        }
 
         return response()->json([
             'status' => true,
@@ -226,6 +380,37 @@ class PaymentController extends Controller
                 }
             })
             ->firstOrFail();
+    }
+
+    private function ensureRetryableOrder(Order $order): void
+    {
+        if (! $this->checkoutService->canRetryPayment($order)) {
+            throw ValidationException::withMessages([
+                'order_id' => ['This order is not eligible for payment retry.'],
+            ]);
+        }
+    }
+
+    private function finalizeSuccessfulPayment(Payment $payment): void
+    {
+        $order = $payment->order;
+
+        $order->update([
+            'payment_status' => 'paid',
+            'status' => 'confirmed',
+            'tracking_id' => $order->tracking_id ?: $this->checkoutService->generateTrackingId(),
+            'delivery_date' => $order->delivery_date ?: now()->addDays(4)->toDateString(),
+        ]);
+
+        // Coupon is consumed only after a successful payment and is never restored on later cancellation.
+        $this->checkoutService->recordCouponUsage($order);
+        $this->checkoutService->clearAppliedCoupon($order->user);
+        $this->checkoutService->clearCart($order->user);
+    }
+
+    private function toPaise(float $amount): int
+    {
+        return (int) round($amount * 100);
     }
 
     private function syncOrderFromPayment(Order $order, Payment $payment): void

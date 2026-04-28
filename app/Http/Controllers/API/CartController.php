@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\ProductVariant;
+use App\Services\CustomerCheckoutService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -13,6 +14,10 @@ class CartController extends Controller
 {
     private const FREE_SHIPPING_THRESHOLD = 500;
     private const SHIPPING_AMOUNT = 50;
+
+    public function __construct(private readonly CustomerCheckoutService $checkoutService)
+    {
+    }
 
     public function index(Request $request)
     {
@@ -22,7 +27,7 @@ class CartController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Cart fetched successfully',
-            'data' => $this->transformCart($cart),
+            'data' => $this->checkoutService->checkoutSummary($request->user()),
         ]);
     }
 
@@ -56,7 +61,7 @@ class CartController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Cart updated',
-            'data' => $this->transformCartItem($item),
+            'data' => $this->checkoutService->checkoutSummary($request->user()),
         ], 201);
     }
 
@@ -80,7 +85,11 @@ class CartController extends Controller
 
         $item->update(['quantity' => $request->quantity]);
 
-        return response()->json(['status' => true, 'message' => 'Cart item updated', 'data' => $item->fresh()->load('variant.product')]);
+        return response()->json([
+            'status' => true,
+            'message' => 'Cart item updated',
+            'data' => $this->checkoutService->checkoutSummary($request->user()),
+        ]);
     }
 
     public function destroy(Request $request, $id)
@@ -89,7 +98,11 @@ class CartController extends Controller
         $item = $cart->items()->where('id', $id)->firstOrFail();
         $item->delete();
 
-        return response()->json(['status' => true, 'message' => 'Cart item removed']);
+        return response()->json([
+            'status' => true,
+            'message' => 'Cart item removed',
+            'data' => $this->checkoutService->checkoutSummary($request->user()),
+        ]);
     }
 
     public function adminIndex(Request $request)

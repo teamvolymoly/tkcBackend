@@ -1,0 +1,177 @@
+Frontend Razorpay + Coupon API Handoff
+
+Base URL
+http://localhost/theKawaCompany/public/api
+
+Common Headers
+Authorization: Bearer <token>
+Accept: application/json
+Content-Type: application/json
+
+1. Cart Data
+Method: GET
+URL: http://localhost/theKawaCompany/public/api/cart
+Payload: No body
+
+Use for:
+- cart items
+- cart summary
+- applied coupon state
+
+2. Update Cart Quantity
+Method: PUT
+URL: http://localhost/theKawaCompany/public/api/cart/{cart_item_id}
+
+Example URL
+http://localhost/theKawaCompany/public/api/cart/1
+
+Payload
+{
+  "quantity": 2
+}
+
+3. Remove Cart Item
+Method: DELETE
+URL: http://localhost/theKawaCompany/public/api/cart/{cart_item_id}
+
+Example URL
+http://localhost/theKawaCompany/public/api/cart/1
+
+Payload: No body
+
+4. Apply Coupon
+Method: POST
+URL: http://localhost/theKawaCompany/public/api/coupons/apply
+
+Payload
+{
+  "code": "Kahwa10"
+}
+
+Use response fields:
+- data.summary.subtotal
+- data.summary.shipping
+- data.summary.tax
+- data.summary.discount_amount
+- data.summary.final_total
+- data.coupon.code
+
+5. Remove Coupon
+Method: POST
+URL: http://localhost/theKawaCompany/public/api/coupons/remove
+
+Payload
+{}
+
+6. Checkout Summary
+Method: GET
+URL: http://localhost/theKawaCompany/public/api/checkout/summary
+Payload: No body
+
+Use for checkout page:
+- items
+- subtotal
+- shipping
+- tax
+- discount
+- total
+
+Important:
+- frontend should not calculate final amount on its own
+- backend response is the source of truth
+
+7. Create Razorpay Order
+Method: POST
+URL: http://localhost/theKawaCompany/public/api/razorpay/order
+
+Payload
+{
+  "address_id": 1,
+  "name": "Deepika",
+  "email": "deepika@gmail.com",
+  "contact": "9009255095"
+}
+
+Retry Payment Payload
+{
+  "order_id": "TKC-2049",
+  "address_id": 1,
+  "name": "Deepika",
+  "email": "deepika@gmail.com",
+  "contact": "9009255095"
+}
+
+Important response fields to use:
+- data.razorpay_order_id
+- data.amount
+- data.currency
+- data.order_id
+- data.key
+
+Important Notes:
+- data.amount is in paise
+- Razorpay popup order_id should use data.razorpay_order_id
+- frontend must not send its own final amount
+
+8. Verify Razorpay Payment
+Method: POST
+URL: http://localhost/theKawaCompany/public/api/razorpay/verify
+
+Payload
+{
+  "razorpay_order_id": "order_ABC123",
+  "razorpay_payment_id": "pay_123456",
+  "razorpay_signature": "signature_here"
+}
+
+Important:
+- verify success response returns order_id
+- after verify success, redirect to:
+  /payment-success?order_id=TKC-xxxx
+
+9. Payment Success Page Data
+Method: GET
+URL: http://localhost/theKawaCompany/public/api/payments/success/{order_id}
+
+Example
+http://localhost/theKawaCompany/public/api/payments/success/TKC-2049
+
+Payload: No body
+
+10. Payment Failed Page Data
+Method: GET
+URL: http://localhost/theKawaCompany/public/api/payments/failed/{order_id}
+
+Example
+http://localhost/theKawaCompany/public/api/payments/failed/TKC-2049
+
+Payload: No body
+
+Frontend Page Mapping
+
+Cart Page
+- GET /cart
+- PUT /cart/{id}
+- DELETE /cart/{id}
+- POST /coupons/apply
+- POST /coupons/remove
+
+Checkout Page
+- GET /checkout/summary
+- POST /razorpay/order
+
+Payment Success Flow
+- POST /razorpay/verify
+- GET /payments/success/{order_id}
+
+Payment Failed Flow
+- GET /payments/failed/{order_id}
+- POST /razorpay/order for retry
+
+Important Business Rules
+- coupon is not used on apply
+- coupon is not used on checkout page load
+- coupon is not used on razorpay order create
+- coupon becomes used only after payment success
+- if payment fails, coupon is not used
+- if payment succeeds and order is later cancelled, coupon is still considered used

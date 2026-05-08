@@ -68,6 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/cart/{id}', [CartController::class, 'update']);
     Route::delete('/cart/{id}', [CartController::class, 'destroy']);
     Route::get('/checkout', [CheckoutController::class, 'summary']);
+    Route::get('/checkout/summary', [CheckoutController::class, 'summary']);
     Route::post('/coupons/apply', [CouponController::class, 'apply']);
     Route::post('/coupons/remove', [CouponController::class, 'remove']);
     Route::post('/razorpay/order', [PaymentController::class, 'createOrder']);

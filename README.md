@@ -82,3 +82,5 @@ github to server pull
 1. ssh krna : ssh -p 22 kirayaca1@103.86.176.233	password -- Kirayacare@123
 2. cd tkc.volymoly.com
 3. git pull origin main
+
+

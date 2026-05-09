@@ -10,6 +10,7 @@ use App\Http\Controllers\API\CartController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\CheckoutController;
 use App\Http\Controllers\API\CouponController;
+use App\Http\Controllers\API\CustomerAccountController;
 use App\Http\Controllers\API\HeroSectionController;
 use App\Http\Controllers\API\HomeBlogPostController;
 use App\Http\Controllers\API\HomeHeroSectionController;
@@ -43,12 +44,17 @@ Route::get('/categories/{category}', [CategoryController::class, 'show']);
 Route::get('/categories/{category}/subcategories', [CategoryController::class, 'subcategories']);
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/filters', [ProductController::class, 'filters']);
+Route::get('/products/{identifier}/reviews', [CustomerAccountController::class, 'productReviews']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::post('/payments/webhook', [PaymentController::class, 'webhook']);
 Route::get('/blog-posts', [BlogPostController::class, 'index']);
 Route::get('/blog-posts/{blogPost}', [BlogPostController::class, 'show']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user/dashboard', [CustomerAccountController::class, 'dashboard']);
+    Route::get('/orders', [CustomerAccountController::class, 'orders']);
+    Route::get('/orders/{orderId}', [CustomerAccountController::class, 'showOrder']);
+
     Route::post('/addresses', [AddressController::class, 'store']);
     Route::get('/addresses', [AddressController::class, 'index']);
     Route::put('/addresses/{id}', [AddressController::class, 'update']);

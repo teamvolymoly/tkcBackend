@@ -6,7 +6,7 @@
 @section('title', 'Roles & Permissions')
 @section('content')
 <div class="space-y-6" x-data="roleManager()">
-    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <section class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div class="max-w-3xl">
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">System Control</p>
@@ -21,18 +21,18 @@
         </div>
     </section>
 
-    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <section class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <form method="GET" class="grid gap-3 xl:grid-cols-[1.6fr_auto]">
             <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Search role name">
             <button type="submit" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200 dark:hover:bg-slate-800">Apply Filters</button>
         </form>
     </section>
 
-    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <section class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         @if (empty($roles['data']))
             @include('admin.components.empty-state', ['title' => 'No roles found', 'message' => 'Create a role to start controlling admin permissions.'])
         @else
-            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+            <div class="overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
                         <thead class="bg-slate-50 dark:bg-slate-950/80">
@@ -85,7 +85,7 @@
 
     <div x-show="createOpen" x-transition.opacity class="fixed inset-0 z-40 bg-slate-950/50" @click="createOpen = false"></div>
     <div x-show="createOpen" x-transition class="fixed inset-0 z-50 overflow-y-auto p-4">
-        <div class="mx-auto w-full max-w-6xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900" @click.stop>
+        <div class="mx-auto w-full max-w-6xl rounded-lg border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900" @click.stop>
             <div class="flex items-start justify-between gap-4">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">System</p>
@@ -97,11 +97,11 @@
                 @csrf
                 <div>
                     <label class="mb-2 block text-sm font-medium">Role name</label>
-                    <input type="text" name="name" value="{{ old('name') }}" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm" placeholder="manager, support, content-editor" required>
+                    <input type="text" name="name" value="{{ old('name') }}" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm" placeholder="manager, support, content-editor" required>
                 </div>
                 @include('admin.roles._permission-groups', ['permissionGroups' => $permissionGroups, 'selectedPermissions' => old('permissions', [])])
                 <div class="flex justify-end">
-                    <button type="submit" class="rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white">Create Role</button>
+                    <button type="submit" class="rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white">Create Role</button>
                 </div>
             </form>
         </div>

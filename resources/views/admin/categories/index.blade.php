@@ -10,10 +10,10 @@
             <h1 class="mt-2 text-3xl font-semibold tracking-tight">Categories and subcategories</h1>
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Organize your catalog hierarchy with one clean management screen.</p>
         </div>
-        <a href="{{ route('admin.categories.create') }}" class="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Add Category</a>
+        <a href="{{ route('admin.categories.create') }}" class="inline-flex items-center justify-center rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Add Category</a>
     </div>
 
-    <div class="rounded-[2rem] border border-white/70 bg-white/80 p-5 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
+    <div class="rounded-lg border border-white/70 bg-white/80 p-5 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <h2 class="text-lg font-semibold">Hierarchy Listing</h2>
@@ -24,14 +24,14 @@
                 <template x-for="id in selected" :key="id">
                     <input type="hidden" name="ids[]" :value="id">
                 </template>
-                <button type="submit" class="rounded-2xl border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-rose-500/20 dark:text-rose-300 dark:hover:bg-rose-500/10" :disabled="selected.length === 0">Delete Selected</button>
+                <button type="submit" class="rounded-lg border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-rose-500/20 dark:text-rose-300 dark:hover:bg-rose-500/10" :disabled="selected.length === 0">Delete Selected</button>
             </form>
         </div>
 
         @if (empty($categories))
             <div class="mt-6">@include('admin.components.empty-state', ['title' => 'No categories yet'])</div>
         @else
-            <div class="mt-6 overflow-hidden rounded-[1.5rem] border border-slate-200 dark:border-slate-800">
+            <div class="mt-6 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
                         <thead class="bg-slate-50/80 dark:bg-slate-950/70">
@@ -49,7 +49,7 @@
                                     <td class="px-4 py-4"><input type="checkbox" value="{{ $category['id'] }}" x-model="selected" class="rounded border-slate-300 text-sky-600 focus:ring-sky-500"></td>
                                     <td class="px-4 py-4">
                                         <div class="flex items-center gap-3">
-                                            <div class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-950/60">
+                                            <div class="flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-950/60">
                                                 @if (!empty($category['image_url']))
                                                     <img src="{{ $category['image_url'] }}" alt="{{ $category['name'] }}" class="h-full w-full object-cover">
                                                 @else
@@ -66,11 +66,11 @@
                                     <td class="px-4 py-4"><span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold {{ !empty($category['status']) ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-slate-100 text-slate-700 dark:bg-slate-700/40 dark:text-slate-200' }}">{{ !empty($category['status']) ? 'Active' : 'Inactive' }}</span></td>
                                     <td class="px-4 py-4 text-right">
                                         <div class="inline-flex items-center gap-2">
-                                            <a href="{{ route('admin.categories.edit', $category['id']) }}" class="rounded-2xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">Edit</a>
+                                            <a href="{{ route('admin.categories.edit', $category['id']) }}" class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">Edit</a>
                                             <form method="POST" action="{{ route('admin.categories.destroy', $category['id']) }}" data-confirm="Delete this category?">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="rounded-2xl border border-rose-200 px-3 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 dark:border-rose-500/20 dark:text-rose-300 dark:hover:bg-rose-500/10">Delete</button>
+                                                <button type="submit" class="rounded-lg border border-rose-200 px-3 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 dark:border-rose-500/20 dark:text-rose-300 dark:hover:bg-rose-500/10">Delete</button>
                                             </form>
                                         </div>
                                     </td>
@@ -80,7 +80,7 @@
                                         <td class="px-4 py-4"><input type="checkbox" value="{{ $child['id'] }}" x-model="selected" class="rounded border-slate-300 text-sky-600 focus:ring-sky-500"></td>
                                         <td class="px-4 py-4 pl-8">
                                             <div class="flex items-center gap-3">
-                                                <div class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+                                                <div class="flex h-11 w-11 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
                                                     @if (!empty($child['image_url']))
                                                         <img src="{{ $child['image_url'] }}" alt="{{ $child['name'] }}" class="h-full w-full object-cover">
                                                     @else
@@ -97,11 +97,11 @@
                                         <td class="px-4 py-4"><span class="inline-flex rounded-full px-3 py-1 text-xs font-semibold {{ !empty($child['status']) ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-slate-100 text-slate-700 dark:bg-slate-700/40 dark:text-slate-200' }}">{{ !empty($child['status']) ? 'Active' : 'Inactive' }}</span></td>
                                         <td class="px-4 py-4 text-right">
                                             <div class="inline-flex items-center gap-2">
-                                                <a href="{{ route('admin.categories.edit', $child['id']) }}" class="rounded-2xl border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">Edit</a>
+                                                <a href="{{ route('admin.categories.edit', $child['id']) }}" class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">Edit</a>
                                                 <form method="POST" action="{{ route('admin.categories.destroy', $child['id']) }}" data-confirm="Delete this subcategory?">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="rounded-2xl border border-rose-200 px-3 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 dark:border-rose-500/20 dark:text-rose-300 dark:hover:bg-rose-500/10">Delete</button>
+                                                    <button type="submit" class="rounded-lg border border-rose-200 px-3 py-2 text-xs font-semibold text-rose-600 transition hover:bg-rose-50 dark:border-rose-500/20 dark:text-rose-300 dark:hover:bg-rose-500/10">Delete</button>
                                                 </form>
                                             </div>
                                         </td>

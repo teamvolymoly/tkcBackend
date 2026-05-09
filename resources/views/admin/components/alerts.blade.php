@@ -17,7 +17,7 @@
     </div>
 @endif
 @if ($errors->any())
-    <div class="mb-6 overflow-hidden rounded-[1.5rem] border border-[#edd0cf] bg-[#fff5f4] shadow-sm">
+    <div class="mb-6 overflow-hidden rounded-lg border border-[#edd0cf] bg-[#fff5f4] shadow-sm">
         <div class="flex items-start gap-4 p-5">
             <div class="flex h-10 w-10 items-center justify-center rounded-[1rem] bg-[#fbe3e2] text-[#c76b68]">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 4.5h.008v.008H12v-.008z"/></svg>

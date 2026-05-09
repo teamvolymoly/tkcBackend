@@ -12,46 +12,46 @@
             
         </div>
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.coupons.index') }}" class="rounded-2xl border border-slate-200 px-4 py-2.5 text-sm font-semibold dark:border-slate-700">Back</a>
-            <a href="{{ route('admin.coupons.edit', $coupon['id']) }}" class="rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Edit Coupon</a>
+            <a href="{{ route('admin.coupons.index') }}" class="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold dark:border-slate-700">Back</a>
+            <a href="{{ route('admin.coupons.edit', $coupon['id']) }}" class="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Edit Coupon</a>
         </div>
     </div>
 
     <div class="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
         <div class="space-y-6">
-            <section class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
+            <section class="rounded-lg border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
                 <h2 class="text-lg font-semibold">Overview</h2>
                 <div class="mt-5 space-y-3 text-sm">
-                    <div class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Discount type</span><span class="font-medium">{{ strtoupper($coupon['discount_type'] ?? 'N/A') }}</span></div>
-                    <div class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Discount value</span><span class="font-medium">{{ number_format((float) ($coupon['discount_value'] ?? 0), 2) }}</span></div>
-                    <div class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Usage count</span><span class="font-medium">{{ $coupon['usages_count'] ?? count($usages) }}</span></div>
-                    <div class="flex items-center justify-between rounded-2xl px-4 py-3 {{ !empty($coupon['is_active']) ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200' }}"><span>Status</span><span class="font-semibold">{{ !empty($coupon['is_active']) ? 'Active' : 'Inactive' }}</span></div>
+                    <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Discount type</span><span class="font-medium">{{ strtoupper($coupon['discount_type'] ?? 'N/A') }}</span></div>
+                    <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Discount value</span><span class="font-medium">{{ number_format((float) ($coupon['discount_value'] ?? 0), 2) }}</span></div>
+                    <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Usage count</span><span class="font-medium">{{ $coupon['usages_count'] ?? count($usages) }}</span></div>
+                    <div class="flex items-center justify-between rounded-lg px-4 py-3 {{ !empty($coupon['is_active']) ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200' }}"><span>Status</span><span class="font-semibold">{{ !empty($coupon['is_active']) ? 'Active' : 'Inactive' }}</span></div>
                 </div>
             </section>
 
-            <section class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
+            <section class="rounded-lg border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
                 <h2 class="text-lg font-semibold">Coupon Rules</h2>
                 <div class="mt-5 grid gap-3 text-sm">
-                    <div class="rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Required completed orders</span><span class="mt-1 block font-medium">{{ $coupon['required_completed_orders'] ?? 'No order requirement' }}</span></div>
-                    <div class="rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Minimum order</span><span class="mt-1 block font-medium">{{ $coupon['min_order_amount'] !== null ? number_format((float) $coupon['min_order_amount'], 2) : 'No minimum' }}</span></div>
-                    <div class="rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Maximum discount</span><span class="mt-1 block font-medium">{{ $coupon['max_discount'] !== null ? number_format((float) $coupon['max_discount'], 2) : 'No cap' }}</span></div>
-                    <div class="rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Usage limit</span><span class="mt-1 block font-medium">{{ $coupon['usage_limit'] ?? 'Unlimited' }}</span></div>
-                    <div class="rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Per user limit</span><span class="mt-1 block font-medium">{{ $coupon['per_user_limit'] ?? 'Unlimited' }}</span></div>
-                    <div class="rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Expiry date</span><span class="mt-1 block font-medium">{{ !empty($coupon['expiry_date']) ? \Illuminate\Support\Carbon::parse($coupon['expiry_date'])->format('d M Y') : 'No expiry' }}</span></div>
+                    <div class="rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Required completed orders</span><span class="mt-1 block font-medium">{{ $coupon['required_completed_orders'] ?? 'No order requirement' }}</span></div>
+                    <div class="rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Minimum order</span><span class="mt-1 block font-medium">{{ $coupon['min_order_amount'] !== null ? number_format((float) $coupon['min_order_amount'], 2) : 'No minimum' }}</span></div>
+                    <div class="rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Maximum discount</span><span class="mt-1 block font-medium">{{ $coupon['max_discount'] !== null ? number_format((float) $coupon['max_discount'], 2) : 'No cap' }}</span></div>
+                    <div class="rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Usage limit</span><span class="mt-1 block font-medium">{{ $coupon['usage_limit'] ?? 'Unlimited' }}</span></div>
+                    <div class="rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Per user limit</span><span class="mt-1 block font-medium">{{ $coupon['per_user_limit'] ?? 'Unlimited' }}</span></div>
+                    <div class="rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Expiry date</span><span class="mt-1 block font-medium">{{ !empty($coupon['expiry_date']) ? \Illuminate\Support\Carbon::parse($coupon['expiry_date'])->format('d M Y') : 'No expiry' }}</span></div>
                 </div>
             </section>
 
-            <section class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
+            <section class="rounded-lg border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
                 <h2 class="text-lg font-semibold">Timeline</h2>
                 <div class="mt-5 space-y-3 text-sm text-slate-600 dark:text-slate-300">
-                    <div class="rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Created</span><span class="mt-1 block">{{ !empty($coupon['created_at']) ? \Illuminate\Support\Carbon::parse($coupon['created_at'])->format('d M Y, h:i A') : 'N/A' }}</span></div>
-                    <div class="rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Last updated</span><span class="mt-1 block">{{ !empty($coupon['updated_at']) ? \Illuminate\Support\Carbon::parse($coupon['updated_at'])->format('d M Y, h:i A') : 'N/A' }}</span></div>
+                    <div class="rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Created</span><span class="mt-1 block">{{ !empty($coupon['created_at']) ? \Illuminate\Support\Carbon::parse($coupon['created_at'])->format('d M Y, h:i A') : 'N/A' }}</span></div>
+                    <div class="rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="block text-xs uppercase tracking-[0.22em] text-slate-400">Last updated</span><span class="mt-1 block">{{ !empty($coupon['updated_at']) ? \Illuminate\Support\Carbon::parse($coupon['updated_at'])->format('d M Y, h:i A') : 'N/A' }}</span></div>
                 </div>
             </section>
         </div>
 
         <div class="space-y-6">
-            <section class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
+            <section class="rounded-lg border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
                 <div class="flex items-center justify-between gap-3">
                     <div>
                         <h2 class="text-lg font-semibold">Usage History</h2>
@@ -59,7 +59,7 @@
                     </div>
                 </div>
                 @if (count($usages))
-                    <div class="mt-5 overflow-hidden rounded-[1.5rem] border border-slate-200 dark:border-slate-800">
+                    <div class="mt-5 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
                         <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
                             <thead class="bg-slate-50/80 dark:bg-slate-950/70">
                                 <tr>

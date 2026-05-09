@@ -13,12 +13,12 @@
             </div>
             <div class="space-y-3">
                 @foreach ($group['permissions'] as $permission)
-                    <label class="flex gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm transition hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900/80 dark:hover:border-slate-700">
+                    <label class="flex gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm transition hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900/80 dark:hover:border-slate-700">
                         <input type="checkbox" name="permissions[]" value="{{ $permission['name'] }}" x-model="selectedPermissions" class="mt-0.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500" @checked($selectedPermissions->contains($permission['name']))>
                         <span>
                             <span class="block font-semibold text-slate-900 dark:text-white">{{ $permission['label'] }}</span>
                             <span class="mt-1 block text-xs text-slate-500 dark:text-slate-400">{{ $permission['description'] }}</span>
-                            <span class="mt-1 block text-[11px] uppercase tracking-[0.18em] text-slate-400">{{ $permission['name'] }}</span>
+                            <span class="mt-1 block text-[14px] uppercase tracking-[0.18em] text-slate-400">{{ $permission['name'] }}</span>
                         </span>
                     </label>
                 @endforeach

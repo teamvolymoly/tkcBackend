@@ -1,7 +1,7 @@
 @php
     $sortOrder = old('sort_order', $heroSection['sort_order'] ?? 0);
 @endphp
-<section class="overflow-hidden rounded-[2rem] border border-white/70 bg-white/85 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
+<section class="overflow-hidden rounded-lg border border-white/70 bg-white/85 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
     <div class="border-b border-slate-200/80 px-6 py-5 dark:border-slate-800">
         <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div>
@@ -19,37 +19,37 @@
         <div class="space-y-5">
             <div>
                 <label class="mb-2 block text-sm font-medium">Product name</label>
-                <input type="text" name="product_name" value="{{ old('product_name', $heroSection['product_name'] ?? '') }}" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm" required>
+                <input type="text" name="product_name" value="{{ old('product_name', $heroSection['product_name'] ?? '') }}" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm" required>
             </div>
             <div>
                 <label class="mb-2 block text-sm font-medium">Product slug</label>
-                <input type="text" name="product_slug" value="{{ old('product_slug', $heroSection['product_slug'] ?? '') }}" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm" placeholder="leave blank for auto slug">
+                <input type="text" name="product_slug" value="{{ old('product_slug', $heroSection['product_slug'] ?? '') }}" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm" placeholder="leave blank for auto slug">
                 <p class="mt-2 text-xs text-slate-500">Frontend is slug ko home hero CTA/product linking ke liye use karega.</p>
             </div>
         </div>
 
         <div class="space-y-5">
-            <div class="rounded-[1.5rem] border border-slate-200 bg-slate-50/70 p-5 dark:border-slate-800 dark:bg-slate-950/60">
+            <div class="rounded-lg border border-slate-200 bg-slate-50/70 p-5 dark:border-slate-800 dark:bg-slate-950/60">
                 <h3 class="text-base font-semibold">Hero Media</h3>
                 <div class="mt-4 space-y-4">
                     <div>
                         <label class="mb-2 block text-sm font-medium">Product image</label>
-                        <input type="file" name="product_image" accept="image/*" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm">
+                        <input type="file" name="product_image" accept="image/*" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm">
                     </div>
                     @if (!empty($heroSection['product_image_url']))
-                        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                        <div class="overflow-hidden rounded-lg border border-slate-200 bg-white">
                             <img src="{{ $heroSection['product_image_url'] }}" alt="{{ $heroSection['product_name'] ?? 'Hero image' }}" class="h-56 w-full object-cover">
                         </div>
                     @endif
                 </div>
             </div>
 
-            <div class="rounded-[1.5rem] border border-slate-200 bg-slate-50/70 p-5 dark:border-slate-800 dark:bg-slate-950/60">
+            <div class="rounded-lg border border-slate-200 bg-slate-50/70 p-5 dark:border-slate-800 dark:bg-slate-950/60">
                 <h3 class="text-base font-semibold">Display Control</h3>
                 <div class="mt-4 space-y-4">
                     <div>
                         <label class="mb-2 block text-sm font-medium">Sort order</label>
-                        <input type="number" min="0" name="sort_order" value="{{ $sortOrder }}" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm">
+                        <input type="number" min="0" name="sort_order" value="{{ $sortOrder }}" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm">
                     </div>
                 </div>
             </div>

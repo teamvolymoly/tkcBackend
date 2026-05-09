@@ -1,5 +1,5 @@
 @if (!empty($paginator['links']) && ($paginator['last_page'] ?? 1) > 1)
-    <div class="mt-6 flex flex-col gap-4 rounded-[1.5rem] border border-[#ddd6ca] bg-[#f5f0e8] px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+    <div class="mt-6 flex flex-col gap-4 rounded-lg border border-[#ddd6ca] bg-[#f5f0e8] px-4 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <p class="text-sm text-[#6d665e]">Showing page {{ $paginator['current_page'] ?? 1 }} of {{ $paginator['last_page'] ?? 1 }}</p>
         <nav class="flex flex-wrap items-center gap-2">
             @foreach ($paginator['links'] as $link)

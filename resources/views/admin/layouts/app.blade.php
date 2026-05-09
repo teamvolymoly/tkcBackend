@@ -75,12 +75,7 @@
             --admin-shadow:0 22px 45px rgba(64,76,66,.16);
         }
         body.admin-panel-shell{background:var(--admin-shell);color:var(--admin-text)}
-        .admin-panel-shell main section,
-        .admin-panel-shell .admin-surface{
-            border-color:color-mix(in srgb, var(--admin-stroke) 78%, white)!important;
-            background:color-mix(in srgb, var(--admin-surface) 92%, white)!important;
-            box-shadow:var(--admin-shadow)!important;
-        }
+     
         .admin-panel-shell .admin-muted-surface{
             background:var(--admin-surface-soft)!important;
             border-color:var(--admin-stroke)!important;
@@ -153,7 +148,7 @@
             box-shadow:0 16px 28px rgba(115,140,118,.28)!important;
         }
         .admin-panel-shell .rounded-xl.border,
-        .admin-panel-shell .rounded-2xl.border,
+        .admin-panel-shell .rounded-lg.border,
         .admin-panel-shell .rounded-\[1\.75rem\].border{
             border-color:color-mix(in srgb, var(--admin-stroke) 82%, white)!important;
         }
@@ -191,7 +186,7 @@
     @stack('styles')
 </head>
 <body class="admin-panel-shell h-full bg-[#eff3ee] text-slate-900 antialiased transition-colors duration-300 dark:bg-[#708271] dark:text-slate-900">
-<div class="min-h-screen bg-[#eff3ee] transition-colors duration-300 dark:bg-[#708271]">
+<div class="min-h-screen bg-[#e3f4e4] transition-colors duration-300 dark:bg-[#708271]">
     <div class="flex min-h-screen gap-0 p-2.5 sm:p-3.5">
         @include('admin.layouts.sidebar')
         <div class="flex min-w-0 flex-1 flex-col overflow-hidden rounded-[14px] bg-transparent">
@@ -207,7 +202,7 @@
 
     <div x-show="confirmOpen" x-transition.opacity class="fixed inset-0 z-40 bg-slate-950/50"></div>
     <div x-show="confirmOpen" x-transition:enter="transition duration-200 ease-out" x-transition:enter-start="opacity-0 translate-y-4 scale-95" x-transition:enter-end="opacity-100 translate-y-0 scale-100" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+        <div class="w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-xl">
             <div class="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-rose-100 text-rose-600">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 4.5h.008v.008H12v-.008z"/></svg>
             </div>

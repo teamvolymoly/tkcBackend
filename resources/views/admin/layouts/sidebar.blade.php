@@ -9,7 +9,7 @@
     $settingsOpen = str_starts_with((string) $current, 'admin.profile') || str_starts_with((string) $current, 'admin.roles') || str_starts_with((string) $current, 'admin.hero-sections');
 @endphp
 <aside x-data="{ cmsOpen: {{ $cmsOpen ? 'true' : 'false' }}, moreOpen: {{ $moreOpen ? 'true' : 'false' }}, settingsOpen: {{ $settingsOpen ? 'true' : 'false' }} }">
-    <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 z-30 bg-slate-950/45 lg:hidden" @click="sidebarOpen = false"></div>
+    <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 z-30 bg-[#5A6F61] lg:hidden" @click="sidebarOpen = false"></div>
     <div :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'" class="fixed inset-y-0 left-0 z-40 flex w-[15.8rem] flex-col rounded-[10px] bg-white px-3 py-3 shadow-2xl transition-all duration-300 lg:static lg:shadow-none">
         <div class="flex h-[70px] items-center justify-center rounded-[10px] bg-white">
             <img src="{{ $sidebarLogoPath }}" alt="The Kahwa Company logo" class="h-full w-auto object-contain">
@@ -57,7 +57,7 @@
                         'Analytics' => $current === 'admin.analytics',
                         default => str_starts_with((string) $current, str_replace('.index', '', $link['route'])),
                     })
-                    <a href="{{ route($link['route']) }}" title="{{ $link['hint'] }}" class="group flex items-center gap-2.5 rounded-full px-2.5 py-2 text-[15px] font-medium transition {{ $active ? 'bg-[#708271] text-white' : 'text-[#2f3630] hover:bg-[#eef1ec]' }}">
+                    <a href="{{ route($link['route']) }}" title="{{ $link['hint'] }}" class="group flex items-center gap-2.5 rounded-full px-2.5 py-2 text-[14px] font-medium transition {{ $active ? 'bg-[#5A6F61] text-white' : 'text-[#2f3630] hover:bg-[#eef1ec]' }}">
                         <span class="flex h-5 w-5 items-center justify-center {{ $active ? 'text-white' : 'text-[#2f3630]' }}">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.55" viewBox="0 0 24 24">{!! $icons[$link['label']] !!}</svg>
                         </span>
@@ -67,7 +67,7 @@
 
                 @if ($cmsLinks->isNotEmpty())
                     <div class="space-y-1.5 pt-1">
-                        <button type="button" @click="cmsOpen = !cmsOpen" class="flex w-full items-center justify-between rounded-full px-2.5 py-2 text-[15px] font-medium transition {{ $cmsOpen ? 'bg-[#708271] text-white' : 'text-[#2f3630] hover:bg-[#eef1ec]' }}">
+                        <button type="button" @click="cmsOpen = !cmsOpen" class="flex w-full items-center justify-between rounded-full px-2.5 py-2 text-[14px] font-medium transition {{ $cmsOpen ? 'bg-[#5A6F61] text-white' : 'text-[#2f3630] hover:bg-[#eef1ec]' }}">
                             <span class="flex items-center gap-2.5">
                                 <span class="flex h-5 w-5 items-center justify-center"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.55" viewBox="0 0 24 24">{!! $icons['CMS'] !!}</svg></span>
                                 <span>CMS</span>
@@ -85,7 +85,7 @@
 
                 @if ($moreLinks->isNotEmpty())
                     <div class="space-y-1.5 pt-1">
-                        <button type="button" @click="moreOpen = !moreOpen" class="flex w-full items-center justify-between rounded-full px-2.5 py-2 text-[15px] font-medium transition {{ $moreOpen ? 'bg-[#708271] text-white' : 'text-[#2f3630] hover:bg-[#eef1ec]' }}">
+                        <button type="button" @click="moreOpen = !moreOpen" class="flex w-full items-center justify-between rounded-full px-2.5 py-2 text-[14px] font-medium transition {{ $moreOpen ? 'bg-[#5A6F61] text-white' : 'text-[#2f3630] hover:bg-[#eef1ec]' }}">
                             <span class="flex items-center gap-2.5">
                                 <span class="flex h-5 w-5 items-center justify-center"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.55" viewBox="0 0 24 24">{!! $icons['More'] !!}</svg></span>
                                 <span>More</span>
@@ -106,7 +106,7 @@
                 <div class="my-4 border-t border-[#e7ebe4]"></div>
                 <nav class="space-y-1.5">
                     <div class="space-y-1.5">
-                        <button type="button" @click="settingsOpen = !settingsOpen" class="flex w-full items-center justify-between rounded-full px-2.5 py-2 text-[11px] font-medium transition {{ $settingsOpen ? 'bg-[#708271] text-white' : 'text-[#2f3630] hover:bg-[#eef1ec]' }}">
+                        <button type="button" @click="settingsOpen = !settingsOpen" class="flex w-full items-center justify-between rounded-full px-2.5 py-2 text-[14px] font-medium transition {{ $settingsOpen ? 'bg-[#5A6F61] text-white' : 'text-[#2f3630] hover:bg-[#eef1ec]' }}">
                             <span class="flex items-center gap-2.5">
                                 <span class="flex h-5 w-5 items-center justify-center"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.55" viewBox="0 0 24 24">{!! $icons['Setting'] !!}</svg></span>
                                 <span>Setting</span>

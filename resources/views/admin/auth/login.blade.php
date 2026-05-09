@@ -39,14 +39,14 @@
         html, body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
     </style>
 </head>
-<body class="min-h-screen overflow-x-hidden bg-[#eff3ee] font-sans text-slate-900 transition-colors duration-300 dark:bg-[#708372] dark:text-slate-900">
+<body class="min-h-screen overflow-x-hidden bg-[#fcf8f4] font-sans text-slate-900 transition-colors duration-300 dark:bg-[#708372] dark:text-slate-900">
     @php($loginImagePath = route('media.public', ['path' => 'login/login_img.png']))
     @php($adminLogoPath = route('media.public', ['path' => 'logo/LOGO_TKC-01.png']))
 
     <div class="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8 sm:px-6">
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.82),_transparent_32%),linear-gradient(180deg,_#f3f6f1_0%,_#eef3ed_100%)] dark:bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_22%),linear-gradient(180deg,_#738674_0%,_#687c6a_100%)]"></div>
 
-        <div class="relative w-full max-w-[720px] overflow-hidden rounded-[18px] bg-[#fcf8f4] shadow-[0_26px_60px_rgba(114,130,115,0.18)] lg:grid lg:min-h-[610px] lg:grid-cols-[1.02fr_0.92fr]">
+        <div class="relative w-full max-w-[900px] overflow-hidden lg:grid lg:min-h-[610px] lg:grid-cols-[1.02fr_0.92fr]">
             <div class="relative hidden h-full lg:block">
                 <img
                     src="{{ $loginImagePath }}"
@@ -58,14 +58,14 @@
                 <div class="absolute inset-x-0 bottom-0 h-28 bg-[linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,0.2)_55%,rgba(255,255,255,0.48))]"></div>
             </div>
 
-            <div class="flex h-full flex-col justify-between bg-[#fcf8f4] px-5 py-5 sm:px-6 sm:py-6">
+            <div class="flex h-full flex-col justify-between bg-white px-5 py-5 sm:px-6 sm:py-6">
                 <div>
                     <div class="flex items-start justify-between gap-4">
-                        <div class="inline-flex min-h-[44px] items-center rounded-[6px] border border-[#d7d1c8] bg-white px-3 py-2 shadow-sm">
+                        <div class="inline-flex min-h-[44px] items-center">
                             <img 
                                 src="{{ $adminLogoPath }}" 
                                 alt="The Kahwa Co." 
-                                class="h-10 w-auto sm:h-12"
+                                class="h-10 w-auto sm:h-16"
                             >
                         </div>
 
@@ -84,9 +84,9 @@
                         </button>
                     </div>
 
-                    <div class="mt-10 sm:mt-12">
-                        <h1 class="text-[2rem] font-semibold leading-none tracking-[-0.035em] text-[#23201d] sm:text-[2.3rem]">Welcome Back!</h1>
-                        <p class="mt-4 max-w-sm text-[11px] leading-4 text-[#6e675e]">
+                    <div class="mt-6 sm:mt-12">
+                        <h1 class="text-[2rem]  leading-none tracking-[-0.035em] text-black sm:text-[2.3rem]">Welcome Back!</h1>
+                        <p class="mt-3 max-w-sm text-[14px] leading-4 text-black/80">
                             Log in to continue the kahwa company tasks, panel team learn more inside.
                         </p>
                     </div>
@@ -97,7 +97,7 @@
                         @csrf
 
                         <div>
-                            <label for="email" class="mb-2 block text-[11px] font-medium text-[#4f4942]">
+                            <label for="email" class="mb-2 block text-[14px] text-[#4f4942]">
                                 Your email
                             </label>
                             <input
@@ -106,13 +106,13 @@
                                 name="email"
                                 value="{{ old('email') }}"
                                 placeholder="business@yourlye.com"
-                                class="h-9 w-full rounded-full border border-[#d8d1c6] bg-[#f9f6f1] px-4 text-xs text-[#2d2925] outline-none transition placeholder:text-[#c0b9b0] focus:border-[#aebba9] focus:ring-2 focus:ring-[#d9e4d7]"
+                                class="h-9 w-full rounded-full border border-[#d8d1c6] bg-[#f9f6f1] px-4 text-sm text-[#2d2925] outline-none transition placeholder:text-[#c0b9b0] focus:border-[#aebba9] focus:ring-2 focus:ring-[#d9e4d7]"
                                 required
                             >
                         </div>
 
                         <div>
-                            <label for="password" class="mb-2 block text-[11px] font-medium text-[#4f4942]">
+                            <label for="password" class="mb-2 block text-[14px] text-[#4f4942]">
                                 Password
                             </label>
                             <div class="relative">
@@ -136,7 +136,7 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-between gap-3 pt-0.5 text-[11px] text-[#625b54]">
+                        <div class="flex items-center justify-between gap-3 pt-0.5 text-[14px] text-[#625b54]">
                             <label class="inline-flex items-center gap-2">
                                 <input type="checkbox" class="h-3.5 w-3.5 rounded border-[#cfc7bb] text-[#7a9680] focus:ring-[#c8d6c6]">
                                 <span>Remember me</span>
@@ -146,16 +146,16 @@
 
                         <button
                             type="submit"
-                            class="mt-2 inline-flex h-10 w-full items-center justify-center rounded-full bg-gradient-to-r from-[#6c836f] to-[#a9c5b0] px-5 text-sm font-medium text-white shadow-[0_12px_24px_rgba(115,140,118,0.22)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_28px_rgba(115,140,118,0.28)] focus:outline-none focus:ring-2 focus:ring-[#c3d4c2] focus:ring-offset-2"
+                            class="mt-2 inline-flex h-10 w-full items-center justify-center rounded-full bg-[#6c836f] px-5 text-sm font-medium text-white "
                         >
                             log in
                         </button>
                     </form>
                 </div>
 
-                <div class="pt-6 text-center">
-                    <p class="text-[11px] text-[#9b9388]">For any quries contact us at</p>
-                    <a href="mailto:info@thekahwacompany.com" class="mt-2 inline-block text-sm font-medium text-[#4f4942] transition hover:text-[#22201d]">
+                <div class="pt-4 text-center">
+                    <p class="text-[14px] text-black/80 font-slim">For any quries contact us at</p>
+                    <a href="mailto:info@thekahwacompany.com" class=" inline-block text-md font-semibold text-[#4f4942] transition hover:text-[#22201d]">
                         info@thekahwacompany.com
                     </a>
                 </div>

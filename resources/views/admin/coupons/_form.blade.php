@@ -1,5 +1,5 @@
 <div class="space-y-6">
-    <section class="overflow-hidden rounded-[2rem] border border-white/70 bg-white/85 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
+    <section class="overflow-hidden rounded-lg border border-white/70 bg-white/85 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
         <div class="border-b border-slate-200/80 px-6 py-5 dark:border-slate-800">
             <div class="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
                 <div>
@@ -17,12 +17,12 @@
             <div class="grid gap-5 lg:grid-cols-2 xl:grid-cols-4">
                 <div class="xl:col-span-2">
                     <label class="mb-2 block text-sm font-medium">Coupon code</label>
-                    <input type="text" name="code" value="{{ old('code', $coupon['code'] ?? '') }}" required class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="SUMMER20">
+                    <input type="text" name="code" value="{{ old('code', $coupon['code'] ?? '') }}" required class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="SUMMER20">
                 </div>
 
                 <div>
                     <label class="mb-2 block text-sm font-medium">Discount type</label>
-                    <select name="discount_type" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">
+                    <select name="discount_type" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">
                         @foreach (['fixed', 'percent'] as $type)
                             <option value="{{ $type }}" @selected(old('discount_type', $coupon['discount_type'] ?? 'fixed') === $type)>{{ ucfirst($type) }}</option>
                         @endforeach
@@ -31,37 +31,37 @@
 
                 <div>
                     <label class="mb-2 block text-sm font-medium">Discount value</label>
-                    <input type="number" step="0.01" min="0" name="discount_value" value="{{ old('discount_value', $coupon['discount_value'] ?? '') }}" required class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="100 or 10">
+                    <input type="number" step="0.01" min="0" name="discount_value" value="{{ old('discount_value', $coupon['discount_value'] ?? '') }}" required class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="100 or 10">
                 </div>
 
                 <div>
                     <label class="mb-2 block text-sm font-medium">Apply after completed orders</label>
-                    <input type="number" min="1" name="required_completed_orders" value="{{ old('required_completed_orders', $coupon['required_completed_orders'] ?? '') }}" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Optional">
+                    <input type="number" min="1" name="required_completed_orders" value="{{ old('required_completed_orders', $coupon['required_completed_orders'] ?? '') }}" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Optional">
                 </div>
 
                 <div>
                     <label class="mb-2 block text-sm font-medium">Minimum order amount</label>
-                    <input type="number" step="0.01" min="0" name="min_order_amount" value="{{ old('min_order_amount', $coupon['min_order_amount'] ?? '') }}" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Optional">
+                    <input type="number" step="0.01" min="0" name="min_order_amount" value="{{ old('min_order_amount', $coupon['min_order_amount'] ?? '') }}" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Optional">
                 </div>
 
                 <div>
                     <label class="mb-2 block text-sm font-medium">Maximum discount</label>
-                    <input type="number" step="0.01" min="0" name="max_discount" value="{{ old('max_discount', $coupon['max_discount'] ?? '') }}" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Only for percent coupons">
+                    <input type="number" step="0.01" min="0" name="max_discount" value="{{ old('max_discount', $coupon['max_discount'] ?? '') }}" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Only for percent coupons">
                 </div>
 
                 <div>
                     <label class="mb-2 block text-sm font-medium">Expiry date</label>
-                    <input type="date" name="expiry_date" value="{{ old('expiry_date', !empty($coupon['expiry_date']) ? \Illuminate\Support\Carbon::parse($coupon['expiry_date'])->format('Y-m-d') : '') }}" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">
+                    <input type="date" name="expiry_date" value="{{ old('expiry_date', !empty($coupon['expiry_date']) ? \Illuminate\Support\Carbon::parse($coupon['expiry_date'])->format('Y-m-d') : '') }}" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">
                 </div>
 
                 <div>
                     <label class="mb-2 block text-sm font-medium">Usage limit</label>
-                    <input type="number" min="1" name="usage_limit" value="{{ old('usage_limit', $coupon['usage_limit'] ?? '') }}" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="All users total">
+                    <input type="number" min="1" name="usage_limit" value="{{ old('usage_limit', $coupon['usage_limit'] ?? '') }}" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="All users total">
                 </div>
 
                 <div>
                     <label class="mb-2 block text-sm font-medium">Per-user limit</label>
-                    <input type="number" min="1" name="per_user_limit" value="{{ old('per_user_limit', $coupon['per_user_limit'] ?? '') }}" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="One customer total">
+                    <input type="number" min="1" name="per_user_limit" value="{{ old('per_user_limit', $coupon['per_user_limit'] ?? '') }}" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="One customer total">
                 </div>
             </div>
         </div>

@@ -86,8 +86,8 @@
         <div class="rounded-[8px] bg-white p-4 shadow-sm">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-[15px] font-semibold text-[#2b322c]">Cancellations</h2>
-                    <p class="mt-1 text-[11px] text-[#8b9388]">Latest cancelled orders in the selected filter window</p>
+                    <h2 class="text-[14px] font-semibold text-[#2b322c]">Cancellations</h2>
+                    <p class="mt-1 text-[14px] text-[#8b9388]">Latest cancelled orders in the selected filter window</p>
                 </div>
                 <span class="rounded-full bg-[#f1f3ef] px-3 py-1 text-xs font-medium text-[#5b6459]">{{ $analytics['cancellations']['total'] ?? 0 }}</span>
             </div>
@@ -112,8 +112,8 @@
         <div class="rounded-[8px] bg-white p-4 shadow-sm">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-[15px] font-semibold text-[#2b322c]">Top Selling Products</h2>
-                    <p class="mt-1 text-[11px] text-[#8b9388]">Best performers for the current filter</p>
+                    <h2 class="text-[14px] font-semibold text-[#2b322c]">Top Selling Products</h2>
+                    <p class="mt-1 text-[14px] text-[#8b9388]">Best performers for the current filter</p>
                 </div>
             </div>
             <div class="mt-4 space-y-3">
@@ -139,8 +139,8 @@
         <div class="rounded-[8px] bg-white p-4 shadow-sm">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-[15px] font-semibold text-[#2b322c]">Customers</h2>
-                    <p class="mt-1 text-[11px] text-[#8b9388]">New customers in {{ $year }}</p>
+                    <h2 class="text-[14px] font-semibold text-[#2b322c]">Customers</h2>
+                    <p class="mt-1 text-[14px] text-[#8b9388]">New customers in {{ $year }}</p>
                 </div>
                 <span class="rounded-full bg-[#f1f3ef] px-3 py-1 text-xs font-medium text-[#5b6459]">{{ $analytics['customers']['total'] ?? 0 }}</span>
             </div>
@@ -165,8 +165,8 @@
         <div class="rounded-[8px] bg-white p-4 shadow-sm">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-[15px] font-semibold text-[#2b322c]">Contact us form queries</h2>
-                    <p class="mt-1 text-[11px] text-[#8b9388]">Latest messages from the contact form</p>
+                    <h2 class="text-[14px] font-semibold text-[#2b322c]">Contact us form queries</h2>
+                    <p class="mt-1 text-[14px] text-[#8b9388]">Latest messages from the contact form</p>
                 </div>
                 <span class="rounded-full bg-[#f1f3ef] px-3 py-1 text-xs font-medium text-[#5b6459]">{{ $analytics['contact_queries']['total'] ?? 0 }}</span>
             </div>

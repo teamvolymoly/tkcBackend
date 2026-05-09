@@ -9,26 +9,26 @@
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">{{ $user['email'] }}</p>
         </div>
         <div class="flex items-center gap-3">
-            <a href="{{ route('admin.users.index') }}" class="rounded-2xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">Back</a>
-            <a href="{{ route('admin.users.edit', $user['id']) }}" class="rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Edit User</a>
+            <a href="{{ route('admin.users.index') }}" class="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">Back</a>
+            <a href="{{ route('admin.users.edit', $user['id']) }}" class="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Edit User</a>
         </div>
     </div>
     <div class="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <section class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
+        <section class="rounded-lg border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
             <h2 class="text-lg font-semibold">Account snapshot</h2>
             <dl class="mt-5 space-y-4 text-sm">
-                <div class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><dt class="text-slate-500">Phone</dt><dd class="font-medium">{{ $user['phone'] ?? 'N/A' }}</dd></div>
-                <div class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><dt class="text-slate-500">Roles</dt><dd class="font-medium">{{ collect($user['roles'] ?? [])->pluck('name')->implode(', ') ?: 'N/A' }}</dd></div>
-                <div class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><dt class="text-slate-500">Addresses</dt><dd class="font-medium">{{ count($user['addresses'] ?? []) }}</dd></div>
-                <div class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><dt class="text-slate-500">Recent orders</dt><dd class="font-medium">{{ count($user['orders'] ?? []) }}</dd></div>
+                <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><dt class="text-slate-500">Phone</dt><dd class="font-medium">{{ $user['phone'] ?? 'N/A' }}</dd></div>
+                <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><dt class="text-slate-500">Roles</dt><dd class="font-medium">{{ collect($user['roles'] ?? [])->pluck('name')->implode(', ') ?: 'N/A' }}</dd></div>
+                <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><dt class="text-slate-500">Addresses</dt><dd class="font-medium">{{ count($user['addresses'] ?? []) }}</dd></div>
+                <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><dt class="text-slate-500">Recent orders</dt><dd class="font-medium">{{ count($user['orders'] ?? []) }}</dd></div>
             </dl>
         </section>
-        <section class="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
+        <section class="rounded-lg border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
             <h2 class="text-lg font-semibold">Recent orders</h2>
             @if (empty($user['orders']))
                 <div class="mt-5">@include('admin.components.empty-state', ['title' => 'No orders yet', 'message' => 'This user has not placed any recent orders.'])</div>
             @else
-                <div class="mt-5 overflow-hidden rounded-[1.5rem] border border-slate-200 dark:border-slate-800">
+                <div class="mt-5 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-800">
                     <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
                         <thead class="bg-slate-50/80 dark:bg-slate-950/70"><tr><th class="px-4 py-3 text-left font-semibold text-slate-500">Order</th><th class="px-4 py-3 text-left font-semibold text-slate-500">Total</th><th class="px-4 py-3 text-left font-semibold text-slate-500">Status</th></tr></thead>
                         <tbody class="divide-y divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-900">

@@ -4,7 +4,7 @@
 @php($totalHeroSections = count($heroSections['data'] ?? []))
 @php($activeHeroSections = collect($heroSections['data'] ?? [])->where('status', true)->count())
 <div class="space-y-6">
-    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <section class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div class="max-w-3xl">
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Settings</p>
@@ -19,7 +19,7 @@
         </div>
     </section>
 
-    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <section class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <form method="GET" class="grid gap-3 xl:grid-cols-[1.8fr_0.8fr_auto]">
             <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Search product name or slug">
             <select name="status" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm dark:border-slate-700 dark:bg-slate-950">
@@ -31,11 +31,11 @@
         </form>
     </section>
 
-    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <section class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         @if (empty($heroSections['data']))
             @include('admin.components.empty-state', ['title' => 'No hero sections found', 'message' => 'Start with your first hero banner item from settings.'])
         @else
-            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+            <div class="overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
                         <thead class="bg-slate-50 dark:bg-slate-950/80">
@@ -52,7 +52,7 @@
                                 <tr class="align-top transition hover:bg-slate-50/70 dark:hover:bg-slate-950/70">
                                     <td class="px-4 py-4">
                                         <div class="flex items-center gap-4">
-                                            <div class="h-16 w-16 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                                            <div class="h-16 w-16 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
                                                 @if (!empty($heroSection['product_image_url']))
                                                     <img src="{{ $heroSection['product_image_url'] }}" alt="{{ $heroSection['product_name'] }}" class="h-full w-full object-cover">
                                                 @else

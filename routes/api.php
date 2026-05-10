@@ -55,6 +55,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/dashboard', [CustomerAccountController::class, 'dashboard']);
     Route::get('/orders', [CustomerAccountController::class, 'orders']);
     Route::get('/orders/{orderId}', [CustomerAccountController::class, 'showOrder']);
+    Route::get('/orders/{orderId}/review-eligibility', [CustomerAccountController::class, 'orderReviewEligibility']);
+    Route::get('/reviews/eligible', [ReviewController::class, 'eligible']);
+    Route::post('/reviews', [ReviewController::class, 'store']);
+    Route::put('/reviews/{id}', [ReviewController::class, 'update']);
 
     Route::post('/addresses', [AddressController::class, 'store']);
     Route::get('/addresses', [AddressController::class, 'index']);

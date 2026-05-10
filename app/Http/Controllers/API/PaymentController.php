@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\User;
+use App\Models\UserAddress;
 use App\Services\CustomerCheckoutService;
 use App\Services\RazorpayService;
 use Illuminate\Http\Request;
@@ -40,40 +42,9 @@ class PaymentController extends Controller
         }
 
         try {
-            [$order, $checkout] = DB::transaction(function () use ($validated, $user, $address) {
-                $checkout = $this->checkoutService->checkoutSummary($user, true);
-                $summary = $checkout['summary'];
-                $coupon = $checkout['coupon'];
-                $order = null;
-
-                if (! empty($validated['order_id'])) {
-                    $order = $this->resolveUserOrder($user->id, $validated['order_id'], ['payments']);
-                    $this->ensureRetryableOrder($order);
-                } else {
-                    $order = $this->checkoutService->createPendingOrderFromCart($user, $address, [
-                        'coupon_code' => $coupon['code'] ?? null,
-                        'discount_amount' => (float) ($summary['discount_amount'] ?? 0),
-                        'total_amount' => (float) ($summary['final_total'] ?? 0),
-                        'status' => 'pending',
-                        'payment_status' => 'unpaid',
-                    ]);
-                }
-
-                if (! empty($validated['order_id'])) {
-                    $order->update([
-                        'address_id' => $address->id,
-                        'coupon_code' => $coupon['code'] ?? null,
-                        'discount_amount' => (float) ($summary['discount_amount'] ?? 0),
-                        'shipping_amount' => (float) ($summary['shipping'] ?? 0),
-                        'subtotal' => (float) ($summary['subtotal'] ?? 0),
-                        'total_amount' => (float) ($summary['final_total'] ?? 0),
-                        'status' => 'pending',
-                        'payment_status' => 'unpaid',
-                    ]);
-                }
-
-                return [$order->fresh(['payments']), $checkout];
-            });
+            [$order, $checkout] = ! empty($validated['order_id'])
+                ? $this->buildRetryCheckoutPayload($user->id, $validated['order_id'], $address)
+                : [null, $this->checkoutService->prepareCheckoutForPayment($user)];
         } catch (ValidationException $exception) {
             return response()->json([
                 'status' => false,
@@ -85,14 +56,15 @@ class PaymentController extends Controller
         $summary = $checkout['summary'];
         $currency = $validated['currency'] ?? CustomerCheckoutService::CURRENCY;
         $amountInPaise = $this->toPaise((float) ($summary['final_total'] ?? 0));
+        $receipt = $order?->order_number ?: ('PAY-'.strtoupper(bin2hex(random_bytes(4))));
 
         try {
             $gatewayOrder = $this->razorpayService->createOrder(
-                $order->order_number,
+                $receipt,
                 $amountInPaise,
                 $currency,
                 [
-                    'internal_order_id' => $order->order_number,
+                    'internal_order_id' => $order?->order_number,
                     'user_id' => (string) $user->id,
                 ]
             );
@@ -103,19 +75,26 @@ class PaymentController extends Controller
             ], 422);
         }
 
-        Payment::create([
-            'order_id' => $order->id,
+        $payment = Payment::create([
+            'order_id' => $order?->id,
             'payment_method' => 'razorpay',
             'amount' => (float) ($summary['final_total'] ?? 0),
             'currency' => $currency,
             'gateway_order_id' => $gatewayOrder['id'],
             'status' => 'initiated',
             'gateway_payload' => [
+                'user_id' => $user->id,
                 'contact' => $validated['contact'] ?? $user->delivery_phone ?? $user->phone,
                 'name' => $validated['name'] ?? $user->name,
                 'email' => $validated['email'] ?? $user->email,
                 'address_id' => $address->id,
+                'address_snapshot' => $this->snapshotAddress($address),
                 'coupon_code' => $checkout['coupon']['code'] ?? null,
+                'checkout' => [
+                    'items' => $checkout['items'] ?? [],
+                    'summary' => $summary,
+                    'coupon' => $checkout['coupon'] ?? null,
+                ],
                 'razorpay_order' => $gatewayOrder,
             ],
         ]);
@@ -127,7 +106,9 @@ class PaymentController extends Controller
                 'amount' => $amountInPaise,
                 'display_amount' => round((float) ($summary['final_total'] ?? 0), 2),
                 'currency' => $currency,
-                'order_id' => $order->order_number,
+                'order_id' => $gatewayOrder['id'],
+                'order_number' => $order?->order_number,
+                'payment_attempt_id' => $payment->id,
                 'discount' => round((float) ($summary['discount_amount'] ?? 0), 2),
                 'subtotal' => round((float) ($summary['subtotal'] ?? 0), 2),
                 'shipping' => round((float) ($summary['shipping'] ?? 0), 2),
@@ -141,31 +122,38 @@ class PaymentController extends Controller
 
     public function success(Request $request, string $orderId)
     {
-        $order = $this->resolveUserOrder(
+        $payment = $this->resolveUserPayment(
             $request->user()->id,
             $orderId,
-            ['user', 'address', 'items.variant.product', 'payments']
+            ['order.user', 'order.address', 'order.items.variant.product', 'order.payments']
         );
+
+        if (! $payment->order) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Order is not available for this payment yet.',
+            ], 404);
+        }
 
         return response()->json([
             'status' => true,
             'message' => 'Payment success details fetched successfully.',
-            'data' => $this->checkoutService->buildPaymentSuccess($order),
+            'data' => $this->checkoutService->buildPaymentSuccess($payment->order),
         ]);
     }
 
     public function failed(Request $request, string $orderId)
     {
-        $order = $this->resolveUserOrder(
+        $payment = $this->resolveUserPayment(
             $request->user()->id,
             $orderId,
-            ['user', 'address', 'items.variant.product', 'payments']
+            ['order.user', 'order.address', 'order.items.variant.product', 'order.payments']
         );
 
         return response()->json([
             'status' => true,
             'message' => 'Payment failure details fetched successfully.',
-            'data' => $this->checkoutService->buildPaymentFailure($order),
+            'data' => $this->checkoutService->buildPaymentFailureFromAttempt($payment),
         ]);
     }
 
@@ -197,7 +185,7 @@ class PaymentController extends Controller
                 'status' => true,
                 'message' => 'Payment already verified',
                 'data' => [
-                    'order_id' => $payment->order->order_number,
+                    'order_id' => $payment->order?->order_number ?? $payment->gateway_order_id,
                     'payment_id' => $payment->transaction_id ?: $validated['razorpay_payment_id'],
                 ],
             ]);
@@ -223,7 +211,7 @@ class PaymentController extends Controller
             'status' => true,
             'message' => 'Payment verified',
             'data' => [
-                'order_id' => $payment->order->order_number,
+                'order_id' => $payment->fresh('order')->order?->order_number ?? $payment->gateway_order_id,
                 'payment_id' => $validated['razorpay_payment_id'],
             ],
         ]);
@@ -285,7 +273,7 @@ class PaymentController extends Controller
             DB::transaction(function () use ($payment) {
                 $this->finalizeSuccessfulPayment($payment->fresh(['order.user', 'order.items.variant.product', 'order.address', 'order.payments']));
             });
-        } else {
+        } elseif ($payment->order) {
             $this->syncOrderFromPayment($payment->order, $payment);
         }
 
@@ -393,6 +381,10 @@ class PaymentController extends Controller
 
     private function finalizeSuccessfulPayment(Payment $payment): void
     {
+        if (! $payment->order) {
+            $payment = $this->attachOrderToSuccessfulPayment($payment);
+        }
+
         $order = $payment->order;
 
         $order->update([
@@ -428,5 +420,109 @@ class PaymentController extends Controller
         };
 
         $order->update($statusMap);
+    }
+
+    private function resolveUserPayment(int $userId, string|int $identifier, array $with = []): Payment
+    {
+        $payment = Payment::with($with)
+            ->where(function ($query) use ($identifier) {
+                $query->where('gateway_order_id', $identifier)
+                    ->orWhere('transaction_id', $identifier);
+
+                if (is_numeric($identifier)) {
+                    $query->orWhere('id', (int) $identifier);
+                }
+            })
+            ->latest('id')
+            ->first();
+
+        if (! $payment) {
+            $order = $this->resolveUserOrder($userId, (string) $identifier, ['payments']);
+            $payment = $order->payments->sortByDesc('id')->first();
+
+            abort_if(! $payment, 404);
+        }
+
+        $ownerId = $payment->order?->user_id ?? (int) data_get($payment->gateway_payload, 'user_id');
+
+        abort_if($ownerId !== $userId, 404);
+
+        return $payment;
+    }
+
+    private function buildRetryCheckoutPayload(int $userId, string|int $orderId, UserAddress $address): array
+    {
+        $order = $this->resolveUserOrder($userId, $orderId, ['items', 'payments']);
+        $this->ensureRetryableOrder($order);
+
+        $items = $order->items->map(fn ($item) => [
+            'product_id' => $item->product_id,
+            'variant_id' => $item->variant_id,
+            'name' => $item->product_name,
+            'product_name' => $item->product_name,
+            'variant' => $item->variant_name,
+            'variant_name' => $item->variant_name,
+            'qty' => (int) $item->quantity,
+            'quantity' => (int) $item->quantity,
+            'price' => round((float) $item->price, 2),
+            'line_total' => round((float) $item->price * (int) $item->quantity, 2),
+            'image' => $item->variant?->primary_image['image_url']
+                ?? $item->product?->resolveMediaUrl($item->product?->image_1),
+        ])->values()->all();
+
+        return [
+            $order,
+            [
+                'items' => $items,
+                'summary' => [
+                    'subtotal' => round((float) $order->subtotal, 2),
+                    'shipping' => round((float) $order->shipping_amount, 2),
+                    'tax' => 0.0,
+                    'discount_amount' => round((float) $order->discount_amount, 2),
+                    'total' => round((float) $order->total_amount, 2),
+                    'final_total' => round((float) $order->total_amount, 2),
+                    'currency' => CustomerCheckoutService::CURRENCY,
+                    'free_shipping_threshold' => CustomerCheckoutService::FREE_SHIPPING_THRESHOLD,
+                ],
+                'coupon' => $order->coupon_code ? ['code' => $order->coupon_code] : null,
+                'address_snapshot' => $this->snapshotAddress($address),
+            ],
+        ];
+    }
+
+    private function attachOrderToSuccessfulPayment(Payment $payment): Payment
+    {
+        $payload = $payment->gateway_payload ?? [];
+        $user = User::findOrFail((int) data_get($payload, 'user_id'));
+        $address = $user->addresses()->find(data_get($payload, 'address_id'));
+        $snapshot = $payload['checkout'] ?? [];
+
+        $order = $this->checkoutService->createOrderFromCheckoutSnapshot($user, $address, $snapshot, [
+            'coupon_code' => data_get($snapshot, 'coupon.code'),
+            'discount_amount' => (float) data_get($snapshot, 'summary.discount_amount', 0),
+            'total_amount' => (float) data_get($snapshot, 'summary.final_total', data_get($snapshot, 'summary.total', 0)),
+            'status' => 'confirmed',
+            'payment_status' => 'paid',
+            'tracking_id' => $this->checkoutService->generateTrackingId(),
+            'delivery_date' => now()->addDays(4)->toDateString(),
+        ]);
+
+        $payment->order()->associate($order);
+        $payment->save();
+
+        return $payment->fresh(['order.user', 'order.items.variant.product', 'order.address', 'order.payments']);
+    }
+
+    private function snapshotAddress(UserAddress $address): array
+    {
+        return [
+            'label' => $address->label,
+            'address_line1' => $address->address_line1,
+            'address_line2' => $address->address_line2,
+            'city' => $address->city,
+            'state' => $address->state,
+            'pincode' => $address->pincode,
+            'country' => $address->country,
+        ];
     }
 }

@@ -43,6 +43,7 @@ Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{category}', [CategoryController::class, 'show']);
 Route::get('/categories/{category}/subcategories', [CategoryController::class, 'subcategories']);
 Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/search', [ProductController::class, 'search']);
 Route::get('/products/filters', [ProductController::class, 'filters']);
 Route::get('/products/{identifier}/reviews', [CustomerAccountController::class, 'productReviews']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);

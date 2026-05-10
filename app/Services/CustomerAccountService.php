@@ -23,6 +23,7 @@ class CustomerAccountService
         $paginator = Order::query()
             ->with(['items'])
             ->where('user_id', $user->id)
+            ->whereIn('payment_status', ['paid', 'refunded'])
             ->when($status !== '', function ($query) use ($status) {
                 $query->where('status', strtolower($status));
             })
@@ -43,6 +44,7 @@ class CustomerAccountService
         $order = Order::query()
             ->with(['items.variant.product', 'address', 'payments', 'user'])
             ->where('user_id', $user->id)
+            ->whereIn('payment_status', ['paid', 'refunded'])
             ->where(function ($query) use ($identifier) {
                 $query->where('order_number', $identifier);
 
@@ -110,10 +112,12 @@ class CustomerAccountService
     {
         $orders = Order::query()
             ->where('user_id', $user->id)
+            ->whereIn('payment_status', ['paid', 'refunded'])
             ->get(['id', 'order_number', 'status', 'payment_status', 'total_amount', 'created_at']);
 
         $recentOrders = Order::query()
             ->where('user_id', $user->id)
+            ->whereIn('payment_status', ['paid', 'refunded'])
             ->latest()
             ->limit(5)
             ->get(['id', 'order_number', 'status', 'total_amount', 'created_at']);

@@ -13,8 +13,8 @@ class OrderService
     {
         return [
             'total_customers' => User::role('customer')->count(),
-            'total_orders' => Order::count(),
-            'pending_orders' => Order::where('status', 'pending')->count(),
+            'total_orders' => Order::whereIn('payment_status', ['paid', 'refunded'])->count(),
+            'pending_orders' => Order::whereIn('payment_status', ['paid', 'refunded'])->where('status', 'pending')->count(),
             'paid_orders' => Order::where('payment_status', 'paid')->count(),
             'revenue' => Order::where('payment_status', 'paid')->sum('total_amount'),
         ];
@@ -23,6 +23,7 @@ class OrderService
     public function adminOrders(array $filters): LengthAwarePaginator
     {
         return Order::with(['user', 'items'])
+            ->whereIn('payment_status', ['paid', 'refunded'])
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
             ->when($filters['q'] ?? null, function ($query, $term) {
                 $query->where(function ($inner) use ($term) {
@@ -41,6 +42,7 @@ class OrderService
     public function adminOrderDetail(int|string $id): Order
     {
         return Order::with(['user', 'address', 'items.variant.product', 'payments'])
+            ->whereIn('payment_status', ['paid', 'refunded'])
             ->findOrFail($id);
     }
 

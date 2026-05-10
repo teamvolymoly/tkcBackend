@@ -28,8 +28,8 @@
                 <tbody class="divide-y divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-900">
                     @foreach ($payments['data'] as $payment)
                         <tr>
-                            <td class="px-4 py-4 font-medium">{{ $payment['order']['order_number'] ?? 'Order #'.$payment['order_id'] }}</td>
-                            <td class="px-4 py-4">{{ $payment['order']['user']['name'] ?? 'Unknown customer' }}</td>
+                            <td class="px-4 py-4 font-medium">{{ $payment['order']['order_number'] ?? ($payment['gateway_order_id'] ?? ('Attempt #'.$payment['id'])) }}</td>
+                            <td class="px-4 py-4">{{ $payment['order']['user']['name'] ?? ($payment['gateway_payload']['name'] ?? 'Unknown customer') }}</td>
                             <td class="px-4 py-4">{{ $payment['payment_method'] }}</td>
                             <td class="px-4 py-4">Rs. {{ number_format((float) $payment['amount'], 2) }}</td>
                             <td class="px-4 py-4">@include('admin.components.status-badge', ['value' => $payment['status']])</td>
@@ -43,4 +43,3 @@
     @endif
 </div>
 @endsection
-

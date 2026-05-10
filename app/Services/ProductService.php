@@ -46,6 +46,54 @@ class ProductService
         ];
     }
 
+    public function searchProducts(array $filters): array
+    {
+        $page = max(1, (int) ($filters['page'] ?? 1));
+        $limit = min(20, max(1, (int) ($filters['limit'] ?? 10)));
+        $search = trim((string) ($filters['q'] ?? ''));
+
+        if ($search === '') {
+            return [
+                'items' => [],
+                'pagination' => [
+                    'page' => $page,
+                    'limit' => $limit,
+                    'total_items' => 0,
+                    'total_pages' => 0,
+                ],
+            ];
+        }
+
+        $paginator = Product::query()
+            ->with([
+                'variants' => fn ($variantQuery) => $variantQuery
+                    ->where('status', true)
+                    ->orderByDesc('is_default')
+                    ->orderBy('id'),
+            ])
+            ->where('status', true)
+            ->where(function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('tag_line_1', 'like', "%{$search}%")
+                    ->orWhere('tag_line_2', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            })
+            ->orderBy('name')
+            ->paginate($limit, ['*'], 'page', $page);
+
+        return [
+            'items' => $paginator->getCollection()
+                ->map(fn (Product $product) => $this->transformSearchProduct($product))
+                ->all(),
+            'pagination' => [
+                'page' => $paginator->currentPage(),
+                'limit' => $paginator->perPage(),
+                'total_items' => $paginator->total(),
+                'total_pages' => $paginator->lastPage(),
+            ],
+        ];
+    }
+
     public function catalogFilters(): array
     {
         return Cache::remember('api.products.filters.v1', now()->addHours(12), function () {
@@ -791,6 +839,21 @@ class ProductService
             'discount_price' => $defaultVariant?->discount_price !== null ? (float) $defaultVariant->discount_price : null,
             'compare_price' => $defaultVariant?->discount_price !== null ? (float) $defaultVariant->discount_price : null,
             'image_url' => collect($product->gallery)->first()['image_url'] ?? null,
+        ];
+    }
+
+    private function transformSearchProduct(Product $product): array
+    {
+        $variant = $product->variants->first();
+
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'variant_name' => $variant?->name,
+            'img' => $variant?->primary_image['image_url']
+                ?? collect($product->gallery)->first()['image_url']
+                ?? null,
+            'slug' => $product->slug,
         ];
     }
 

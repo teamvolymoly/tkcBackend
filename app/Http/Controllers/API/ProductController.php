@@ -24,6 +24,15 @@ class ProductController extends Controller
         ]);
     }
 
+    public function search(Request $request)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => 'Products fetched successfully',
+            'data' => $this->productService->searchProducts($request->all()),
+        ]);
+    }
+
     public function filters()
     {
         return response()->json([

@@ -8,6 +8,7 @@ use App\Models\Coupon;
 use App\Models\CouponUsage;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Payment;
 use App\Models\ProductVariant;
 use App\Models\User;
 use App\Models\UserAddress;
@@ -97,7 +98,7 @@ class CustomerCheckoutService
         ];
     }
 
-    public function createPendingOrderFromCart(User $user, UserAddress $address, array $attributes = []): Order
+    public function prepareCheckoutForPayment(User $user): array
     {
         $cart = $this->currentCart($user);
 
@@ -118,6 +119,19 @@ class CustomerCheckoutService
         }
 
         $checkout = $this->checkoutSummary($user, true);
+
+        return [
+            'cart' => $cart,
+            'items' => $checkout['items'],
+            'summary' => $checkout['summary'],
+            'coupon' => $checkout['coupon'],
+        ];
+    }
+
+    public function createPendingOrderFromCart(User $user, UserAddress $address, array $attributes = []): Order
+    {
+        $checkout = $this->prepareCheckoutForPayment($user);
+        $cart = $checkout['cart'];
         $summary = $checkout['summary'];
         $coupon = $checkout['coupon'];
 
@@ -147,6 +161,51 @@ class CustomerCheckoutService
                     'variant_name' => $item->variant->name,
                     'price' => $this->resolveVariantPrice($item->variant),
                     'quantity' => $item->quantity,
+                ]);
+            }
+
+            return $order->load('items.variant.product', 'address', 'payments');
+        });
+    }
+
+    public function createOrderFromCheckoutSnapshot(User $user, ?UserAddress $address, array $snapshot, array $attributes = []): Order
+    {
+        $items = collect($snapshot['items'] ?? [])->filter(fn (array $item) => ! empty($item['variant_id']))->values();
+        $summary = $snapshot['summary'] ?? [];
+        $coupon = $snapshot['coupon'] ?? null;
+
+        if ($items->isEmpty()) {
+            throw ValidationException::withMessages([
+                'payment' => ['Unable to create order because the payment snapshot is incomplete.'],
+            ]);
+        }
+
+        return DB::transaction(function () use ($user, $address, $attributes, $items, $summary, $coupon) {
+            $order = Order::create([
+                'user_id' => $user->id,
+                'address_id' => $address?->id,
+                'order_number' => $attributes['order_number'] ?? $this->generateOrderNumber(),
+                'subtotal' => (float) ($summary['subtotal'] ?? 0),
+                'discount_amount' => $attributes['discount_amount'] ?? (float) ($summary['discount_amount'] ?? 0),
+                'shipping_amount' => (float) ($summary['shipping'] ?? 0),
+                'total_amount' => $attributes['total_amount'] ?? (float) ($summary['final_total'] ?? $summary['total'] ?? 0),
+                'coupon_code' => $attributes['coupon_code'] ?? ($coupon['code'] ?? null),
+                'status' => $attributes['status'] ?? 'pending',
+                'payment_status' => $attributes['payment_status'] ?? 'unpaid',
+                'notes' => $attributes['notes'] ?? null,
+                'tracking_id' => $attributes['tracking_id'] ?? null,
+                'delivery_date' => $attributes['delivery_date'] ?? null,
+            ]);
+
+            foreach ($items as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product_id'] ?? null,
+                    'variant_id' => $item['variant_id'],
+                    'product_name' => $item['product_name'] ?? $item['name'] ?? 'Product',
+                    'variant_name' => $item['variant_name'] ?? $item['variant'] ?? 'Variant',
+                    'price' => (float) ($item['price'] ?? 0),
+                    'quantity' => (int) ($item['quantity'] ?? $item['qty'] ?? 0),
                 ]);
             }
 
@@ -354,6 +413,61 @@ class CustomerCheckoutService
         ];
     }
 
+    public function buildPaymentFailureFromAttempt(Payment $payment): array
+    {
+        if ($payment->order) {
+            return $this->buildPaymentFailure($payment->order);
+        }
+
+        $payload = $payment->gateway_payload ?? [];
+        $checkout = $payload['checkout'] ?? [];
+        $summary = $checkout['summary'] ?? [];
+
+        return [
+            'order' => [
+                'id' => $payment->gateway_order_id ?? (string) $payment->id,
+                'attempted_on' => optional($payment->updated_at ?? $payment->created_at)->toDateString(),
+                'status' => $payment->status === 'failed' ? 'Payment Failed' : 'Payment Pending',
+            ],
+            'payment' => [
+                'payment_id' => $payment->transaction_id,
+                'gateway_order_id' => $payment->gateway_order_id,
+                'method' => strtoupper((string) $payment->payment_method),
+                'status' => $this->humanPaymentStatus($payment->status),
+                'amount' => round((float) ($payment->amount ?? ($summary['final_total'] ?? 0)), 2),
+                'currency' => $payment->currency ?? self::CURRENCY,
+                'failure_code' => $payment->failure_code,
+                'failure_reason' => $payment->failure_reason ?: 'Payment could not be processed. Please try again.',
+            ],
+            'customer' => [
+                'name' => $payload['name'] ?? null,
+                'email' => $payload['email'] ?? null,
+                'phone' => $payload['contact'] ?? null,
+            ],
+            'items' => collect($checkout['items'] ?? [])
+                ->map(fn (array $item) => [
+                    'product_name' => $item['product_name'] ?? $item['name'] ?? null,
+                    'variant_name' => $item['variant_name'] ?? $item['variant'] ?? null,
+                    'quantity' => (int) ($item['quantity'] ?? $item['qty'] ?? 0),
+                    'price' => round((float) ($item['price'] ?? 0), 2),
+                    'image' => $item['image'] ?? null,
+                ])
+                ->values()
+                ->all(),
+            'shipping_address' => $payload['address_snapshot'] ?? null,
+            'summary' => [
+                'subtotal' => round((float) ($summary['subtotal'] ?? 0), 2),
+                'shipping' => round((float) ($summary['shipping'] ?? 0), 2),
+                'tax' => round((float) ($summary['tax'] ?? 0), 2),
+                'discount' => round((float) ($summary['discount_amount'] ?? 0), 2),
+                'total' => round((float) ($summary['final_total'] ?? $summary['total'] ?? 0), 2),
+                'currency' => $payment->currency ?? self::CURRENCY,
+                'coupon_code' => data_get($checkout, 'coupon.code'),
+            ],
+            'can_retry' => in_array($payment->status, ['initiated', 'failed'], true),
+        ];
+    }
+
     public function trackingEvents(Order $order): array
     {
         $events = [
@@ -416,7 +530,9 @@ class CustomerCheckoutService
     public function humanPaymentStatus(?string $status): ?string
     {
         return match ($status) {
+            'initiated' => 'Initiated',
             'paid' => 'Paid',
+            'success' => 'Paid',
             'failed' => 'Failed',
             'refunded' => 'Refunded',
             'unpaid' => 'Unpaid',
@@ -443,6 +559,7 @@ class CustomerCheckoutService
 
                 return [
                     'id' => $item->id,
+                    'product_id' => $product?->id,
                     'variant_id' => $item->variant_id,
                     'name' => $product?->name,
                     'product_name' => $product?->name,

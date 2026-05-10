@@ -6,7 +6,7 @@
         <div>
             <p class="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600 dark:text-sky-300">Payment Detail</p>
             <h1 class="mt-2 text-3xl font-semibold tracking-tight">{{ $payment['transaction_id'] ?: 'Manual payment record' }}</h1>
-            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Order: {{ $payment['order']['order_number'] ?? 'N/A' }}</p>
+            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Order: {{ $payment['order']['order_number'] ?? ($payment['gateway_order_id'] ?? 'N/A') }}</p>
         </div>
         <a href="{{ route('admin.payments.index') }}" class="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold dark:border-slate-700">Back</a>
     </div>
@@ -35,7 +35,7 @@
             <div>
                 <h2 class="text-lg font-semibold">Snapshot</h2>
                 <div class="mt-5 space-y-3 text-sm">
-                    <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Customer</span><span class="font-medium">{{ $payment['order']['user']['name'] ?? 'N/A' }}</span></div>
+                    <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Customer</span><span class="font-medium">{{ $payment['order']['user']['name'] ?? ($payment['gateway_payload']['name'] ?? 'N/A') }}</span></div>
                     <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Amount</span><span class="font-medium">Rs. {{ number_format((float) $payment['amount'], 2) }}</span></div>
                     <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Status</span><span>@include('admin.components.status-badge', ['value' => $payment['status']])</span></div>
                     <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Paid at</span><span class="font-medium">{{ !empty($payment['paid_at']) ? \Illuminate\Support\Carbon::parse($payment['paid_at'])->format('d M Y h:i A') : 'Not paid yet' }}</span></div>
@@ -47,8 +47,8 @@
                     <table class="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
                         <thead class="bg-slate-50/80 dark:bg-slate-950/70"><tr><th class="px-4 py-3 text-left font-semibold text-slate-500">Product</th><th class="px-4 py-3 text-left font-semibold text-slate-500">Variant</th><th class="px-4 py-3 text-left font-semibold text-slate-500">Qty</th></tr></thead>
                         <tbody class="divide-y divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-900">
-                            @foreach (($payment['order']['items'] ?? []) as $item)
-                                <tr><td class="px-4 py-4 font-medium">{{ $item['product_name'] ?? ($item['variant']['product']['name'] ?? 'Product') }}</td><td class="px-4 py-4">{{ $item['variant_name'] ?? ($item['variant']['variant_name'] ?? 'Variant') }}</td><td class="px-4 py-4">{{ $item['quantity'] }}</td></tr>
+                            @foreach (($payment['order']['items'] ?? $payment['gateway_payload']['checkout']['items'] ?? []) as $item)
+                                <tr><td class="px-4 py-4 font-medium">{{ $item['product_name'] ?? ($item['variant']['product']['name'] ?? 'Product') }}</td><td class="px-4 py-4">{{ $item['variant_name'] ?? ($item['variant']['variant_name'] ?? 'Variant') }}</td><td class="px-4 py-4">{{ $item['quantity'] ?? $item['qty'] ?? 0 }}</td></tr>
                             @endforeach
                         </tbody>
                     </table>

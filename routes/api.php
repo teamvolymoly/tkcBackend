@@ -80,6 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/coupons/remove', [CouponController::class, 'remove']);
     Route::post('/razorpay/order', [PaymentController::class, 'createOrder']);
     Route::post('/razorpay/verify', [PaymentController::class, 'verify']);
+    Route::post('/razorpay/failure', [PaymentController::class, 'failure']);
     Route::get('/payments/success/{order_id}', [PaymentController::class, 'success']);
     Route::get('/payments/failed/{order_id}', [PaymentController::class, 'failed']);
     Route::post('/coupons', [CouponController::class, 'store'])->middleware('admin.api_permission:coupons.create');

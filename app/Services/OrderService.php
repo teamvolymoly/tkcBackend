@@ -52,7 +52,13 @@ class OrderService
             ]);
         }
 
-        $order->update(['status' => $status]);
+        $attributes = ['status' => $status];
+
+        if ($status === 'delivered' && ! $order->delivery_date) {
+            $attributes['delivery_date'] = now()->toDateString();
+        }
+
+        $order->update($attributes);
 
         return $order->fresh(['user', 'items']);
     }

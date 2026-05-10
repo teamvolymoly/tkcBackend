@@ -62,6 +62,7 @@ class CustomerAccountService
                 'status' => $this->checkoutService->humanStatus($order->status),
                 'payment_status' => $this->checkoutService->humanPaymentStatus($order->payment_status),
                 'payment_method' => $payment ? strtoupper((string) $payment->payment_method) : null,
+                'delivered_date' => optional($order->delivery_date)->toDateString(),
                 'subtotal' => round((float) $order->subtotal, 2),
                 'shipping' => round((float) $order->shipping_amount, 2),
                 'tax' => 0.0,
@@ -189,6 +190,8 @@ class CustomerAccountService
 
     private function transformOrderListItem(Order $order): array
     {
+        $firstItem = $order->items->first();
+
         return [
             'id' => $order->order_number,
             'placed_on' => optional($order->created_at)->toDateString(),
@@ -197,6 +200,8 @@ class CustomerAccountService
             'total' => round((float) $order->total_amount, 2),
             'currency' => CustomerCheckoutService::CURRENCY,
             'items_count' => (int) $order->items->sum('quantity'),
+            'product_name' => $firstItem?->product_name,
+            'product_variant' => $firstItem?->variant_name,
         ];
     }
 

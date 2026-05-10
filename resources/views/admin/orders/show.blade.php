@@ -1,6 +1,19 @@
 @extends('admin.layouts.app')
 @section('title', 'Order Details')
 @section('content')
+@php
+    $allowedTransitions = [
+        'pending' => ['confirmed', 'cancelled'],
+        'confirmed' => ['processing', 'cancelled'],
+        'processing' => ['shipped', 'cancelled'],
+        'shipped' => ['delivered'],
+        'delivered' => [],
+        'cancelled' => [],
+    ];
+    $currentStatus = $order['status'] ?? 'pending';
+    $availableStatuses = array_values(array_unique(array_merge([$currentStatus], $allowedTransitions[$currentStatus] ?? [])));
+    $deliveredOn = !empty($order['delivery_date']) ? \Illuminate\Support\Carbon::parse($order['delivery_date'])->format('d M Y') : null;
+@endphp
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
@@ -17,10 +30,16 @@
                 <form method="POST" action="{{ route('admin.orders.status', $order['id']) }}" data-loading-form class="mt-5 space-y-4">
                     @csrf @method('PUT')
                     <select name="status" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">
-                        @foreach (['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'] as $status)
+                        @foreach ($availableStatuses as $status)
                             <option value="{{ $status }}" @selected($order['status'] === $status)>{{ ucfirst($status) }}</option>
                         @endforeach
                     </select>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                        Current status can move only through the next valid workflow step.
+                    </p>
+                    @if ($currentStatus === 'delivered' && $deliveredOn)
+                        <p class="text-sm font-medium text-slate-700 dark:text-slate-300">Delivered on: {{ $deliveredOn }}</p>
+                    @endif
                     <button type="submit" class="w-full rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Update Status</button>
                 </form>
             </section>
@@ -28,6 +47,9 @@
                 <h2 class="text-lg font-semibold">Summary</h2>
                 <div class="mt-5 space-y-3 text-sm">
                     <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Payment</span><span>@include('admin.components.status-badge', ['value' => $order['payment_status']])</span></div>
+                    @if ($deliveredOn)
+                        <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Delivered on</span><span class="font-medium">{{ $deliveredOn }}</span></div>
+                    @endif
                     <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Subtotal</span><span class="font-medium">Rs. {{ number_format((float) $order['subtotal'], 2) }}</span></div>
                     <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Shipping</span><span class="font-medium">Rs. {{ number_format((float) $order['shipping_amount'], 2) }}</span></div>
                     <div class="flex items-center justify-between rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60"><span class="text-slate-500">Discount</span><span class="font-medium">Rs. {{ number_format((float) $order['discount_amount'], 2) }}</span></div>

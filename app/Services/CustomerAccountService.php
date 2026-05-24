@@ -297,6 +297,7 @@ class CustomerAccountService
             'placed_on' => optional($order->created_at)->toDateString(),
             'status' => $this->checkoutService->humanStatus($order->status),
             'payment_status' => $this->checkoutService->humanPaymentStatus($order->payment_status),
+            'can_review' => $order->payment_status === 'paid' && $order->status === 'delivered',
             'total' => round((float) $order->total_amount, 2),
             'currency' => CustomerCheckoutService::CURRENCY,
             'items_count' => (int) $order->items->sum('quantity'),

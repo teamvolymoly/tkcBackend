@@ -52,7 +52,7 @@
                 <div class="mt-3 flex flex-wrap gap-5 text-sm text-[#6b7368]">
                     <span class="inline-flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-[#72d3e4]"></span>Sales <strong class="text-[#4e5650]">&#8377;{{ number_format((float) ($overview['totals']['sales'] ?? 0), 0) }}</strong></span>
                     <span class="inline-flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-[#b6b8bd]"></span>Cancelled <strong class="text-[#4e5650]">&#8377;{{ number_format((float) ($overview['totals']['cancelled'] ?? 0), 0) }}</strong></span>
-                    <span class="inline-flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-[#3553a6]"></span>Completed <strong class="text-[#4e5650]">{{ number_format((float) ($overview['totals']['completed'] ?? 0), 0) }}</strong></span>
+                    <span class="inline-flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-[#8fa38c]"></span>Completed <strong class="text-[#4e5650]">{{ number_format((float) ($overview['totals']['completed'] ?? 0), 0) }}</strong></span>
                     <span class="inline-flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-[#33c26c]"></span>New Orders <strong class="text-[#4e5650]">{{ number_format((float) ($overview['totals']['new_orders'] ?? 0), 0) }}</strong></span>
                 </div>
             </div>
@@ -232,8 +232,8 @@
                             type: 'line',
                             label: 'Completed',
                             data: completed,
-                            borderColor: '#3553a6',
-                            backgroundColor: '#3553a6',
+                            borderColor: '#8fa38c',
+                            backgroundColor: '#8fa38c',
                             tension: 0.35,
                             borderWidth: 2,
                             pointRadius: 0,
@@ -312,7 +312,6 @@
         })();
     </script>
 @endpush
-
 
 
 

@@ -41,10 +41,10 @@
         .scrollbar-hide::-webkit-scrollbar{display:none}
         html,body{font-family:'Inter',ui-sans-serif,system-ui,sans-serif}
         :root{
-            --admin-shell:#eff3ee;
-            --admin-surface:#fcf8f4;
-            --admin-surface-soft:#f5f0e8;
-            --admin-surface-muted:#f7f4ef;
+            --admin-shell:#ffffff;
+            --admin-surface:#ffffff;
+            --admin-surface-soft:#ffffff;
+            --admin-surface-muted:#ffffff;
             --admin-stroke:#ddd6ca;
             --admin-stroke-strong:#cfc5b8;
             --admin-text:#27231f;
@@ -61,20 +61,28 @@
             --admin-shadow:0 24px 50px rgba(114,130,115,.12);
         }
         .dark{
-            --admin-shell:#708271;
-            --admin-surface:#f6f0e8;
-            --admin-surface-soft:#efe7dc;
-            --admin-surface-muted:#f5efe7;
-            --admin-stroke:#d3c8bb;
-            --admin-stroke-strong:#c6baa9;
-            --admin-text:#23201c;
-            --admin-text-soft:#5f584f;
-            --admin-olive:#657866;
-            --admin-olive-deep:#526252;
-            --admin-olive-soft:#9bb39f;
-            --admin-shadow:0 22px 45px rgba(64,76,66,.16);
+            --admin-shell:#0f1510;
+            --admin-surface:#171f18;
+            --admin-surface-soft:#202a21;
+            --admin-surface-muted:#1c261d;
+            --admin-stroke:#354335;
+            --admin-stroke-strong:#4d5f4d;
+            --admin-text:#f5f7f2;
+            --admin-text-soft:#b8c3b4;
+            --admin-olive:#8fa38c;
+            --admin-olive-deep:#a9bea4;
+            --admin-olive-soft:#647964;
+            --admin-success-bg:#173321;
+            --admin-success-text:#86efac;
+            --admin-danger-bg:#3b1e20;
+            --admin-danger-text:#fca5a5;
+            --admin-warning-bg:#3a2c16;
+            --admin-warning-text:#facc15;
+            --admin-shadow:0 22px 45px rgba(0,0,0,.26);
         }
         body.admin-panel-shell{background:var(--admin-shell);color:var(--admin-text)}
+        .admin-panel-shell .admin-shell-bg{background:var(--admin-shell)!important}
+        .admin-panel-shell .admin-sticky-chrome{background:var(--admin-shell)!important}
      
         .admin-panel-shell .admin-muted-surface{
             background:var(--admin-surface-soft)!important;
@@ -89,14 +97,30 @@
         .admin-panel-shell .text-slate-900,
         .admin-panel-shell .dark\:text-white,
         .admin-panel-shell .dark\:text-slate-100,
-        .admin-panel-shell .dark\:text-slate-200{color:var(--admin-text)!important}
+        .admin-panel-shell .dark\:text-slate-200,
+        .admin-panel-shell .text-black,
+        .admin-panel-shell .text-\[\#1e2620\],
+        .admin-panel-shell .text-\[\#1d241d\],
+        .admin-panel-shell .text-\[\#2b322c\],
+        .admin-panel-shell .text-\[\#2d342e\],
+        .admin-panel-shell .text-\[\#4e5650\]{color:var(--admin-text)!important}
         .admin-panel-shell .text-slate-700,
         .admin-panel-shell .text-slate-600,
         .admin-panel-shell .text-slate-500,
         .admin-panel-shell .text-slate-400,
         .admin-panel-shell .dark\:text-slate-300,
         .admin-panel-shell .dark\:text-slate-400,
-        .admin-panel-shell .dark\:text-slate-500{color:var(--admin-text-soft)!important}
+        .admin-panel-shell .dark\:text-slate-500,
+        .admin-panel-shell .text-black\/70,
+        .admin-panel-shell .text-\[\#52604f\],
+        .admin-panel-shell .text-\[\#556053\],
+        .admin-panel-shell .text-\[\#6f766f\],
+        .admin-panel-shell .text-\[\#6b7368\],
+        .admin-panel-shell .text-\[\#7d8579\],
+        .admin-panel-shell .text-\[\#889084\],
+        .admin-panel-shell .text-\[\#8b9388\],
+        .admin-panel-shell .text-\[\#8f988d\],
+        .admin-panel-shell .text-\[\#9aa298\]{color:var(--admin-text-soft)!important}
         .admin-panel-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
         .admin-panel-shell select,
         .admin-panel-shell textarea{
@@ -122,13 +146,25 @@
         }
         .admin-panel-shell table thead,
         .admin-panel-shell .bg-slate-50,
+        .admin-panel-shell .bg-slate-50\/60,
+        .admin-panel-shell .bg-slate-50\/70,
+        .admin-panel-shell .bg-slate-50\/80,
         .admin-panel-shell .dark\:bg-slate-950,
-        .admin-panel-shell .dark\:bg-slate-950\/80{background:var(--admin-surface-soft)!important}
+        .admin-panel-shell .dark\:bg-slate-950\/40,
+        .admin-panel-shell .dark\:bg-slate-950\/60,
+        .admin-panel-shell .dark\:bg-slate-950\/70,
+        .admin-panel-shell .dark\:bg-slate-950\/80,
+        .admin-panel-shell .bg-\[\#f1f2ef\],
+        .admin-panel-shell .bg-\[\#f1f3ef\],
+        .admin-panel-shell .bg-\[\#eef3ec\],
+        .admin-panel-shell .bg-gray-200{background:var(--admin-surface-soft)!important}
         .admin-panel-shell table,
         .admin-panel-shell tbody,
         .admin-panel-shell .border-slate-200,
         .admin-panel-shell .dark\:border-slate-800,
-        .admin-panel-shell .dark\:border-slate-700{border-color:color-mix(in srgb, var(--admin-stroke) 82%, white)!important}
+        .admin-panel-shell .dark\:border-slate-700,
+        .admin-panel-shell .border-\[\#edf0ea\],
+        .admin-panel-shell .border-\[\#e3e8e0\]{border-color:var(--admin-stroke)!important}
         .admin-panel-shell tbody tr:hover{background:rgba(169,197,176,.12)!important}
         .admin-panel-shell a.inline-flex,
         .admin-panel-shell button,
@@ -168,30 +204,77 @@
         .admin-panel-shell .dark\:bg-amber-500\/10{background:var(--admin-warning-bg)!important}
         .admin-panel-shell .text-amber-700,
         .admin-panel-shell .dark\:text-amber-300{color:var(--admin-warning-text)!important}
+        .admin-panel-shell .bg-sky-50,
         .admin-panel-shell .bg-sky-100,
-        .admin-panel-shell .dark\:bg-sky-500\/10,
-        .admin-panel-shell .bg-cyan-100{background:#e6eee4!important}
+        .admin-panel-shell .bg-blue-50,
+        .admin-panel-shell .bg-blue-100,
+        .admin-panel-shell .bg-cyan-50,
+        .admin-panel-shell .bg-cyan-100,
+        .admin-panel-shell .bg-indigo-50,
+        .admin-panel-shell .bg-indigo-100{background:#e6eee4!important}
+        .dark .admin-panel-shell .bg-sky-50,
+        .dark .admin-panel-shell .bg-sky-100,
+        .dark .admin-panel-shell .bg-blue-50,
+        .dark .admin-panel-shell .bg-blue-100,
+        .dark .admin-panel-shell .bg-cyan-50,
+        .dark .admin-panel-shell .bg-cyan-100,
+        .dark .admin-panel-shell .bg-indigo-50,
+        .dark .admin-panel-shell .bg-indigo-100,
+        .dark .admin-panel-shell .dark\:bg-sky-500\/10,
+        .dark .admin-panel-shell .dark\:bg-blue-500\/10,
+        .dark .admin-panel-shell .dark\:bg-cyan-500\/10,
+        .dark .admin-panel-shell .dark\:bg-indigo-500\/10{background:var(--admin-surface-soft)!important}
+        .admin-panel-shell .border-sky-200,
+        .admin-panel-shell .border-blue-200,
+        .admin-panel-shell .border-cyan-200,
+        .admin-panel-shell .border-indigo-200,
+        .admin-panel-shell .dark\:border-sky-500\/20,
+        .admin-panel-shell .dark\:border-blue-500\/20,
+        .admin-panel-shell .dark\:border-cyan-500\/20,
+        .admin-panel-shell .dark\:border-indigo-500\/20{border-color:var(--admin-stroke)!important}
         .admin-panel-shell .text-sky-700,
         .admin-panel-shell .text-sky-600,
         .admin-panel-shell .dark\:text-sky-300,
-        .admin-panel-shell .text-cyan-700{color:var(--admin-olive-deep)!important}
+        .admin-panel-shell .text-blue-700,
+        .admin-panel-shell .text-blue-600,
+        .admin-panel-shell .dark\:text-blue-300,
+        .admin-panel-shell .text-cyan-700,
+        .admin-panel-shell .text-cyan-600,
+        .admin-panel-shell .dark\:text-cyan-300,
+        .admin-panel-shell .text-indigo-700,
+        .admin-panel-shell .text-indigo-600,
+        .admin-panel-shell .dark\:text-indigo-300{color:var(--admin-olive-deep)!important}
         .admin-panel-shell .bg-white,
-        .admin-panel-shell .dark\:bg-slate-900{background:color-mix(in srgb, var(--admin-surface) 94%, white)!important}
+        .admin-panel-shell .bg-white\/80,
+        .admin-panel-shell .bg-white\/85,
+        .admin-panel-shell .dark\:bg-slate-900,
+        .admin-panel-shell .dark\:bg-slate-900\/70,
+        .admin-panel-shell .dark\:bg-slate-900\/80{background:var(--admin-surface)!important}
+        .dark .admin-panel-shell .dark\:bg-slate-700\/40{background:var(--admin-surface-soft)!important}
+        .admin-panel-shell .bg-\[\#fbfbfa\],
+        .admin-panel-shell .bg-\[\#fbfcfa\],
+        .admin-panel-shell .bg-\[\#f8faf7\]{background:var(--admin-surface-muted)!important}
         .admin-panel-shell .shadow-sm,
         .admin-panel-shell .shadow-lg{box-shadow:var(--admin-shadow)!important}
         .admin-panel-shell .ring-slate-200,
-        .admin-panel-shell .ring-\[\#edf0ea\]{--tw-ring-color:color-mix(in srgb, var(--admin-stroke) 70%, white)!important}
+        .admin-panel-shell .ring-\[\#edf0ea\]{--tw-ring-color:var(--admin-stroke)!important}
         .admin-panel-shell .border-white\/70{border-color:rgba(255,255,255,.65)!important}
+        .dark .admin-panel-shell .text-\[\#2f3630\],
+        .dark .admin-panel-shell .text-\[\#536054\]{color:var(--admin-text-soft)!important}
+        .dark .admin-panel-shell .bg-\[\#dfe7db\].text-\[\#2f3630\]{color:var(--admin-text)!important}
+        .dark .admin-panel-shell .bg-\[\#dfe7db\],
+        .dark .admin-panel-shell .hover\:bg-\[\#eef1ec\]:hover{background:var(--admin-surface-soft)!important}
+        .dark .admin-panel-shell .border-\[\#e7ebe4\]{border-color:var(--admin-stroke)!important}
     </style>
     @stack('styles')
 </head>
-<body class="admin-panel-shell h-full bg-[#eff3ee] text-slate-900 antialiased transition-colors duration-300 dark:bg-[#708271] dark:text-slate-900">
-<div class="min-h-screen bg-[#e3f4e4] transition-colors duration-300 dark:bg-[#708271]">
-    <div class="flex min-h-screen gap-0 p-2.5 sm:p-3.5">
+<body class="admin-panel-shell h-full bg-white text-slate-900 antialiased transition-colors duration-300">
+<div class="admin-shell-bg min-h-screen transition-colors duration-300">
+    <div class="flex min-h-screen gap-0 p-1.5 sm:p-2">
         @include('admin.layouts.sidebar')
-        <div class="flex min-w-0 flex-1 flex-col overflow-hidden rounded-[14px] bg-transparent">
+        <div class="flex min-w-0 flex-1 flex-col rounded-[14px] bg-transparent">
             @include('admin.layouts.navbar')
-            <main class="flex-1 overflow-hidden px-3 pb-3 pt-1 sm:px-4 sm:pb-4" x-data="{ visible: false }" x-init="requestAnimationFrame(() => visible = true)">
+            <main class="flex-1 px-3 pb-3 pt-1 sm:px-4 sm:pb-4" x-data="{ visible: false }" x-init="requestAnimationFrame(() => visible = true)">
                 @include('admin.components.alerts')
                 <div x-show="visible" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1.5" x-transition:enter-end="opacity-100 translate-y-0" class="mx-auto h-full w-full max-w-[1480px]">
                     @yield('content')

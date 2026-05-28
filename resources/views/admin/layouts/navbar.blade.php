@@ -7,7 +7,7 @@
     ];
 @endphp
 
-<header class="px-1 pb-3 pt-1 sm:px-2">
+<header class="admin-sticky-chrome sticky top-1.5 z-30 px-1 pb-3 pt-1 sm:top-2 sm:px-2">
     <div class="mx-auto flex w-full max-w-[1480px] items-center justify-between gap-3 rounded-[12px] bg-transparent px-2 py-1.5 sm:px-3">
         <div class="flex min-w-0 items-center gap-3">
             <button type="button" class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#586056] shadow-sm ring-1 ring-[#edf0ea] transition hover:-translate-y-0.5 lg:hidden" @click="sidebarOpen = true" aria-label="Open sidebar">

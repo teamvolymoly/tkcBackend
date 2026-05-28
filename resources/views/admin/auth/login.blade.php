@@ -39,12 +39,12 @@
         html, body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
     </style>
 </head>
-<body class="min-h-screen overflow-x-hidden bg-[#fcf8f4] font-sans text-slate-900 transition-colors duration-300 dark:bg-[#708372] dark:text-slate-900">
+<body class="min-h-screen overflow-x-hidden bg-white font-sans text-slate-900 transition-colors duration-300 dark:bg-[#0f1510] dark:text-[#f5f7f2]">
     @php($loginImagePath = route('media.public', ['path' => 'login/login_img.png']))
     @php($adminLogoPath = route('media.public', ['path' => 'logo/LOGO_TKC-01.png']))
 
     <div class="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8 sm:px-6">
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.82),_transparent_32%),linear-gradient(180deg,_#f3f6f1_0%,_#eef3ed_100%)] dark:bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.08),_transparent_22%),linear-gradient(180deg,_#738674_0%,_#687c6a_100%)]"></div>
+        <div class="absolute inset-0 bg-white dark:bg-[radial-gradient(circle_at_top,_rgba(143,163,140,0.16),_transparent_24%),linear-gradient(180deg,_#0f1510_0%,_#171f18_100%)]"></div>
 
         <div class="relative w-full max-w-[900px] overflow-hidden lg:grid lg:min-h-[610px] lg:grid-cols-[1.02fr_0.92fr]">
             <div class="relative hidden h-full lg:block">
@@ -58,7 +58,7 @@
                 <div class="absolute inset-x-0 bottom-0 h-28 bg-[linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,0.2)_55%,rgba(255,255,255,0.48))]"></div>
             </div>
 
-            <div class="flex h-full flex-col justify-between bg-white px-5 py-5 sm:px-6 sm:py-6">
+            <div class="flex h-full flex-col justify-between bg-white px-5 py-5 sm:px-6 sm:py-6 dark:bg-[#171f18]">
                 <div>
                     <div class="flex items-start justify-between gap-4">
                         <div class="inline-flex min-h-[44px] items-center">
@@ -71,11 +71,11 @@
 
                         <button
                             type="button"
-                            class="inline-flex items-center rounded-full bg-[#f2efeb] p-1 text-[#8e877e] shadow-sm transition hover:text-[#5f574f]"
+                            class="inline-flex items-center rounded-full bg-white p-1 text-[#8e877e] shadow-sm ring-1 ring-[#ddd6ca] transition hover:text-[#5f574f] dark:bg-[#202a21] dark:text-[#b8c3b4] dark:ring-[#354335] dark:hover:text-white"
                             @click="darkMode = !darkMode; localStorage.setItem('admin-dark-mode', darkMode ? 'true' : 'false')"
                             aria-label="Toggle theme"
                         >
-                            <span class="flex h-7 w-7 items-center justify-center rounded-full" :class="darkMode ? 'bg-white text-[#625b54] shadow-sm' : ''">
+                            <span class="flex h-7 w-7 items-center justify-center rounded-full" :class="darkMode ? 'bg-[#171f18] text-white shadow-sm' : ''">
                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3c-.12.58-.18 1.18-.18 1.79A7.5 7.5 0 0018.5 12.3c.86 0 1.68-.14 2.45-.4.03.3.05.59.05.89z"/></svg>
                             </span>
                             <span class="flex h-7 w-7 items-center justify-center rounded-full" :class="!darkMode ? 'bg-white text-[#625b54] shadow-sm' : ''">
@@ -85,8 +85,8 @@
                     </div>
 
                     <div class="mt-6 sm:mt-12">
-                        <h1 class="text-[2rem]  leading-none tracking-[-0.035em] text-black sm:text-[2.3rem]">Welcome Back!</h1>
-                        <p class="mt-3 max-w-sm text-[14px] leading-4 text-black/80">
+                        <h1 class="text-[2rem]  leading-none tracking-[-0.035em] text-black dark:text-[#f5f7f2] sm:text-[2.3rem]">Welcome Back!</h1>
+                        <p class="mt-3 max-w-sm text-[14px] leading-4 text-black/80 dark:text-[#b8c3b4]">
                             Log in to continue the kahwa company tasks, panel team learn more inside.
                         </p>
                     </div>
@@ -97,7 +97,7 @@
                         @csrf
 
                         <div>
-                            <label for="email" class="mb-2 block text-[14px] text-[#4f4942]">
+                            <label for="email" class="mb-2 block text-[14px] text-[#4f4942] dark:text-[#d7ded2]">
                                 Your email
                             </label>
                             <input
@@ -106,13 +106,13 @@
                                 name="email"
                                 value="{{ old('email') }}"
                                 placeholder="business@yourlye.com"
-                                class="h-9 w-full rounded-full border border-[#d8d1c6] bg-[#f9f6f1] px-4 text-sm text-[#2d2925] outline-none transition placeholder:text-[#c0b9b0] focus:border-[#aebba9] focus:ring-2 focus:ring-[#d9e4d7]"
+                                class="h-9 w-full rounded-full border border-[#ddd6ca] bg-white px-4 text-sm text-[#2d2925] outline-none transition placeholder:text-[#c0b9b0] focus:border-[#aebba9] focus:ring-2 focus:ring-[#d9e4d7] dark:border-[#354335] dark:bg-[#1c261d] dark:text-[#f5f7f2] dark:placeholder:text-[#6f7d6b]"
                                 required
                             >
                         </div>
 
                         <div>
-                            <label for="password" class="mb-2 block text-[14px] text-[#4f4942]">
+                            <label for="password" class="mb-2 block text-[14px] text-[#4f4942] dark:text-[#d7ded2]">
                                 Password
                             </label>
                             <div class="relative">
@@ -121,7 +121,7 @@
                                     x-bind:type="showPassword ? 'text' : 'password'"
                                     name="password"
                                     placeholder="Enter your password"
-                                    class="h-9 w-full rounded-full border border-[#d8d1c6] bg-[#f9f6f1] px-4 pr-11 text-xs text-[#2d2925] outline-none transition placeholder:text-[#c0b9b0] focus:border-[#aebba9] focus:ring-2 focus:ring-[#d9e4d7]"
+                                    class="h-9 w-full rounded-full border border-[#ddd6ca] bg-white px-4 pr-11 text-xs text-[#2d2925] outline-none transition placeholder:text-[#c0b9b0] focus:border-[#aebba9] focus:ring-2 focus:ring-[#d9e4d7] dark:border-[#354335] dark:bg-[#1c261d] dark:text-[#f5f7f2] dark:placeholder:text-[#6f7d6b]"
                                     required
                                 >
                                 <button
@@ -136,12 +136,12 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-between gap-3 pt-0.5 text-[14px] text-[#625b54]">
+                        <div class="flex items-center justify-between gap-3 pt-0.5 text-[14px] text-[#625b54] dark:text-[#b8c3b4]">
                             <label class="inline-flex items-center gap-2">
                                 <input type="checkbox" class="h-3.5 w-3.5 rounded border-[#cfc7bb] text-[#7a9680] focus:ring-[#c8d6c6]">
                                 <span>Remember me</span>
                             </label>
-                            <a href="{{ route('admin.password.request') }}" class="font-medium text-[#4e4a44] transition hover:text-[#1f1d1a]">Forgot password?</a>
+                            <a href="{{ route('admin.password.request') }}" class="font-medium text-[#4e4a44] transition hover:text-[#1f1d1a] dark:text-[#d7ded2] dark:hover:text-white">Forgot password?</a>
                         </div>
 
                         <button
@@ -154,8 +154,8 @@
                 </div>
 
                 <div class="pt-4 text-center">
-                    <p class="text-[14px] text-black/80 font-slim">For any quries contact us at</p>
-                    <a href="mailto:info@thekahwacompany.com" class=" inline-block text-md font-semibold text-[#4f4942] transition hover:text-[#22201d]">
+                    <p class="text-[14px] text-black/80 font-slim dark:text-[#b8c3b4]">For any quries contact us at</p>
+                    <a href="mailto:info@thekahwacompany.com" class=" inline-block text-md font-semibold text-[#4f4942] transition hover:text-[#22201d] dark:text-[#d7ded2] dark:hover:text-white">
                         info@thekahwacompany.com
                     </a>
                 </div>

@@ -38,11 +38,11 @@
         html, body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
     </style>
 </head>
-<body class="min-h-screen bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-white">
+<body class="min-h-screen bg-white text-slate-900 dark:bg-[#0f1510] dark:text-[#f5f7f2]">
     <div class="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10">
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(14,165,233,0.18),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.16),_transparent_25%)]"></div>
-        <div class="absolute inset-0 opacity-60 dark:opacity-30" style="background-image:radial-gradient(circle at 1px 1px, rgba(148,163,184,.18) 1px, transparent 0);background-size:24px 24px"></div>
-        <div class="relative w-full max-w-xl overflow-hidden rounded-lg border border-white/70 bg-white/85 shadow-2xl shadow-slate-300/40 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/80">
+        <div class="absolute inset-0 bg-white dark:bg-[radial-gradient(circle_at_top,_rgba(143,163,140,0.14),_transparent_24%),linear-gradient(180deg,_#0f1510_0%,_#171f18_100%)]"></div>
+        <div class="absolute inset-0 opacity-0 dark:opacity-30" style="background-image:radial-gradient(circle at 1px 1px, rgba(184,195,180,.2) 1px, transparent 0);background-size:24px 24px"></div>
+        <div class="relative w-full max-w-xl overflow-hidden rounded-lg border border-[#ddd6ca] bg-white shadow-2xl shadow-slate-300/30 dark:border-[#354335] dark:bg-[#171f18] dark:shadow-black/30">
             <div class="p-6 sm:p-10">
                 <div class="flex items-center justify-between gap-4">
                     <div>
@@ -72,5 +72,4 @@
     </div>
 </body>
 </html>
-
 

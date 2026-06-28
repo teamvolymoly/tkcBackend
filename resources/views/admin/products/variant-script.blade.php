@@ -1,5 +1,5 @@
 <script>
-function productForm(initialIngredients, initialFaqs, initialVariants) {
+function productForm(initialIngredients, initialFaqs, initialBrewingRituals, initialVariants) {
     const uid = (prefix) => `${prefix}-${Date.now()}-${Math.random()}`;
     const toPreview = (path) => {
         if (!path) return '';
@@ -9,19 +9,28 @@ function productForm(initialIngredients, initialFaqs, initialVariants) {
     const ingredientTemplate = () => ({ uid: uid('ingredient'), name: '', existing_image: '', preview: '' });
     const faqTemplate = () => ({ uid: uid('faq'), question: '', answer: '' });
     const ritualTemplate = (ritual = '') => ({ uid: uid('ritual'), ritual, existing_image: '', preview: '' });
-    const normalizeRituals = (rituals = []) => {
-        const items = (rituals || []).slice(0, 2).map((ritual) => ({
+    const normalizeRitualGroup = (rituals = []) => {
+        const items = (rituals || []).map((ritual) => ({
             uid: uid('ritual'),
-            ritual: ritual.ritual || ritual.text || '',
-            existing_image: ritual.image || ritual.image_path || '',
-            preview: toPreview(ritual.image || ritual.image_path || ''),
+            ritual: ritual.ritual || ritual.text || ritual.items?.[0]?.text || '',
+            existing_image: ritual.image || ritual.image_path || ritual.items?.[0]?.image || ritual.items?.[0]?.image_url || '',
+            preview: toPreview(ritual.image || ritual.image_path || ritual.items?.[0]?.image || ritual.items?.[0]?.image_url || ''),
         }));
 
-        while (items.length < 2) {
-            items.push(ritualTemplate());
+        return items.length ? items : [ritualTemplate()];
+    };
+    const normalizeRituals = (rituals = []) => {
+        if (!Array.isArray(rituals) && rituals && typeof rituals === 'object') {
+            return {
+                hot_brew: normalizeRitualGroup(rituals.hot_brew || []),
+                iced_brew: normalizeRitualGroup(rituals.iced_brew || []),
+            };
         }
 
-        return items;
+        return {
+            hot_brew: normalizeRitualGroup((rituals || []).slice(0, 1)),
+            iced_brew: normalizeRitualGroup((rituals || []).slice(1, 2)),
+        };
     };
     const variantTemplate = (isDefault = false) => ({
         uid: uid('variant'),
@@ -31,7 +40,6 @@ function productForm(initialIngredients, initialFaqs, initialVariants) {
         price: '',
         discount_price: '',
         weight: '',
-        brewing_rituals: normalizeRituals(),
         is_default: isDefault,
         status: true,
     });
@@ -48,6 +56,7 @@ function productForm(initialIngredients, initialFaqs, initialVariants) {
             question: faq.question || '',
             answer: faq.answer || '',
         })) : [faqTemplate()],
+        brewing_rituals: normalizeRituals(initialBrewingRituals || []),
         variants: (initialVariants || []).length ? initialVariants.map((variant, index) => ({
             uid: uid('variant'),
             id: variant.id || '',
@@ -56,7 +65,6 @@ function productForm(initialIngredients, initialFaqs, initialVariants) {
             price: variant.price || '',
             discount_price: variant.discount_price || variant.compare_price || '',
             weight: variant.weight || '',
-            brewing_rituals: normalizeRituals(variant.brewing_rituals || []),
             is_default: typeof variant.is_default === 'undefined' ? index === 0 : Boolean(Number(variant.is_default) || variant.is_default),
             status: typeof variant.status === 'undefined' ? true : Boolean(Number(variant.status) || variant.status),
         })) : [variantTemplate(true)],
@@ -65,6 +73,11 @@ function productForm(initialIngredients, initialFaqs, initialVariants) {
         addFaq() { this.faqs.push(faqTemplate()); },
         removeFaq(index) { this.faqs.length === 1 ? this.faqs[index] = faqTemplate() : this.faqs.splice(index, 1); },
         addVariant() { this.variants.push(variantTemplate(this.variants.length === 0)); },
+        addBrewingRitual(group) { this.brewing_rituals[group].push(ritualTemplate()); },
+        removeBrewingRitual(group, ritualIndex) {
+            const rituals = this.brewing_rituals[group];
+            rituals.length === 1 ? rituals[ritualIndex] = ritualTemplate() : rituals.splice(ritualIndex, 1);
+        },
         removeVariant(index) {
             if (this.variants.length === 1) { alert('At least one variant is required.'); return; }
             const wasDefault = this.variants[index].is_default;

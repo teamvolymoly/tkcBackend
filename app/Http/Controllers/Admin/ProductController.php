@@ -136,6 +136,17 @@ class ProductController extends BaseAdminController
             'faqs' => ['nullable', 'array'],
             'faqs.*.question' => ['nullable', 'string'],
             'faqs.*.answer' => ['nullable', 'string'],
+            'brewing_rituals' => ['nullable', 'array'],
+            'brewing_rituals.hot_brew' => ['nullable', 'array'],
+            'brewing_rituals.hot_brew.*.ritual' => ['nullable', 'string', 'max:255'],
+            'brewing_rituals.hot_brew.*.image' => ['nullable', function (string $attribute, mixed $value, \Closure $fail) {
+                $this->validateOptionalImageValue($attribute, $value, $fail);
+            }],
+            'brewing_rituals.iced_brew' => ['nullable', 'array'],
+            'brewing_rituals.iced_brew.*.ritual' => ['nullable', 'string', 'max:255'],
+            'brewing_rituals.iced_brew.*.image' => ['nullable', function (string $attribute, mixed $value, \Closure $fail) {
+                $this->validateOptionalImageValue($attribute, $value, $fail);
+            }],
             'status' => ['nullable'],
             'variants' => ['required', 'array', 'min:1'],
             'variants.*.id' => [$updating ? 'nullable' : 'sometimes'],
@@ -144,19 +155,14 @@ class ProductController extends BaseAdminController
             'variants.*.price' => ['required', 'numeric', 'min:0'],
             'variants.*.discount_price' => ['nullable', 'numeric', 'min:0'],
             'variants.*.weight' => ['nullable', 'string', 'max:255'],
-            'variants.*.brewing_rituals' => ['nullable', 'array'],
-            'variants.*.brewing_rituals.*.ritual' => ['nullable', 'string', 'max:255'],
-            'variants.*.brewing_rituals.*.image' => ['nullable', function (string $attribute, mixed $value, \Closure $fail) {
-                $this->validateOptionalImageValue($attribute, $value, $fail);
-            }],
             'variants.*.is_default' => ['nullable'],
             'variants.*.status' => ['nullable'],
         ]);
 
-        $validated['category_id'] = $validated['category_id'] ?: null;
-        $validated['subcategory_id'] = $validated['subcategory_id'] ?: null;
+        $validated['category_id'] = ($validated['category_id'] ?? null) ?: null;
+        $validated['subcategory_id'] = ($validated['subcategory_id'] ?? null) ?: null;
         $validated['status'] = $request->boolean('status');
-        $validated['caffeine'] = $validated['caffeine'] ?: null;
+        $validated['caffeine'] = ($validated['caffeine'] ?? null) ?: null;
         $validated['collection'] = collect(explode(',', (string) ($validated['collection'] ?? '')))
             ->map(fn ($item) => trim((string) $item))
             ->filter()
@@ -185,21 +191,28 @@ class ProductController extends BaseAdminController
             ->values()
             ->all();
 
+        $validated['brewing_rituals'] = collect(['hot_brew', 'iced_brew'])
+            ->mapWithKeys(function (string $group) use ($validated, $request) {
+                $rituals = collect($validated['brewing_rituals'][$group] ?? [])
+                    ->map(function ($ritual, $ritualIndex) use ($request, $group) {
+                        $image = $request->file("brewing_rituals.{$group}.{$ritualIndex}.image");
+                        $current = $request->input("brewing_rituals.{$group}.{$ritualIndex}.existing_image");
+
+                        return [
+                            'ritual' => trim((string) ($ritual['ritual'] ?? '')),
+                            'image' => $image ?: ($current ?: null),
+                        ];
+                    })
+                    ->filter(fn ($ritual) => $ritual['ritual'] !== '' || $ritual['image'] !== null)
+                    ->values()
+                    ->all();
+
+                return [$group => $rituals];
+            })
+            ->all();
+
         $validated['variants'] = collect($validated['variants'])->map(function ($variant, $index) use ($request) {
             $variant['discount_price'] = isset($variant['discount_price']) && $variant['discount_price'] !== '' ? (float) $variant['discount_price'] : null;
-            $variant['brewing_rituals'] = collect($variant['brewing_rituals'] ?? [])
-                ->map(function ($ritual, $ritualIndex) use ($request, $index) {
-                    $image = $request->file("variants.{$index}.brewing_rituals.{$ritualIndex}.image");
-                    $current = $request->input("variants.{$index}.brewing_rituals.{$ritualIndex}.existing_image");
-
-                    return [
-                        'ritual' => trim((string) ($ritual['ritual'] ?? '')),
-                        'image' => $image ?: ($current ?: null),
-                    ];
-                })
-                ->filter(fn ($ritual) => $ritual['ritual'] !== '' || $ritual['image'] !== null)
-                ->values()
-                ->all();
             $variant['status'] = $request->boolean("variants.{$index}.status");
             $variant['is_default'] = $request->boolean("variants.{$index}.is_default");
 

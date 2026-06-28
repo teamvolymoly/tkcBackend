@@ -36,6 +36,13 @@ class UpdateProductRequest extends FormRequest
             'faqs' => 'nullable|array',
             'faqs.*.question' => 'nullable|string',
             'faqs.*.answer' => 'nullable|string',
+            'brewing_rituals' => 'nullable|array',
+            'brewing_rituals.hot_brew' => 'nullable|array',
+            'brewing_rituals.hot_brew.*.ritual' => 'nullable|string|max:255',
+            'brewing_rituals.hot_brew.*.image' => 'nullable',
+            'brewing_rituals.iced_brew' => 'nullable|array',
+            'brewing_rituals.iced_brew.*.ritual' => 'nullable|string|max:255',
+            'brewing_rituals.iced_brew.*.image' => 'nullable',
             'status' => 'nullable|boolean',
             'variants' => 'nullable|array',
             'variants.*.id' => [
@@ -48,9 +55,6 @@ class UpdateProductRequest extends FormRequest
             'variants.*.price' => 'required_with:variants|numeric|min:0',
             'variants.*.discount_price' => 'nullable|numeric|min:0',
             'variants.*.weight' => 'nullable|string|max:255',
-            'variants.*.brewing_rituals' => 'nullable|array',
-            'variants.*.brewing_rituals.*.ritual' => 'nullable|string|max:255',
-            'variants.*.brewing_rituals.*.image' => 'nullable',
             'variants.*.is_default' => 'nullable|boolean',
             'variants.*.status' => 'nullable|boolean',
         ];

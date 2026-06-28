@@ -26,12 +26,14 @@ class Product extends Model
         'image_5',
         'ingredients',
         'faqs',
+        'brewing_rituals',
         'status',
     ];
 
     protected $casts = [
         'ingredients' => 'array',
         'faqs' => 'array',
+        'brewing_rituals' => 'array',
         'status' => 'boolean',
     ];
 

@@ -114,16 +114,32 @@
                         <div class="rounded-lg bg-white px-4 py-3 dark:bg-slate-900"><span class="block text-xs uppercase tracking-[0.2em] text-slate-400">Default</span><span class="mt-1 block font-medium">{{ !empty($variant['is_default']) ? 'Yes' : 'No' }}</span></div>
                     </div>
                     <div class="mt-4 space-y-3">
-                        @foreach (['Hot Brew', 'Iced Brew'] as $ritualIndex => $ritualLabel)
-                            @php $ritual = $variant['brewing_rituals'][$ritualIndex] ?? null; @endphp
-                            @if (!empty($ritual['ritual'] ?? $ritual['text'] ?? null) || !empty($ritual['image_url'] ?? null))
+                        @php
+                            $brewingRituals = $variant['brewing_rituals'] ?? [];
+                            $ritualGroups = (is_array($brewingRituals) && (array_key_exists('hot_brew', $brewingRituals) || array_key_exists('iced_brew', $brewingRituals)))
+                                ? ['Hot Brew' => $brewingRituals['hot_brew'] ?? [], 'Iced Brew' => $brewingRituals['iced_brew'] ?? []]
+                                : ['Hot Brew' => array_filter([$brewingRituals[0] ?? null]), 'Iced Brew' => array_filter([$brewingRituals[1] ?? null])];
+                        @endphp
+                        @foreach ($ritualGroups as $groupLabel => $groupRituals)
+                            @if (!empty($groupRituals))
                                 <div class="rounded-lg bg-white px-4 py-3 dark:bg-slate-900">
-                                    <span class="block text-xs uppercase tracking-[0.2em] text-slate-400">{{ $ritualLabel }}</span>
-                                    <div class="mt-2 flex items-center gap-3">
-                                        @if (!empty($ritual['image_url']))
-                                            <img src="{{ $ritual['image_url'] }}" alt="{{ $ritualLabel }}" class="h-12 w-12 rounded-xl object-cover">
+                                    <span class="block text-xs uppercase tracking-[0.2em] text-slate-400">{{ $groupLabel }}</span>
+                                    <div class="mt-3 space-y-3">
+                                        @foreach ($groupRituals as $ritualIndex => $ritual)
+                            @php
+                                $ritualText = $ritual['ritual'] ?? $ritual['text'] ?? ($ritual['items'][0]['text'] ?? null);
+                                $ritualImage = $ritual['image_url'] ?? ($ritual['items'][0]['image_url'] ?? ($ritual['image'] ?? null));
+                                $ritualImageUrl = $ritualImage && !preg_match('/^https?:\/\//', $ritualImage) ? route('media.public', ['path' => ltrim($ritualImage, '/')]) : $ritualImage;
+                            @endphp
+                            @if (!empty($ritualText) || !empty($ritualImageUrl))
+                                            <div class="flex items-center gap-3">
+                                        @if (!empty($ritualImageUrl))
+                                                    <img src="{{ $ritualImageUrl }}" alt="{{ $groupLabel }} {{ $ritualIndex + 1 }}" class="h-12 w-12 rounded-xl object-cover">
                                         @endif
-                                        <span class="text-sm font-medium">{{ $ritual['ritual'] ?? $ritual['text'] ?? '-' }}</span>
+                                        <span class="text-sm font-medium">{{ $ritualText ?? '-' }}</span>
+                                    </div>
+                            @endif
+                        @endforeach
                                     </div>
                                 </div>
                             @endif

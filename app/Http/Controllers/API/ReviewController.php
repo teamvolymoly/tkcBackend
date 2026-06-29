@@ -39,6 +39,8 @@ class ReviewController extends Controller
             'rating' => ['required', 'integer', 'min:1', 'max:5'],
             'title' => ['nullable', 'string', 'max:255'],
             'comment' => ['nullable', 'string'],
+            'images' => ['nullable', 'array', 'max:6'],
+            'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
         try {

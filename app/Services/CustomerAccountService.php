@@ -9,6 +9,8 @@ use App\Models\Review;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class CustomerAccountService
@@ -155,7 +157,7 @@ class CustomerAccountService
             ->firstOrFail();
 
         $paginator = Review::query()
-            ->with('user:id,name')
+            ->with(['user:id,name', 'images'])
             ->where('product_id', $product->id)
             ->where('status', 'approved')
             ->latest()
@@ -180,6 +182,7 @@ class CustomerAccountService
                     'comment' => $review->review,
                     'status' => ucfirst((string) $review->status),
                     'created_at' => optional($review->created_at)->toDateString(),
+                    'images' => $this->transformReviewImages($review),
                 ])
                 ->values()
                 ->all(),
@@ -252,17 +255,23 @@ class CustomerAccountService
             ]);
         }
 
-        $review = Review::create([
-            'product_id' => $orderItem->product_id,
-            'variant_id' => $orderItem->variant_id,
-            'user_id' => $user->id,
-            'order_id' => $orderItem->order_id,
-            'order_item_id' => $orderItem->id,
-            'rating' => $attributes['rating'],
-            'title' => $attributes['title'] ?? null,
-            'review' => $attributes['comment'] ?? null,
-            'status' => 'pending',
-        ]);
+        $review = DB::transaction(function () use ($attributes, $orderItem, $user) {
+            $review = Review::create([
+                'product_id' => $orderItem->product_id,
+                'variant_id' => $orderItem->variant_id,
+                'user_id' => $user->id,
+                'order_id' => $orderItem->order_id,
+                'order_item_id' => $orderItem->id,
+                'rating' => $attributes['rating'],
+                'title' => $attributes['title'] ?? null,
+                'review' => $attributes['comment'] ?? null,
+                'status' => 'pending',
+            ]);
+
+            $this->storeReviewImages($review, $attributes['images'] ?? []);
+
+            return $review;
+        });
 
         return $this->transformCustomerReview($review->fresh());
     }
@@ -398,6 +407,35 @@ class CustomerAccountService
             'updated_at' => optional($review->updated_at)->toISOString(),
             'created_at' => optional($review->created_at)->toISOString(),
             'status' => ucfirst((string) $review->status),
+            'images' => $this->transformReviewImages($review),
         ];
+    }
+
+    private function storeReviewImages(Review $review, array $images): void
+    {
+        collect($images)
+            ->filter(fn ($image) => $image instanceof UploadedFile)
+            ->values()
+            ->each(function (UploadedFile $image, int $index) use ($review) {
+                $review->images()->create([
+                    'image_path' => $image->store('reviews', 'public'),
+                    'sort_order' => $index,
+                ]);
+            });
+    }
+
+    private function transformReviewImages(Review $review): array
+    {
+        $review->loadMissing('images');
+
+        return $review->images
+            ->map(fn ($image) => [
+                'id' => $image->id,
+                'image_path' => $image->image_path,
+                'image_url' => $image->image_url,
+                'sort_order' => (int) $image->sort_order,
+            ])
+            ->values()
+            ->all();
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Review extends Model
 {
@@ -17,6 +18,13 @@ class Review extends Model
         'review',
         'status',
     ];
+
+    protected static function booted(): void
+    {
+        static::deleting(function (Review $review) {
+            $review->images()->get()->each->delete();
+        });
+    }
 
     public function order()
     {
@@ -41,5 +49,10 @@ class Review extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(ReviewImage::class)->orderBy('sort_order')->orderBy('id');
     }
 }

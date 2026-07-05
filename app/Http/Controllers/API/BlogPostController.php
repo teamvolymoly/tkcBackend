@@ -11,6 +11,39 @@ use Illuminate\Validation\Rule;
 
 class BlogPostController extends Controller
 {
+    public function adminIndex(Request $request)
+    {
+        $posts = BlogPost::query()
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $term = $request->q;
+                $query->where(function ($inner) use ($term) {
+                    $inner->where('title', 'like', "%{$term}%")
+                        ->orWhere('excerpt', 'like', "%{$term}%")
+                        ->orWhere('content', 'like', "%{$term}%");
+                });
+            })
+            ->when($request->filled('status'), fn ($query) => $query->where('status', $request->boolean('status')))
+            ->latest('published_at')
+            ->latest('id')
+            ->paginate(20)
+            ->withQueryString();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Blog posts fetched successfully',
+            'data' => $posts,
+        ]);
+    }
+
+    public function adminShow(BlogPost $blogPost)
+    {
+        return response()->json([
+            'status' => true,
+            'message' => 'Blog post fetched successfully',
+            'data' => $blogPost,
+        ]);
+    }
+
     public function index(Request $request)
     {
         $isAdmin = $request->user()?->hasRole('admin') ?? false;

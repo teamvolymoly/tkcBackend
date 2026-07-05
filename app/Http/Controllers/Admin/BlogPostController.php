@@ -13,7 +13,7 @@ class BlogPostController extends BaseAdminController
         $filters = $request->only(['q', 'status', 'page']);
 
         return view('admin.blogs.index', [
-            'posts' => $this->apiService->get('blog-posts', array_filter($filters, fn ($value) => $value !== null && $value !== ''))['data'] ?? [],
+            'posts' => $this->apiService->get('admin/blog-posts', array_filter($filters, fn ($value) => $value !== null && $value !== ''))['data'] ?? [],
             'filters' => $filters,
         ]);
     }
@@ -35,12 +35,12 @@ class BlogPostController extends BaseAdminController
             return $this->backWithApiError($response, 'Unable to create blog post.');
         }
 
-        return redirect()->route('admin.blogs.edit', $response['data']['id'] ?? null)->with('success', $response['message'] ?: 'Blog post created successfully.');
+        return redirect()->route('admin.blogs.index')->with('success', $response['message'] ?: 'Blog post created successfully.');
     }
 
     public function show(int $blog): View
     {
-        $response = $this->apiService->get("blog-posts/{$blog}");
+        $response = $this->apiService->get("admin/blog-posts/{$blog}");
         abort_unless($response['ok'], 404);
 
         return view('admin.blogs.show', [
@@ -50,7 +50,7 @@ class BlogPostController extends BaseAdminController
 
     public function edit(int $blog): View
     {
-        $response = $this->apiService->get("blog-posts/{$blog}");
+        $response = $this->apiService->get("admin/blog-posts/{$blog}");
         abort_unless($response['ok'], 404);
 
         return view('admin.blogs.edit', [
@@ -68,7 +68,7 @@ class BlogPostController extends BaseAdminController
             return $this->backWithApiError($response, 'Unable to update blog post.');
         }
 
-        return redirect()->route('admin.blogs.edit', $blog)->with('success', $response['message'] ?: 'Blog post updated successfully.');
+        return redirect()->route('admin.blogs.index')->with('success', $response['message'] ?: 'Blog post updated successfully.');
     }
 
     public function destroy(int $blog): RedirectResponse

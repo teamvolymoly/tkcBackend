@@ -111,6 +111,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/hero-sections/{heroSection}', [HeroSectionController::class, 'update'])->middleware('admin.api_permission:hero_sections.update');
     Route::delete('/hero-sections/{heroSection}', [HeroSectionController::class, 'destroy'])->middleware('admin.api_permission:hero_sections.delete');
 
+    Route::get('/admin/blog-posts', [BlogPostController::class, 'adminIndex'])->middleware('admin.api_permission:blogs.view');
+    Route::get('/admin/blog-posts/{blogPost}', [BlogPostController::class, 'adminShow'])->middleware('admin.api_permission:blogs.view');
     Route::post('/blog-posts', [BlogPostController::class, 'store'])->middleware('admin.api_permission:blogs.create');
     Route::put('/blog-posts/{blogPost}', [BlogPostController::class, 'update'])->middleware('admin.api_permission:blogs.update');
     Route::delete('/blog-posts/{blogPost}', [BlogPostController::class, 'destroy'])->middleware('admin.api_permission:blogs.delete');

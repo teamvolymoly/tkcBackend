@@ -38,16 +38,23 @@
             ['route' => 'admin.roles.index', 'label' => 'Roles & Permissions', 'hint' => 'Role access management', 'permission' => 'roles.view'],
         ])->filter(fn ($link) => $canAccess($link['permission'])))
         @php($icons = [
-            'Dashboard' => '<path stroke-linecap="round" stroke-linejoin="round" d="M4.5 7.5h6v4.75h-6zm9 0h6v4.75h-6zM4.5 14.25h6V19h-6zm9 0h6V19h-6z"/>',
-            'Analytics' => '<path stroke-linecap="round" stroke-linejoin="round" d="M6.5 18V9.5h3V18m5-6.5V18h3V6h-3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 18h15"/>',
-            'Orders' => '<path stroke-linecap="round" stroke-linejoin="round" d="M7 7.5h3V18H7zm7-3h3V18h-3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 18h15"/>',
-            'Payments' => '<path stroke-linecap="round" stroke-linejoin="round" d="M5.5 7.5h13a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z"/><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5h15"/><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14h3"/>',
-            'Products' => '<path stroke-linecap="round" stroke-linejoin="round" d="M6 9.5h12l1.25 8.5H4.75L6 9.5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 9.5a3 3 0 0 1 6 0"/>',
-            'Coupons' => '<path stroke-linecap="round" stroke-linejoin="round" d="M8 6.75h8l1.75 3.5L12 13 6.25 10.25z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6.25 10.25V17.5H17.75v-7.25"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75v10.75"/>',
-            'CMS' => '<path stroke-linecap="round" stroke-linejoin="round" d="M5.5 7.5h13v9h-13z"/><path stroke-linecap="round" stroke-linejoin="round" d="M8 18.5h8"/>',
-            'More' => '<circle cx="12" cy="12" r="1.25"/><circle cx="6.75" cy="12" r="1.25"/><circle cx="17.25" cy="12" r="1.25"/>',
-            'Setting' => '<path stroke-linecap="round" stroke-linejoin="round" d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19 12l-1.2-.7.1-1.35-1.25-2.15-1.35.3-.95-.95.3-1.35-2.15-1.25L12 5 10.65 4.7 8.5 5.95l.3 1.35-.95.95-1.35-.3-1.25 2.15.1 1.35L5 12l1.2.7-.1 1.35 1.25 2.15 1.35-.3.95.95-.3 1.35 2.15 1.25L12 19l1.35.3 2.15-1.25-.3-1.35.95-.95 1.35.3 1.25-2.15-.1-1.35z"/>',
+            'Dashboard' => 'Widget_add_light.png',
+            'Analytics' => 'Chart_light.png',
+            'Orders' => 'Box_open_light.png',
+            'Payments' => 'Wallet_light.png',
+            'Products' => 'Boxes_light.png',
+            'Coupons' => 'Gift_light.png',
+            'CMS' => 'desktop_light.png',
+            'More' => 'Shop_light.png',
+            'Setting' => 'Stat.png',
         ])
+        @php($sidebarIcon = function (string $key) use ($icons) {
+            $file = $icons[$key] ?? $icons['Dashboard'];
+            return [
+                'lightMode' => asset('assects/admin/dark/' . $file),
+                'darkMode' => asset('assects/admin/light/' . $file),
+            ];
+        })
 
         <div class="mt-4 flex-1 overflow-y-auto pr-1 scrollbar-hide">
             <nav class="space-y-1.5">
@@ -58,8 +65,10 @@
                         default => str_starts_with((string) $current, str_replace('.index', '', $link['route'])),
                     })
                     <a href="{{ route($link['route']) }}" title="{{ $link['hint'] }}" class="group flex items-center gap-2.5 rounded-full px-2.5 py-2 text-[14px] font-medium transition {{ $active ? 'bg-[#5A6F61] text-white' : 'text-[#2f3630] hover:bg-[#eef1ec]' }}">
-                        <span class="flex h-6 w-6 items-center justify-center {{ $active ? 'text-white' : 'text-[#2f3630]' }}">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.55" viewBox="0 0 24 24">{!! $icons[$link['label']] !!}</svg>
+                        @php($icon = $sidebarIcon($link['label']))
+                        <span class="flex h-6 w-6 items-center justify-center">
+                            <img x-show="!darkMode" src="{{ $icon['lightMode'] }}" alt="" class="h-5 w-5 object-contain">
+                            <img x-show="darkMode" src="{{ $icon['darkMode'] }}" alt="" class="h-5 w-5 object-contain">
                         </span>
                         <span>{{ $link['label'] }}</span>
                     </a>
@@ -69,7 +78,11 @@
                     <div class="space-y-1.5 pt-1">
                         <button type="button" @click="cmsOpen = !cmsOpen" class="flex w-full items-center justify-between rounded-full px-2.5 py-2 text-[14px] font-medium transition {{ $cmsOpen ? 'bg-[#5A6F61] text-white' : 'text-[#2f3630] hover:bg-[#eef1ec]' }}">
                             <span class="flex items-center gap-2.5">
-                                <span class="flex h-6 w-6 items-center justify-center"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.55" viewBox="0 0 24 24">{!! $icons['CMS'] !!}</svg></span>
+                                @php($cmsIcon = $sidebarIcon('CMS'))
+                                <span class="flex h-6 w-6 items-center justify-center">
+                                    <img x-show="!darkMode" src="{{ $cmsIcon['lightMode'] }}" alt="" class="h-5 w-5 object-contain">
+                                    <img x-show="darkMode" src="{{ $cmsIcon['darkMode'] }}" alt="" class="h-5 w-5 object-contain">
+                                </span>
                                 <span>CMS</span>
                             </span>
                             <svg class="h-4 w-4 transition" :class="cmsOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
@@ -87,7 +100,11 @@
                     <div class="space-y-1.5 pt-1">
                         <button type="button" @click="moreOpen = !moreOpen" class="flex w-full items-center justify-between rounded-full px-2.5 py-2 text-[14px] font-medium transition {{ $moreOpen ? 'bg-[#5A6F61] text-white' : 'text-[#2f3630] hover:bg-[#eef1ec]' }}">
                             <span class="flex items-center gap-2.5">
-                                <span class="flex h-6 w-6 items-center justify-center"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.55" viewBox="0 0 24 24">{!! $icons['More'] !!}</svg></span>
+                                @php($moreIcon = $sidebarIcon('More'))
+                                <span class="flex h-6 w-6 items-center justify-center">
+                                    <img x-show="!darkMode" src="{{ $moreIcon['lightMode'] }}" alt="" class="h-5 w-5 object-contain">
+                                    <img x-show="darkMode" src="{{ $moreIcon['darkMode'] }}" alt="" class="h-5 w-5 object-contain">
+                                </span>
                                 <span>More</span>
                             </span>
                             <svg class="h-4 w-4 transition" :class="moreOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
@@ -108,7 +125,11 @@
                     <div class="space-y-1.5">
                         <button type="button" @click="settingsOpen = !settingsOpen" class="flex w-full items-center justify-between rounded-full px-2.5 py-2 text-[14px] font-medium transition {{ $settingsOpen ? 'bg-[#5A6F61] text-white' : 'text-[#2f3630] hover:bg-[#eef1ec]' }}">
                             <span class="flex items-center gap-2.5">
-                                <span class="flex h-6 w-6 items-center justify-center"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.55" viewBox="0 0 24 24">{!! $icons['Setting'] !!}</svg></span>
+                                @php($settingIcon = $sidebarIcon('Setting'))
+                                <span class="flex h-6 w-6 items-center justify-center">
+                                    <img x-show="!darkMode" src="{{ $settingIcon['lightMode'] }}" alt="" class="h-5 w-5 object-contain">
+                                    <img x-show="darkMode" src="{{ $settingIcon['darkMode'] }}" alt="" class="h-5 w-5 object-contain">
+                                </span>
                                 <span>Setting</span>
                             </span>
                             <svg class="h-4 w-4 transition" :class="settingsOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>

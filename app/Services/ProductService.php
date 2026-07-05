@@ -192,7 +192,7 @@ class ProductService
         $product = Product::with([
             'category',
             'subcategory',
-            'reviews.user',
+            'reviews' => fn ($reviewQuery) => $reviewQuery->where('status', 'approved')->with('user'),
             'variants' => fn ($variantQuery) => $variantQuery->where('status', true)->orderByDesc('is_default')->orderBy('id'),
         ])->where('status', true)->where('slug', $slug)->firstOrFail();
 
@@ -231,7 +231,7 @@ class ProductService
             ->selectRaw('COALESCE(sales_stats.total_sold, 0) as total_sold')
             ->selectSub($displayPriceSubQuery, 'display_price')
             ->selectSub($comparePriceSubQuery, 'compare_price')
-            ->withAvg('reviews as average_rating', 'rating')
+            ->withAvg(['reviews as average_rating' => fn ($reviewQuery) => $reviewQuery->where('status', 'approved')], 'rating')
             ->withCount(['variants as active_variants_count' => fn ($variantQuery) => $variantQuery->where('status', true)]);
 
         if ($isAdminRequest) {

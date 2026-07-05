@@ -55,10 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/dashboard', [CustomerAccountController::class, 'dashboard']);
     Route::get('/orders', [CustomerAccountController::class, 'orders']);
     Route::get('/orders/{orderId}', [CustomerAccountController::class, 'showOrder']);
-    Route::get('/orders/{orderId}/review-eligibility', [CustomerAccountController::class, 'orderReviewEligibility']);
     Route::get('/reviews/eligible', [ReviewController::class, 'eligible']);
     Route::post('/reviews', [ReviewController::class, 'store']);
-    Route::put('/reviews/{id}', [ReviewController::class, 'update']);
 
     Route::post('/addresses', [AddressController::class, 'store']);
     Route::get('/addresses', [AddressController::class, 'index']);
@@ -126,6 +124,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/admin/orders/{id}/status', [AdminController::class, 'updateOrderStatus'])->middleware('admin.api_permission:orders.update');
     Route::get('/admin/reviews', [ReviewController::class, 'adminIndex'])->middleware('admin.api_permission:reviews.view');
     Route::get('/admin/reviews/{id}', [ReviewController::class, 'adminShow'])->middleware('admin.api_permission:reviews.view');
+    Route::put('/admin/reviews/{id}/status', [ReviewController::class, 'adminUpdateStatus'])->middleware('admin.api_permission:reviews.update');
     Route::delete('/admin/reviews/{id}', [ReviewController::class, 'adminDestroy'])->middleware('admin.api_permission:reviews.delete');
     Route::get('/admin/payments', [PaymentController::class, 'adminIndex'])->middleware('admin.api_permission:payments.view');
     Route::get('/admin/payments/{id}', [PaymentController::class, 'adminShow'])->middleware('admin.api_permission:payments.view');

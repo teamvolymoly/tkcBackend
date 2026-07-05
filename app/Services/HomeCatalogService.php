@@ -25,8 +25,8 @@ class HomeCatalogService
                 ->with([
                     'defaultVariant' => fn ($variantQuery) => $variantQuery->where('status', true),
                 ])
-                ->withCount('reviews')
-                ->withAvg('reviews', 'rating')
+                ->withCount(['reviews' => fn ($reviewQuery) => $reviewQuery->where('status', 'approved')])
+                ->withAvg(['reviews' => fn ($reviewQuery) => $reviewQuery->where('status', 'approved')], 'rating')
                 ->where('status', true)
                 ->inRandomOrder()
                 ->limit($limit)
@@ -38,8 +38,8 @@ class HomeCatalogService
             ->with([
                 'defaultVariant' => fn ($variantQuery) => $variantQuery->where('status', true),
             ])
-            ->withCount('reviews')
-            ->withAvg('reviews', 'rating')
+            ->withCount(['reviews' => fn ($reviewQuery) => $reviewQuery->where('status', 'approved')])
+            ->withAvg(['reviews' => fn ($reviewQuery) => $reviewQuery->where('status', 'approved')], 'rating')
             ->where('status', true)
             ->whereIn('id', $soldProducts->keys())
             ->get();

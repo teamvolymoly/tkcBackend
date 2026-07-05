@@ -23,15 +23,6 @@ class ReviewController extends Controller
         ]);
     }
 
-    public function orderEligibility(Request $request, string $orderId)
-    {
-        return response()->json([
-            'status' => true,
-            'message' => 'Order review eligibility fetched successfully',
-            'data' => $this->customerAccountService->orderReviewEligibility($request->user(), $orderId),
-        ]);
-    }
-
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -62,45 +53,20 @@ class ReviewController extends Controller
         ], 201);
     }
 
-    public function update(Request $request, int $id)
-    {
-        $validated = $request->validate([
-            'rating' => ['required', 'integer', 'min:1', 'max:5'],
-            'title' => ['nullable', 'string', 'max:255'],
-            'comment' => ['nullable', 'string'],
-        ]);
-
-        try {
-            $review = $this->customerAccountService->updateCustomerReview($request->user(), $id, $validated);
-        } catch (ValidationException $exception) {
-            return response()->json([
-                'status' => false,
-                'message' => collect($exception->errors())->flatten()->first() ?: 'Unable to update review.',
-                'errors' => $exception->errors(),
-            ], 422);
-        }
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Review updated successfully',
-            'data' => [
-                'review' => $review,
-            ],
-        ]);
-    }
-
     public function adminIndex(Request $request)
     {
-        $reviews = Review::with(['user:id,name,email', 'product:id,name,slug'])
+        $reviews = Review::with(['user:id,name,email', 'product:id,name,slug', 'order:id,order_number', 'orderItem:id,product_name,variant_name'])
             ->when($request->filled('q'), function ($query) use ($request) {
                 $term = $request->q;
                 $query->where(function ($inner) use ($term) {
                     $inner->where('review', 'like', '%'.$term.'%')
+                        ->orWhere('title', 'like', '%'.$term.'%')
                         ->orWhereHas('product', fn ($productQuery) => $productQuery->where('name', 'like', '%'.$term.'%'))
                         ->orWhereHas('user', fn ($userQuery) => $userQuery->where('name', 'like', '%'.$term.'%')->orWhere('email', 'like', '%'.$term.'%'));
                 });
             })
             ->when($request->filled('rating'), fn ($query) => $query->where('rating', $request->integer('rating')))
+            ->when($request->filled('status'), fn ($query) => $query->where('status', strtolower($request->string('status')->toString())))
             ->latest()
             ->paginate(20)
             ->withQueryString();
@@ -110,9 +76,25 @@ class ReviewController extends Controller
 
     public function adminShow($id)
     {
-        $review = Review::with(['user', 'product.defaultVariant', 'product.variants'])->findOrFail($id);
+        $review = Review::with(['user', 'product.defaultVariant', 'product.variants', 'order', 'orderItem', 'images'])->findOrFail($id);
 
         return response()->json(['status' => true, 'data' => $review]);
+    }
+
+    public function adminUpdateStatus(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'status' => ['required', 'string', 'in:pending,approved,rejected'],
+        ]);
+
+        $review = Review::findOrFail($id);
+        $review->update(['status' => $validated['status']]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Review status updated successfully',
+            'data' => $review->fresh(['user:id,name,email', 'product:id,name,slug', 'order:id,order_number', 'orderItem:id,product_name,variant_name']),
+        ]);
     }
 
     public function adminDestroy($id)

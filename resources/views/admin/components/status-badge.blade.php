@@ -14,6 +14,8 @@ $map = [
     'refunded' => 'bg-[#f8ecd6] text-[#a4732d]',
     'active' => 'bg-[#e1f2df] text-[#4e9b55]',
     'inactive' => 'bg-[#ece8e1] text-[#6f675f]',
+    'approved' => 'bg-[#e1f2df] text-[#4e9b55]',
+    'rejected' => 'bg-[#fbe3e2] text-[#c76b68]',
 ];
 $className = $map[$value] ?? 'bg-[#ece8e1] text-[#6f675f]';
 @endphp

@@ -84,6 +84,7 @@ class AdminPermissionRegistry
                 'label' => 'Reviews',
                 'permissions' => [
                     ['name' => 'reviews.view', 'label' => 'View reviews', 'description' => 'Can access review listing and review detail screens.'],
+                    ['name' => 'reviews.update', 'label' => 'Moderate reviews', 'description' => 'Can approve or reject customer reviews.'],
                     ['name' => 'reviews.delete', 'label' => 'Delete reviews', 'description' => 'Can remove customer reviews.'],
                 ],
             ],
@@ -168,7 +169,7 @@ class AdminPermissionRegistry
                 'admin.access', 'dashboard.view', 'orders.view', 'orders.update', 'payments.view', 'payments.update',
                 'products.view', 'products.create', 'products.update', 'categories.view', 'categories.create', 'categories.update',
                 'coupons.view', 'coupons.create', 'coupons.update',
-                'users.view', 'reviews.view', 'reviews.delete', 'carts.view', 'wishlists.view',
+                'users.view', 'reviews.view', 'reviews.update', 'reviews.delete', 'carts.view', 'wishlists.view',
                 'blogs.view', 'blogs.create', 'blogs.update', 'hero_sections.view', 'hero_sections.create', 'hero_sections.update',
                 'profile.view', 'profile.update', 'roles.view',
             ],

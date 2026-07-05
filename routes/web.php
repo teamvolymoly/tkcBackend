@@ -65,6 +65,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
             Route::get('/reviews', [AdminReviewController::class, 'index'])->middleware('admin.permission:reviews.view')->name('reviews.index');
             Route::get('/reviews/{review}', [AdminReviewController::class, 'show'])->middleware('admin.permission:reviews.view')->name('reviews.show');
+            Route::put('/reviews/{review}/status', [AdminReviewController::class, 'updateStatus'])->middleware('admin.permission:reviews.update')->name('reviews.status');
             Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->middleware('admin.permission:reviews.delete')->name('reviews.destroy');
 
             Route::get('/payments', [AdminPaymentController::class, 'index'])->middleware('admin.permission:payments.view')->name('payments.index');

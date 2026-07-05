@@ -165,6 +165,7 @@ class CustomerAccountService
 
         $summary = Review::query()
             ->where('product_id', $product->id)
+            ->where('status', 'approved')
             ->selectRaw('COALESCE(AVG(rating), 0) as average_rating, COUNT(*) as total_reviews')
             ->first();
 
@@ -212,34 +213,6 @@ class CustomerAccountService
         ];
     }
 
-    public function orderReviewEligibility(User $user, string $identifier): array
-    {
-        $order = $this->resolveUserOrder($user, $identifier);
-
-        $canReviewOrder = $order->payment_status === 'paid' && $order->status === 'delivered';
-
-        $order->load([
-            'items.variant.product',
-            'items.review' => fn ($query) => $query->where('user_id', $user->id),
-        ]);
-
-        return [
-            'order_id' => $order->order_number,
-            'order_status' => $this->checkoutService->humanStatus($order->status),
-            'payment_status' => $this->checkoutService->humanPaymentStatus($order->payment_status),
-            'items' => $order->items->map(function (OrderItem $item) use ($canReviewOrder) {
-                $payload = $this->transformEligibleReviewItem($item);
-                unset($payload['order_id'], $payload['delivered_date']);
-                $payload['can_review'] = $canReviewOrder && $payload['review'] === null;
-                $payload['reason'] = $payload['can_review']
-                    ? null
-                    : ($payload['review'] ? 'You have already reviewed this item.' : 'Only delivered paid order items can be reviewed.');
-
-                return $payload;
-            })->values()->all(),
-        ];
-    }
-
     public function storeCustomerReview(User $user, array $attributes): array
     {
         $orderItem = $this->resolveReviewableOrderItem($user, $attributes['order_item_id']);
@@ -272,27 +245,6 @@ class CustomerAccountService
 
             return $review;
         });
-
-        return $this->transformCustomerReview($review->fresh());
-    }
-
-    public function updateCustomerReview(User $user, int $reviewId, array $attributes): array
-    {
-        $review = Review::query()
-            ->where('id', $reviewId)
-            ->where('user_id', $user->id)
-            ->firstOrFail();
-
-        $orderItem = $this->resolveReviewableOrderItem($user, $review->order_item_id);
-
-        $review->update([
-            'product_id' => $orderItem->product_id,
-            'variant_id' => $orderItem->variant_id,
-            'order_id' => $orderItem->order_id,
-            'rating' => $attributes['rating'],
-            'title' => $attributes['title'] ?? null,
-            'review' => $attributes['comment'] ?? null,
-        ]);
 
         return $this->transformCustomerReview($review->fresh());
     }
@@ -388,6 +340,7 @@ class CustomerAccountService
                 ?? $item->product?->resolveMediaUrl($item->product?->image_1),
             'delivered_date' => optional($item->order?->delivery_date ?? $item->order?->updated_at ?? $item->order?->created_at)->toDateString(),
             'can_review' => $review === null,
+            'already_reviewed' => $review !== null,
             'reason' => $review ? 'You have already reviewed this item.' : null,
             'review' => $review ? $this->transformCustomerReview($review) : null,
         ];

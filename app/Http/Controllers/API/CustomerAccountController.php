@@ -54,12 +54,4 @@ class CustomerAccountController extends Controller
         ]);
     }
 
-    public function orderReviewEligibility(Request $request, string $orderId)
-    {
-        return response()->json([
-            'status' => true,
-            'message' => 'Order review eligibility fetched successfully',
-            'data' => $this->customerAccountService->orderReviewEligibility($request->user(), $orderId),
-        ]);
-    }
 }

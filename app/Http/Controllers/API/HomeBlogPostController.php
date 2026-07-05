@@ -12,10 +12,6 @@ class HomeBlogPostController extends Controller
     {
         $posts = BlogPost::query()
             ->where('status', true)
-            ->where(function ($query) {
-                $query->whereNull('published_at')
-                    ->orWhere('published_at', '<=', now());
-            })
             ->latest('published_at')
             ->latest('id')
             ->limit(3)

@@ -50,11 +50,7 @@ class BlogPostController extends Controller
 
         $posts = BlogPost::query()
             ->when(! $isAdmin, function ($query) {
-                $query->where('status', true)
-                    ->where(function ($inner) {
-                        $inner->whereNull('published_at')
-                            ->orWhere('published_at', '<=', now());
-                    });
+                $query->where('status', true);
             })
             ->when($request->filled('q'), function ($query) use ($request) {
                 $term = $request->q;
@@ -81,7 +77,7 @@ class BlogPostController extends Controller
     {
         $isAdmin = $request->user()?->hasRole('admin') ?? false;
 
-        if (! $isAdmin && (! $blogPost->status || ($blogPost->published_at && $blogPost->published_at->isFuture()))) {
+        if (! $isAdmin && ! $blogPost->status) {
             abort(404);
         }
 

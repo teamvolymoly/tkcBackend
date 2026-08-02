@@ -89,6 +89,13 @@ class AdminPermissionRegistry
                 ],
             ],
             [
+                'key' => 'contact_queries',
+                'label' => 'Contact Queries',
+                'permissions' => [
+                    ['name' => 'contact_queries.view', 'label' => 'View contact queries', 'description' => 'Can view frontend contact form submissions.'],
+                ],
+            ],
+            [
                 'key' => 'carts',
                 'label' => 'Carts',
                 'permissions' => [

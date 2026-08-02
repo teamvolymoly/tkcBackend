@@ -16,6 +16,7 @@ class Product extends Model
         'name',
         'slug',
         'tag_line_2',
+        'short_description',
         'description',
         'caffeine',
         'collection',
@@ -31,7 +32,6 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'ingredients' => 'array',
         'faqs' => 'array',
         'brewing_rituals' => 'array',
         'status' => 'boolean',

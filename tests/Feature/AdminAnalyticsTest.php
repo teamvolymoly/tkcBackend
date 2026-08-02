@@ -35,6 +35,30 @@ class AdminAnalyticsTest extends TestCase
         ]);
     }
 
+    public function test_frontend_contact_query_fields_are_stored(): void
+    {
+        $response = $this->postJson('/api/contact-queries', [
+            'company_name' => 'The Kawa Company',
+            'name' => 'Riya Sharma',
+            'email' => 'riya@example.com',
+            'phone_number' => '9876543210',
+            'comment' => 'Please share wholesale pricing.',
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('status', true)
+            ->assertJsonPath('data.company_name', 'The Kawa Company')
+            ->assertJsonPath('data.phone_number', '9876543210')
+            ->assertJsonPath('data.comment', 'Please share wholesale pricing.');
+
+        $this->assertDatabaseHas('contact_queries', [
+            'company_name' => 'The Kawa Company',
+            'email' => 'riya@example.com',
+            'phone_number' => '9876543210',
+            'comment' => 'Please share wholesale pricing.',
+        ]);
+    }
+
     public function test_admin_analytics_returns_expected_summary_and_month_buckets(): void
     {
         $admin = User::factory()->create();

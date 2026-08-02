@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\BlogPostController as AdminBlogPostController;
 use App\Http\Controllers\Admin\CartController as AdminCartController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CouponController as AdminCouponController;
+use App\Http\Controllers\Admin\ContactQueryController as AdminContactQueryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\HeroSectionController as AdminHeroSectionController;
 use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
@@ -40,6 +41,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
             Route::get('/', AdminDashboardController::class)->middleware('admin.permission:dashboard.view')->name('dashboard');
             Route::get('/analytics', AdminAnalyticsController::class)->middleware('admin.permission:dashboard.view')->name('analytics');
+            Route::get('/contact-queries', [AdminContactQueryController::class, 'index'])->middleware('admin.permission:contact_queries.view')->name('contact-queries.index');
+            Route::get('/contact-queries/{contactQuery}', [AdminContactQueryController::class, 'show'])->middleware('admin.permission:contact_queries.view')->name('contact-queries.show');
             Route::get('/profile', [AdminAuthController::class, 'profile'])->middleware('admin.permission:profile.view')->name('profile.show');
             Route::put('/profile', [AdminAuthController::class, 'updateProfile'])->middleware('admin.permission:profile.update')->name('profile.update');
 
@@ -95,4 +98,3 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
     });
 });
-

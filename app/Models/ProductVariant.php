@@ -14,6 +14,8 @@ class ProductVariant extends Model
         'price',
         'discount_price',
         'weight',
+        'product_dimension',
+        'item_form',
         'brewing_rituals',
         'is_default',
         'status',

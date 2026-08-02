@@ -1,20 +1,13 @@
 <script>
-function productForm(initialIngredients, initialFaqs, initialBrewingRituals, initialVariants) {
+function productForm(initialFaqs, initialBrewingRituals, initialVariants) {
     const uid = (prefix) => `${prefix}-${Date.now()}-${Math.random()}`;
-    const toPreview = (path) => {
-        if (!path) return '';
-        if (/^https?:\/\//i.test(path)) return path;
-        return `/media/public/${String(path).replace(/^\/+/, '')}`;
-    };
-    const ingredientTemplate = () => ({ uid: uid('ingredient'), name: '', existing_image: '', preview: '' });
     const faqTemplate = () => ({ uid: uid('faq'), question: '', answer: '' });
-    const ritualTemplate = (ritual = '') => ({ uid: uid('ritual'), ritual, existing_image: '', preview: '' });
+    const ritualTemplate = () => ({ uid: uid('ritual'), label: '', value: '' });
     const normalizeRitualGroup = (rituals = []) => {
         const items = (rituals || []).map((ritual) => ({
             uid: uid('ritual'),
-            ritual: ritual.ritual || ritual.text || ritual.items?.[0]?.text || '',
-            existing_image: ritual.image || ritual.image_path || ritual.items?.[0]?.image || ritual.items?.[0]?.image_url || '',
-            preview: toPreview(ritual.image || ritual.image_path || ritual.items?.[0]?.image || ritual.items?.[0]?.image_url || ''),
+            label: ritual.label || '',
+            value: ritual.value || ritual.ritual || ritual.text || ritual.items?.[0]?.text || '',
         }));
 
         return items.length ? items : [ritualTemplate()];
@@ -24,12 +17,14 @@ function productForm(initialIngredients, initialFaqs, initialBrewingRituals, ini
             return {
                 hot_brew: normalizeRitualGroup(rituals.hot_brew || []),
                 iced_brew: normalizeRitualGroup(rituals.iced_brew || []),
+                note: rituals.note || '',
             };
         }
 
         return {
             hot_brew: normalizeRitualGroup((rituals || []).slice(0, 1)),
             iced_brew: normalizeRitualGroup((rituals || []).slice(1, 2)),
+            note: '',
         };
     };
     const variantTemplate = (isDefault = false) => ({
@@ -40,17 +35,13 @@ function productForm(initialIngredients, initialFaqs, initialBrewingRituals, ini
         price: '',
         discount_price: '',
         weight: '',
+        product_dimension: '',
+        item_form: '',
         is_default: isDefault,
         status: true,
     });
 
     return {
-        ingredients: (initialIngredients || []).length ? initialIngredients.map((ingredient) => ({
-            uid: uid('ingredient'),
-            name: ingredient.name || '',
-            existing_image: ingredient.image || ingredient.image_path || '',
-            preview: toPreview(ingredient.image || ingredient.image_path || ''),
-        })) : [ingredientTemplate()],
         faqs: (initialFaqs || []).length ? initialFaqs.map((faq) => ({
             uid: uid('faq'),
             question: faq.question || '',
@@ -65,11 +56,11 @@ function productForm(initialIngredients, initialFaqs, initialBrewingRituals, ini
             price: variant.price || '',
             discount_price: variant.discount_price || variant.compare_price || '',
             weight: variant.weight || '',
+            product_dimension: variant.product_dimension || '',
+            item_form: variant.item_form || '',
             is_default: typeof variant.is_default === 'undefined' ? index === 0 : Boolean(Number(variant.is_default) || variant.is_default),
             status: typeof variant.status === 'undefined' ? true : Boolean(Number(variant.status) || variant.status),
         })) : [variantTemplate(true)],
-        addIngredient() { this.ingredients.push(ingredientTemplate()); },
-        removeIngredient(index) { this.ingredients.length === 1 ? this.ingredients[index] = ingredientTemplate() : this.ingredients.splice(index, 1); },
         addFaq() { this.faqs.push(faqTemplate()); },
         removeFaq(index) { this.faqs.length === 1 ? this.faqs[index] = faqTemplate() : this.faqs.splice(index, 1); },
         addVariant() { this.variants.push(variantTemplate(this.variants.length === 0)); },

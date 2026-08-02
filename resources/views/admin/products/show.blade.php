@@ -4,7 +4,7 @@
 @php
     $variants = $product['variants'] ?? [];
     $gallery = $product['gallery'] ?? [];
-    $ingredients = $product['ingredients'] ?? [];
+    $ingredients = $product['ingredients'] ?? '';
     $faqs = $product['faqs'] ?? [];
 @endphp
 <div class="space-y-6">
@@ -23,8 +23,17 @@
     <section class="rounded-lg border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80">
         <div class="grid gap-4 lg:grid-cols-2">
             <div>
-                <h2 class="text-lg font-semibold">Description</h2>
-                <p class="mt-4 text-sm text-slate-600 dark:text-slate-300">{{ $product['description'] ?? 'No description added.' }}</p>
+                <h2 class="text-lg font-semibold">Product Description</h2>
+                <div class="mt-4 space-y-4">
+                    <div>
+                        <span class="block text-xs uppercase tracking-[0.2em] text-slate-400">Short Description</span>
+                        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">{{ $product['short_description'] ?? 'No short description added.' }}</p>
+                    </div>
+                    <div>
+                        <span class="block text-xs uppercase tracking-[0.2em] text-slate-400">Description</span>
+                        <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">{{ $product['description'] ?? 'No description added.' }}</p>
+                    </div>
+                </div>
                 <div class="mt-4 grid gap-3 text-sm sm:grid-cols-2">
                     <div class="rounded-lg bg-slate-50 px-4 py-3 dark:bg-slate-950/60">
                         <span class="block text-xs uppercase tracking-[0.2em] text-slate-400">Caffeine</span>
@@ -67,18 +76,7 @@
 
     <section class="rounded-lg border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80">
         <h2 class="text-lg font-semibold">Ingredients</h2>
-        <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            @forelse ($ingredients as $ingredient)
-                <div class="rounded-lg border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-950/60">
-                    @if (!empty($ingredient['image_url']))
-                        <img src="{{ $ingredient['image_url'] }}" alt="{{ $ingredient['name'] }}" class="mb-3 h-28 w-full rounded-lg object-cover">
-                    @endif
-                    <p class="text-sm font-semibold">{{ $ingredient['name'] ?? 'Ingredient' }}</p>
-                </div>
-            @empty
-                <div>@include('admin.components.empty-state', ['title' => 'No ingredients'])</div>
-            @endforelse
-        </div>
+        <p class="mt-5 text-sm text-slate-600 dark:text-slate-300">{{ $ingredients ?: 'No ingredients added.' }}</p>
     </section>
 
     <section class="rounded-lg border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80">
@@ -111,6 +109,8 @@
                         <div class="rounded-lg bg-white px-4 py-3 dark:bg-slate-900"><span class="block text-xs uppercase tracking-[0.2em] text-slate-400">Price</span><span class="mt-1 block font-medium">Rs. {{ number_format((float) ($variant['price'] ?? 0), 2) }}</span></div>
                         <div class="rounded-lg bg-white px-4 py-3 dark:bg-slate-900"><span class="block text-xs uppercase tracking-[0.2em] text-slate-400">Discount price</span><span class="mt-1 block font-medium">{{ isset($variant['discount_price']) ? 'Rs. '.number_format((float) $variant['discount_price'], 2) : 'N/A' }}</span></div>
                         <div class="rounded-lg bg-white px-4 py-3 dark:bg-slate-900"><span class="block text-xs uppercase tracking-[0.2em] text-slate-400">Weight</span><span class="mt-1 block font-medium">{{ $variant['weight'] ?? 'N/A' }}</span></div>
+                        <div class="rounded-lg bg-white px-4 py-3 dark:bg-slate-900"><span class="block text-xs uppercase tracking-[0.2em] text-slate-400">Product Dimension</span><span class="mt-1 block font-medium">{{ $variant['product_dimension'] ?? 'N/A' }}</span></div>
+                        <div class="rounded-lg bg-white px-4 py-3 dark:bg-slate-900"><span class="block text-xs uppercase tracking-[0.2em] text-slate-400">Item Form</span><span class="mt-1 block font-medium">{{ $variant['item_form'] ?? 'N/A' }}</span></div>
                         <div class="rounded-lg bg-white px-4 py-3 dark:bg-slate-900"><span class="block text-xs uppercase tracking-[0.2em] text-slate-400">Default</span><span class="mt-1 block font-medium">{{ !empty($variant['is_default']) ? 'Yes' : 'No' }}</span></div>
                     </div>
                     <div class="mt-4 space-y-3">
@@ -127,16 +127,13 @@
                                     <div class="mt-3 space-y-3">
                                         @foreach ($groupRituals as $ritualIndex => $ritual)
                             @php
-                                $ritualText = $ritual['ritual'] ?? $ritual['text'] ?? ($ritual['items'][0]['text'] ?? null);
-                                $ritualImage = $ritual['image_url'] ?? ($ritual['items'][0]['image_url'] ?? ($ritual['image'] ?? null));
-                                $ritualImageUrl = $ritualImage && !preg_match('/^https?:\/\//', $ritualImage) ? route('media.public', ['path' => ltrim($ritualImage, '/')]) : $ritualImage;
+                                $ritualLabel = $ritual['label'] ?? '';
+                                $ritualValue = $ritual['value'] ?? $ritual['ritual'] ?? $ritual['text'] ?? ($ritual['items'][0]['text'] ?? '');
                             @endphp
-                            @if (!empty($ritualText) || !empty($ritualImageUrl))
-                                            <div class="flex items-center gap-3">
-                                        @if (!empty($ritualImageUrl))
-                                                    <img src="{{ $ritualImageUrl }}" alt="{{ $groupLabel }} {{ $ritualIndex + 1 }}" class="h-12 w-12 rounded-xl object-cover">
-                                        @endif
-                                        <span class="text-sm font-medium">{{ $ritualText ?? '-' }}</span>
+                            @if ($ritualLabel !== '' || $ritualValue !== '')
+                                    <div class="grid gap-1 sm:grid-cols-2">
+                                        <span class="text-sm text-slate-500">{{ $ritualLabel ?: '-' }}</span>
+                                        <span class="text-sm font-medium">{{ $ritualValue ?: '-' }}</span>
                                     </div>
                             @endif
                         @endforeach

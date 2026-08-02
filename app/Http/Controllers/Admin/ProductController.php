@@ -120,6 +120,7 @@ class ProductController extends BaseAdminController
             'tag_line_1' => ['nullable', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
             'tag_line_2' => ['nullable', 'string', 'max:255'],
+            'short_description' => ['nullable', 'string'],
             'description' => ['nullable', 'string'],
             'caffeine' => ['nullable', 'in:low,medium,caffeine_free'],
             'collection' => ['nullable', 'string'],
@@ -128,25 +129,18 @@ class ProductController extends BaseAdminController
             'image_3' => ['nullable', 'file', 'image', 'max:5120'],
             'image_4' => ['nullable', 'file', 'image', 'max:5120'],
             'image_5' => ['nullable', 'file', 'image', 'max:5120'],
-            'ingredients' => ['nullable', 'array'],
-            'ingredients.*.name' => ['nullable', 'string', 'max:255'],
-            'ingredients.*.image' => ['nullable', function (string $attribute, mixed $value, \Closure $fail) {
-                $this->validateOptionalImageValue($attribute, $value, $fail);
-            }],
+            'ingredients' => ['nullable', 'string'],
             'faqs' => ['nullable', 'array'],
             'faqs.*.question' => ['nullable', 'string'],
             'faqs.*.answer' => ['nullable', 'string'],
             'brewing_rituals' => ['nullable', 'array'],
+            'brewing_rituals.note' => ['nullable', 'string'],
             'brewing_rituals.hot_brew' => ['nullable', 'array'],
-            'brewing_rituals.hot_brew.*.ritual' => ['nullable', 'string', 'max:255'],
-            'brewing_rituals.hot_brew.*.image' => ['nullable', function (string $attribute, mixed $value, \Closure $fail) {
-                $this->validateOptionalImageValue($attribute, $value, $fail);
-            }],
+            'brewing_rituals.hot_brew.*.label' => ['nullable', 'string', 'max:255'],
+            'brewing_rituals.hot_brew.*.value' => ['nullable', 'string', 'max:255'],
             'brewing_rituals.iced_brew' => ['nullable', 'array'],
-            'brewing_rituals.iced_brew.*.ritual' => ['nullable', 'string', 'max:255'],
-            'brewing_rituals.iced_brew.*.image' => ['nullable', function (string $attribute, mixed $value, \Closure $fail) {
-                $this->validateOptionalImageValue($attribute, $value, $fail);
-            }],
+            'brewing_rituals.iced_brew.*.label' => ['nullable', 'string', 'max:255'],
+            'brewing_rituals.iced_brew.*.value' => ['nullable', 'string', 'max:255'],
             'status' => ['nullable'],
             'variants' => ['required', 'array', 'min:1'],
             'variants.*.id' => [$updating ? 'nullable' : 'sometimes'],
@@ -155,6 +149,8 @@ class ProductController extends BaseAdminController
             'variants.*.price' => ['required', 'numeric', 'min:0'],
             'variants.*.discount_price' => ['nullable', 'numeric', 'min:0'],
             'variants.*.weight' => ['nullable', 'string', 'max:255'],
+            'variants.*.product_dimension' => ['nullable', 'string', 'max:255'],
+            'variants.*.item_form' => ['nullable', 'string', 'max:255'],
             'variants.*.is_default' => ['nullable'],
             'variants.*.status' => ['nullable'],
         ]);
@@ -168,19 +164,7 @@ class ProductController extends BaseAdminController
             ->filter()
             ->implode(', ') ?: null;
 
-        $validated['ingredients'] = collect($validated['ingredients'] ?? [])
-            ->map(function ($ingredient, $index) use ($request) {
-                $image = $request->file("ingredients.{$index}.image");
-                $current = $request->input("ingredients.{$index}.existing_image");
-
-                return [
-                    'name' => trim((string) ($ingredient['name'] ?? '')),
-                    'image' => $image ?: ($current ?: null),
-                ];
-            })
-            ->filter(fn ($ingredient) => $ingredient['name'] !== '' || $ingredient['image'] !== null)
-            ->values()
-            ->all();
+        $validated['ingredients'] = trim((string) ($validated['ingredients'] ?? '')) ?: null;
 
         $validated['faqs'] = collect($validated['faqs'] ?? [])
             ->map(fn ($faq) => [
@@ -192,24 +176,20 @@ class ProductController extends BaseAdminController
             ->all();
 
         $validated['brewing_rituals'] = collect(['hot_brew', 'iced_brew'])
-            ->mapWithKeys(function (string $group) use ($validated, $request) {
+            ->mapWithKeys(function (string $group) use ($validated) {
                 $rituals = collect($validated['brewing_rituals'][$group] ?? [])
-                    ->map(function ($ritual, $ritualIndex) use ($request, $group) {
-                        $image = $request->file("brewing_rituals.{$group}.{$ritualIndex}.image");
-                        $current = $request->input("brewing_rituals.{$group}.{$ritualIndex}.existing_image");
-
-                        return [
-                            'ritual' => trim((string) ($ritual['ritual'] ?? '')),
-                            'image' => $image ?: ($current ?: null),
-                        ];
-                    })
-                    ->filter(fn ($ritual) => $ritual['ritual'] !== '' || $ritual['image'] !== null)
+                    ->map(fn ($ritual) => [
+                        'label' => trim((string) ($ritual['label'] ?? '')),
+                        'value' => trim((string) ($ritual['value'] ?? '')),
+                    ])
+                    ->filter(fn ($ritual) => $ritual['label'] !== '' || $ritual['value'] !== '')
                     ->values()
                     ->all();
 
                 return [$group => $rituals];
             })
             ->all();
+        $validated['brewing_rituals']['note'] = trim((string) $request->input('brewing_rituals.note', ''));
 
         $validated['variants'] = collect($validated['variants'])->map(function ($variant, $index) use ($request) {
             $variant['discount_price'] = isset($variant['discount_price']) && $variant['discount_price'] !== '' ? (float) $variant['discount_price'] : null;

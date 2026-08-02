@@ -340,6 +340,7 @@ class ProductService
             'id' => $product->id,
             'name' => $product->name,
             'slug' => $product->slug,
+            'short_description' => $product->short_description,
             'price' => $price,
             'compare_price' => $comparePrice,
             'badge' => $this->buildBadge($product),
@@ -382,6 +383,8 @@ class ProductService
                     'name' => $variant->name,
                     'price' => $effectivePrice,
                     'compare_price' => $variant->price !== null ? (float) $variant->price : null,
+                    'product_dimension' => $variant->product_dimension,
+                    'item_form' => $variant->item_form,
                 ];
             })->values()->all();
         }
@@ -539,6 +542,7 @@ class ProductService
             'name' => $product->name,
             'slug' => $product->slug,
             'tag_line_2' => $product->tag_line_2,
+            'short_description' => $product->short_description,
             'description' => $product->description,
             'caffeine' => $product->caffeine,
             'collection' => $product->collection,
@@ -558,7 +562,7 @@ class ProductService
                 ->filter(fn (array $image) => ! empty($image['image_url']))
                 ->values()
                 ->all(),
-            'ingredients_list' => $this->transformIngredients($product),
+            'ingredients' => $product->ingredients,
             'faqs' => $this->transformFaqs($product),
             'variants' => $activeVariants->map(fn (ProductVariant $variant) => $this->transformVariant($variant))->all(),
             'default_variant_id' => $selectedVariant?->id,
@@ -567,6 +571,7 @@ class ProductService
             'compare_price' => $selectedVariant?->discount_price !== null ? (float) $selectedVariant->discount_price : null,
             'currency' => 'INR',
             'brewing_rituals' => $this->transformBrewingRituals($product),
+            'brewing_rituals_note' => trim((string) data_get($product->brewing_rituals, 'note', '')),
             'reviews' => [
                 'average_rating' => round((float) $product->reviews->avg('rating'), 1),
                 'count' => $product->reviews->count(),
@@ -637,10 +642,13 @@ class ProductService
             'tag_line_1' => $payload['tag_line_1'] ?? $product?->tag_line_1,
             'name' => $payload['name'] ?? $product?->name,
             'tag_line_2' => $payload['tag_line_2'] ?? $product?->tag_line_2,
+            'short_description' => $payload['short_description'] ?? $product?->short_description,
             'description' => $payload['description'] ?? $product?->description,
             'caffeine' => $payload['caffeine'] ?? $product?->caffeine,
             'collection' => $this->normalizeCollection($payload['collection'] ?? $product?->collection),
-            'ingredients' => $this->prepareIngredients($payload['ingredients'] ?? ($product?->ingredients ?? []), $product),
+            'ingredients' => array_key_exists('ingredients', $payload)
+                ? (trim((string) $payload['ingredients']) ?: null)
+                : $product?->ingredients,
             'faqs' => $payload['faqs'] ?? $product?->faqs ?? [],
             'brewing_rituals' => $this->prepareBrewingRituals($payload['brewing_rituals'] ?? ($product?->brewing_rituals ?? [])),
             'status' => array_key_exists('status', $payload) ? (bool) $payload['status'] : ($product?->status ?? true),
@@ -730,6 +738,8 @@ class ProductService
             'price' => $variantData['price'],
             'discount_price' => $variantData['discount_price'] ?? null,
             'weight' => $variantData['weight'] ?? null,
+            'product_dimension' => $variantData['product_dimension'] ?? null,
+            'item_form' => $variantData['item_form'] ?? null,
             'is_default' => false,
             'status' => (bool) ($variantData['status'] ?? true),
         ];
@@ -751,24 +761,14 @@ class ProductService
             'compare_price' => $discountPrice,
             'formatted_discount_price' => $discountPrice !== null ? number_format($discountPrice, 2, '.', '') : null,
             'weight' => $variant->weight,
+            'product_dimension' => $variant->product_dimension,
+            'item_form' => $variant->item_form,
             'is_default' => (bool) $variant->is_default,
             'status' => (bool) $variant->status,
             'primary_image' => $variant->primary_image ? [
                 'image_url' => $variant->primary_image['image_url'] ?? null,
             ] : null,
         ];
-    }
-
-    private function transformIngredients(Product $product): array
-    {
-        return collect($product->ingredients ?? [])
-            ->filter(fn ($ingredient) => is_array($ingredient))
-            ->values()
-            ->map(fn (array $ingredient) => [
-                'name' => $ingredient['name'] ?? null,
-                'image_url' => $product->resolveMediaUrl($ingredient['image'] ?? null),
-            ])
-            ->all();
     }
 
     private function transformFaqs(Product $product): array
@@ -791,16 +791,16 @@ class ProductService
             'hot_brew' => 'Hot Brew',
             'iced_brew' => 'Iced Brew',
         ])
-            ->map(function (string $title, string $group) use ($ritualGroups, $product) {
+            ->map(function (string $title, string $group) use ($ritualGroups) {
                 $items = collect($ritualGroups[$group] ?? [])
                     ->filter(fn ($ritual) => is_array($ritual))
-                    ->map(function (array $ritual) use ($product) {
-                        $text = $ritual['ritual'] ?? null;
-                        $imageUrl = $product?->resolveMediaUrl($ritual['image'] ?? null);
+                    ->map(function (array $ritual) {
+                        $label = trim((string) ($ritual['label'] ?? ''));
+                        $value = trim((string) ($ritual['value'] ?? $ritual['ritual'] ?? $ritual['text'] ?? ''));
 
-                        return (! empty($text) || ! empty($imageUrl)) ? [
-                            'text' => $text,
-                            'image_url' => $imageUrl,
+                        return ($label !== '' || $value !== '') ? [
+                            'label' => $label,
+                            'value' => $value,
                         ] : null;
                     })
                     ->filter()
@@ -899,14 +899,6 @@ class ProductService
             }
         }
 
-        foreach ($product->ingredients ?? [] as $ingredient) {
-            $path = $ingredient['image'] ?? null;
-
-            if ($path && ! preg_match('/^https?:\/\//i', $path)) {
-                Storage::disk('public')->delete($path);
-            }
-        }
-
         foreach ($this->flattenBrewingRituals($product->brewing_rituals ?? []) as $ritual) {
             $path = $ritual['image'] ?? null;
 
@@ -926,42 +918,28 @@ class ProductService
         }
     }
 
-    private function prepareIngredients(array $ingredients, ?Product $product = null): array
-    {
-        return collect($ingredients)
-            ->filter(fn ($ingredient) => is_array($ingredient))
-            ->values()
-            ->map(function (array $ingredient, int $index) use ($product) {
-                $currentPath = $product?->ingredients[$index]['image'] ?? null;
-
-                return [
-                    'name' => trim((string) ($ingredient['name'] ?? '')),
-                    'image' => $this->storeOptionalFile($ingredient['image'] ?? null, 'products/ingredients', $currentPath),
-                ];
-            })
-            ->filter(fn ($ingredient) => $ingredient['name'] !== '' || $ingredient['image'] !== null)
-            ->values()
-            ->all();
-    }
-
     private function prepareBrewingRituals(array $rituals): array
     {
         $ritualGroups = $this->normalizeBrewingRitualGroups($rituals);
 
-        return collect(['hot_brew', 'iced_brew'])
+        $prepared = collect(['hot_brew', 'iced_brew'])
             ->mapWithKeys(fn (string $group) => [
                 $group => collect($ritualGroups[$group] ?? [])
             ->filter(fn ($ritual) => is_array($ritual))
             ->values()
             ->map(fn (array $ritual) => [
-                'ritual' => trim((string) ($ritual['ritual'] ?? '')),
-                'image' => $this->storeOptionalFile($ritual['image'] ?? null, 'products/rituals'),
+                'label' => trim((string) ($ritual['label'] ?? '')),
+                'value' => trim((string) ($ritual['value'] ?? $ritual['ritual'] ?? $ritual['text'] ?? '')),
             ])
-            ->filter(fn ($ritual) => $ritual['ritual'] !== '' || $ritual['image'] !== null)
+            ->filter(fn ($ritual) => $ritual['label'] !== '' || $ritual['value'] !== '')
             ->values()
             ->all(),
             ])
             ->all();
+
+        $prepared['note'] = trim((string) ($rituals['note'] ?? ''));
+
+        return $prepared;
     }
 
     private function normalizeBrewingRitualGroups(array $rituals): array
@@ -970,12 +948,14 @@ class ProductService
             return [
                 'hot_brew' => is_array($rituals['hot_brew'] ?? null) ? $rituals['hot_brew'] : [],
                 'iced_brew' => is_array($rituals['iced_brew'] ?? null) ? $rituals['iced_brew'] : [],
+                'note' => trim((string) ($rituals['note'] ?? '')),
             ];
         }
 
         return [
             'hot_brew' => array_values(array_filter([$rituals[0] ?? null], fn ($ritual) => is_array($ritual))),
             'iced_brew' => array_values(array_filter([$rituals[1] ?? null], fn ($ritual) => is_array($ritual))),
+            'note' => '',
         ];
     }
 

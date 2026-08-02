@@ -1,7 +1,7 @@
 @php
     $selectedCategory = old('category_id', $product['category_id'] ?? '');
     $selectedSubcategory = old('subcategory_id', $product['subcategory_id'] ?? '');
-    $ingredients = old('ingredients', $product['ingredients'] ?? [['name' => '', 'image' => null]]);
+    $ingredients = old('ingredients', $product['ingredients'] ?? '');
     $faqs = old('faqs', $product['faqs'] ?? [['question' => '', 'answer' => '']]);
     $brewingRituals = old('brewing_rituals', $product['brewing_rituals'] ?? ($product['variants'][0]['brewing_rituals'] ?? []));
     $variants = old('variants', $product['variants'] ?? [[
@@ -10,12 +10,14 @@
         'price' => '',
         'discount_price' => '',
         'weight' => '',
+        'product_dimension' => '',
+        'item_form' => '',
         'is_default' => 1,
         'status' => 1,
     ]]);
 @endphp
 
-<div x-data="productForm({{ \Illuminate\Support\Js::from($ingredients) }}, {{ \Illuminate\Support\Js::from($faqs) }}, {{ \Illuminate\Support\Js::from($brewingRituals) }}, {{ \Illuminate\Support\Js::from($variants) }})" class="space-y-6">
+<div x-data="productForm({{ \Illuminate\Support\Js::from($faqs) }}, {{ \Illuminate\Support\Js::from($brewingRituals) }}, {{ \Illuminate\Support\Js::from($variants) }})" class="space-y-6">
     <form method="POST" action="{{ $productFormAction }}" enctype="multipart/form-data" data-loading-form class="space-y-6">
         @csrf
         @if ($productFormMethod !== 'POST')
@@ -40,6 +42,7 @@
                 <div><label class="mb-2 block text-sm font-medium">Tag line 2</label><input type="text" name="tag_line_2" value="{{ old('tag_line_2', $product['tag_line_2'] ?? '') }}" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950"></div>
                 <div><label class="mb-2 block text-sm font-medium">Category</label><select name="category_id" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950"><option value="">Select category</option>@foreach ($categories as $categoryOption)<option value="{{ $categoryOption['id'] }}" @selected((string) $selectedCategory === (string) $categoryOption['id'])>{{ $categoryOption['name'] }}</option>@endforeach</select></div>
                 <div><label class="mb-2 block text-sm font-medium">Subcategory</label><select name="subcategory_id" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950"><option value="">Optional subcategory</option>@foreach ($categories as $categoryOption)@foreach ($categoryOption['children'] ?? [] as $child)<option value="{{ $child['id'] }}" @selected((string) $selectedSubcategory === (string) $child['id'])>{{ $categoryOption['name'] }} / {{ $child['name'] }}</option>@endforeach @endforeach</select></div>
+                <div class="lg:col-span-2"><label class="mb-2 block text-sm font-medium">Short Description</label><textarea name="short_description" rows="3" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">{{ old('short_description', $product['short_description'] ?? '') }}</textarea></div>
                 <div class="lg:col-span-2"><label class="mb-2 block text-sm font-medium">Description</label><textarea name="description" rows="5" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">{{ old('description', $product['description'] ?? '') }}</textarea></div>
                 <div class="lg:col-span-2 rounded-lg border border-slate-200 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-950/60">
                     <h3 class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Filter Section</h3>
@@ -94,31 +97,10 @@
         </section>
 
         <section class="rounded-lg border border-white/70 bg-white/85 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80">
-            <div class="flex items-center justify-between gap-3">
-                <div>
-                    <h2 class="text-lg font-semibold">Ingredients</h2>
-                    <p class="mt-1 text-sm text-slate-500">Only image + name is stored.</p>
-                </div>
-                <button type="button" @click="addIngredient()" class="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold dark:border-slate-700">Add Ingredient</button>
-            </div>
-            <div class="mt-6 space-y-4">
-                <template x-for="(ingredient, index) in ingredients" :key="ingredient.uid">
-                    <div class="grid gap-4 rounded-lg border border-slate-200 bg-slate-50/70 p-4 md:grid-cols-[1fr_1fr_auto] dark:border-slate-800 dark:bg-slate-950/60">
-                        <div>
-                            <label class="mb-2 block text-sm font-medium">Name</label>
-                            <input type="text" :name="`ingredients[${index}][name]`" x-model="ingredient.name" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-900">
-                            <input type="hidden" :name="`ingredients[${index}][existing_image]`" x-model="ingredient.existing_image">
-                        </div>
-                        <div>
-                            <label class="mb-2 block text-sm font-medium">Image</label>
-                            <template x-if="ingredient.preview"><img :src="ingredient.preview" class="mb-3 h-24 w-24 rounded-lg object-cover"></template>
-                            <input type="file" :name="`ingredients[${index}][image]`" accept="image/*" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-900">
-                        </div>
-                        <div class="flex items-end">
-                            <button type="button" @click="removeIngredient(index)" class="rounded-lg border border-rose-200 px-4 py-3 text-sm font-semibold text-rose-600">Remove</button>
-                        </div>
-                    </div>
-                </template>
+            <h2 class="text-lg font-semibold">Ingredients</h2>
+            <div class="mt-6">
+                <label class="mb-2 block text-sm font-medium">Ingredients</label>
+                <textarea name="ingredients" rows="4" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Enter ingredients">{{ $ingredients }}</textarea>
             </div>
         </section>
 
@@ -147,7 +129,7 @@
                                 <div class="flex flex-wrap items-start justify-between gap-3">
                                     <div>
                                         <h4 class="font-semibold">Brewing Rituals</h4>
-                                        <p class="mt-1 text-sm text-slate-500">Add multiple hot brew / iced brew steps with images.</p>
+                                        <p class="mt-1 text-sm text-slate-500">Add multiple hot brew / iced brew label and value pairs.</p>
                                     </div>
                                 </div>
                             </div>
@@ -164,14 +146,9 @@
                                                     <label class="block text-sm font-medium" x-text="`Hot Brew ${ritualIndex + 1}`"></label>
                                                     <button type="button" @click="removeBrewingRitual('hot_brew', ritualIndex)" class="text-xs font-semibold text-rose-600" x-show="brewing_rituals.hot_brew.length > 1">Remove</button>
                                                 </div>
-                                                <input type="text" :name="`brewing_rituals[hot_brew][${ritualIndex}][ritual]`" x-model="ritual.ritual" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Enter hot brew text">
-                                                <input type="hidden" :name="`brewing_rituals[hot_brew][${ritualIndex}][existing_image]`" x-model="ritual.existing_image">
-                                                <div class="mt-4">
-                                                    <label class="mb-2 block text-sm font-medium">Image</label>
-                                                    <template x-if="ritual.preview">
-                                                        <img :src="ritual.preview" :alt="`Hot Brew ${ritualIndex + 1}`" class="mb-3 h-24 w-24 rounded-lg object-cover">
-                                                    </template>
-                                                    <input type="file" :name="`brewing_rituals[hot_brew][${ritualIndex}][image]`" accept="image/*" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">
+                                                <div class="grid gap-3 sm:grid-cols-2">
+                                                    <div><label class="mb-2 block text-sm font-medium">Label</label><input type="text" :name="`brewing_rituals[hot_brew][${ritualIndex}][label]`" x-model="ritual.label" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Enter label"></div>
+                                                    <div><label class="mb-2 block text-sm font-medium">Value</label><input type="text" :name="`brewing_rituals[hot_brew][${ritualIndex}][value]`" x-model="ritual.value" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Enter value"></div>
                                                 </div>
                                             </div>
                                         </template>
@@ -189,19 +166,18 @@
                                                     <label class="block text-sm font-medium" x-text="`Iced Brew ${ritualIndex + 1}`"></label>
                                                     <button type="button" @click="removeBrewingRitual('iced_brew', ritualIndex)" class="text-xs font-semibold text-rose-600" x-show="brewing_rituals.iced_brew.length > 1">Remove</button>
                                                 </div>
-                                                <input type="text" :name="`brewing_rituals[iced_brew][${ritualIndex}][ritual]`" x-model="ritual.ritual" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Enter iced brew text">
-                                                <input type="hidden" :name="`brewing_rituals[iced_brew][${ritualIndex}][existing_image]`" x-model="ritual.existing_image">
-                                                <div class="mt-4">
-                                                    <label class="mb-2 block text-sm font-medium">Image</label>
-                                                    <template x-if="ritual.preview">
-                                                        <img :src="ritual.preview" :alt="`Iced Brew ${ritualIndex + 1}`" class="mb-3 h-24 w-24 rounded-lg object-cover">
-                                                    </template>
-                                                    <input type="file" :name="`brewing_rituals[iced_brew][${ritualIndex}][image]`" accept="image/*" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">
+                                                <div class="grid gap-3 sm:grid-cols-2">
+                                                    <div><label class="mb-2 block text-sm font-medium">Label</label><input type="text" :name="`brewing_rituals[iced_brew][${ritualIndex}][label]`" x-model="ritual.label" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Enter label"></div>
+                                                    <div><label class="mb-2 block text-sm font-medium">Value</label><input type="text" :name="`brewing_rituals[iced_brew][${ritualIndex}][value]`" x-model="ritual.value" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Enter value"></div>
                                                 </div>
                                             </div>
                                         </template>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="mt-4">
+                                <label class="mb-2 block text-sm font-medium">Note</label>
+                                <textarea name="brewing_rituals[note]" x-model="brewing_rituals.note" rows="3" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950" placeholder="Enter brewing rituals note"></textarea>
                             </div>
                         </div>
         </section>
@@ -228,6 +204,8 @@
                             <div><label class="mb-2 block text-sm font-medium">Price</label><input type="number" step="0.01" :name="`variants[${index}][price]`" x-model="variant.price" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-900" required></div>
                             <div><label class="mb-2 block text-sm font-medium">Discount price</label><input type="number" step="0.01" :name="`variants[${index}][discount_price]`" x-model="variant.discount_price" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-900"></div>
                             <div><label class="mb-2 block text-sm font-medium">Weight</label><input type="text" :name="`variants[${index}][weight]`" x-model="variant.weight" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-900"></div>
+                            <div><label class="mb-2 block text-sm font-medium">Product Dimension</label><input type="text" :name="`variants[${index}][product_dimension]`" x-model="variant.product_dimension" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-900"></div>
+                            <div><label class="mb-2 block text-sm font-medium">Item Form</label><input type="text" :name="`variants[${index}][item_form]`" x-model="variant.item_form" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-900"></div>
                             <label class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900"><span class="text-sm font-medium">Default variant</span><input type="checkbox" value="1" :name="`variants[${index}][is_default]`" x-model="variant.is_default" @change="setDefaultVariant(index)" class="h-5 w-5 rounded border-slate-300 text-sky-600 focus:ring-sky-500"></label>
                             <label class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900"><span class="text-sm font-medium">Active variant</span><input type="checkbox" value="1" :name="`variants[${index}][status]`" x-model="variant.status" class="h-5 w-5 rounded border-slate-300 text-sky-600 focus:ring-sky-500"></label>
                         </div>
@@ -243,5 +221,3 @@
         </div>
     </form>
 </div>
-
-

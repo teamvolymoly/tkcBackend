@@ -9,6 +9,7 @@ use App\Http\Controllers\API\BlogPostController;
 use App\Http\Controllers\API\CartController;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\CheckoutController;
+use App\Http\Controllers\API\ContactQueryController;
 use App\Http\Controllers\API\CouponController;
 use App\Http\Controllers\API\CustomerAccountController;
 use App\Http\Controllers\API\HeroSectionController;
@@ -50,6 +51,7 @@ Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::post('/payments/webhook', [PaymentController::class, 'webhook']);
 Route::get('/blog-posts', [BlogPostController::class, 'index']);
 Route::get('/blog-posts/{blogPost}', [BlogPostController::class, 'show']);
+Route::post('/contact-queries', [ContactQueryController::class, 'store']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/dashboard', [CustomerAccountController::class, 'dashboard']);
@@ -134,6 +136,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/wishlists', [WishlistController::class, 'adminIndex'])->middleware('admin.api_permission:wishlists.view');
     Route::delete('/admin/wishlists/{id}', [WishlistController::class, 'adminDestroy'])->middleware('admin.api_permission:wishlists.delete');
 });
-
 
 

@@ -167,12 +167,26 @@ class CustomerAccountService
             ->where('product_id', $product->id)
             ->where('status', 'approved')
             ->selectRaw('COALESCE(AVG(rating), 0) as average_rating, COUNT(*) as total_reviews')
+            ->selectRaw('SUM(CASE WHEN rating = 5 THEN 1 ELSE 0 END) as five_star_count')
+            ->selectRaw('SUM(CASE WHEN rating = 4 THEN 1 ELSE 0 END) as four_star_count')
+            ->selectRaw('SUM(CASE WHEN rating = 3 THEN 1 ELSE 0 END) as three_star_count')
+            ->selectRaw('SUM(CASE WHEN rating = 2 THEN 1 ELSE 0 END) as two_star_count')
+            ->selectRaw('SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) as one_star_count')
+            ->selectRaw('SUM(CASE WHEN rating = 0 THEN 1 ELSE 0 END) as zero_star_count')
             ->first();
 
         return [
             'summary' => [
                 'average_rating' => round((float) ($summary?->average_rating ?? 0), 1),
                 'total_reviews' => (int) ($summary?->total_reviews ?? 0),
+                'rating_counts' => [
+                    '5_star' => (int) ($summary?->five_star_count ?? 0),
+                    '4_star' => (int) ($summary?->four_star_count ?? 0),
+                    '3_star' => (int) ($summary?->three_star_count ?? 0),
+                    '2_star' => (int) ($summary?->two_star_count ?? 0),
+                    '1_star' => (int) ($summary?->one_star_count ?? 0),
+                    '0_star' => (int) ($summary?->zero_star_count ?? 0),
+                ],
             ],
             'items' => collect($paginator->items())
                 ->map(fn (Review $review) => [

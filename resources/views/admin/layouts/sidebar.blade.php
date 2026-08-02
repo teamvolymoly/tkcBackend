@@ -5,7 +5,7 @@
     $isAdmin = collect($adminUser['roles'] ?? [])->pluck('name')->contains('admin');
     $canAccess = fn (?string $permission = null) => $permission === null || $isAdmin || in_array($permission, $permissionNames, true);
     $cmsOpen = str_starts_with((string) $current, 'admin.blogs');
-    $moreOpen = str_starts_with((string) $current, 'admin.users') || str_starts_with((string) $current, 'admin.reviews') || str_starts_with((string) $current, 'admin.carts') || str_starts_with((string) $current, 'admin.wishlists');
+    $moreOpen = str_starts_with((string) $current, 'admin.users') || str_starts_with((string) $current, 'admin.reviews') || str_starts_with((string) $current, 'admin.contact-queries') || str_starts_with((string) $current, 'admin.carts') || str_starts_with((string) $current, 'admin.wishlists');
     $settingsOpen = str_starts_with((string) $current, 'admin.profile') || str_starts_with((string) $current, 'admin.roles') || str_starts_with((string) $current, 'admin.hero-sections');
 @endphp
 <aside x-data="{ cmsOpen: {{ $cmsOpen ? 'true' : 'false' }}, moreOpen: {{ $moreOpen ? 'true' : 'false' }}, settingsOpen: {{ $settingsOpen ? 'true' : 'false' }} }">
@@ -29,6 +29,7 @@
         @php($moreLinks = collect([
             ['route' => 'admin.users.index', 'label' => 'Users', 'hint' => 'Users management', 'permission' => 'users.view'],
             ['route' => 'admin.reviews.index', 'label' => 'Reviews', 'hint' => 'Customer reviews', 'permission' => 'reviews.view'],
+            ['route' => 'admin.contact-queries.index', 'label' => 'Contact Queries', 'hint' => 'Frontend contact submissions', 'permission' => 'contact_queries.view'],
             ['route' => 'admin.carts.index', 'label' => 'Carts', 'hint' => 'Customer carts', 'permission' => 'carts.view'],
             ['route' => 'admin.wishlists.index', 'label' => 'Wishlists', 'hint' => 'Saved wishlist products', 'permission' => 'wishlists.view'],
         ])->filter(fn ($link) => $canAccess($link['permission'])))

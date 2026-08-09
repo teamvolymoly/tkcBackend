@@ -20,12 +20,18 @@ class HomeBlogPostController extends Controller
                 'title',
                 'slug',
                 'excerpt',
-                'content',
                 'featured_image_path',
                 'published_at',
-                'created_at',
-                'updated_at',
-            ]);
+            ])
+            ->map(fn (BlogPost $post) => [
+                'id' => $post->id,
+                'title' => $post->title,
+                'slug' => $post->slug,
+                'excerpt' => $post->excerpt,
+                'featured_image_path' => $post->featured_image_url,
+                'published_at' => $post->published_at,
+            ])
+            ->values();
 
         return response()->json([
             'status' => true,

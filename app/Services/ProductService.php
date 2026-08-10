@@ -232,7 +232,10 @@ class ProductService
             ->selectSub($displayPriceSubQuery, 'display_price')
             ->selectSub($comparePriceSubQuery, 'compare_price')
             ->withAvg(['reviews as average_rating' => fn ($reviewQuery) => $reviewQuery->where('status', 'approved')], 'rating')
-            ->withCount(['variants as active_variants_count' => fn ($variantQuery) => $variantQuery->where('status', true)]);
+            ->withCount([
+                'reviews as rating_count' => fn ($reviewQuery) => $reviewQuery->where('status', 'approved'),
+                'variants as active_variants_count' => fn ($variantQuery) => $variantQuery->where('status', true),
+            ]);
 
         if ($isAdminRequest) {
             if (array_key_exists('status', $filters) && $filters['status'] !== '') {
@@ -345,6 +348,7 @@ class ProductService
             'compare_price' => $comparePrice,
             'badge' => $this->buildBadge($product),
             'rating' => $rating,
+            'rating_count' => (int) ($product->rating_count ?? 0),
             'in_stock' => $isInStock,
             'status' => (bool) $product->status,
             'caffeine' => $product->caffeine,

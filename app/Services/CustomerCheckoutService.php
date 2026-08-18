@@ -315,7 +315,7 @@ class CustomerCheckoutService
                     'quantity' => (int) $item->quantity,
                     'price' => round((float) $item->price, 2),
                     'image' => $item->variant?->primary_image['image_url']
-                        ?? $item->product?->resolveMediaUrl($item->product?->image_1),
+                        ?? $item->product?->resolveMediaUrl($item->product?->cart_image_1),
                 ];
             })->values()->all(),
             'shipping_address' => $address ? $this->transformAddress($address) : null,
@@ -570,7 +570,7 @@ class CustomerCheckoutService
                     'price' => round($unitPrice, 2),
                     'line_total' => $lineTotal,
                     'image' => $variant?->primary_image['image_url']
-                        ?? $product?->resolveMediaUrl($product?->image_1),
+                        ?? $product?->resolveMediaUrl($product?->cart_image_1),
                 ];
             })
             ->all();

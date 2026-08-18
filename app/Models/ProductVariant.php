@@ -40,7 +40,7 @@ class ProductVariant extends Model
 
     public function getPrimaryImageAttribute(): ?array
     {
-        $path = $this->product?->image_1;
+        $path = $this->product?->cart_image_1;
 
         if (! $path && $this->product) {
             $path = collect($this->product->gallery)->first()['image_path'] ?? null;

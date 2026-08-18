@@ -81,7 +81,7 @@ class CustomerAccountService
                         'price' => round((float) $item->price, 2),
                         'line_total' => round((float) $item->price * (int) $item->quantity, 2),
                         'image' => $item->variant?->primary_image['image_url']
-                            ?? $item->product?->resolveMediaUrl($item->product?->image_1),
+                            ?? $item->product?->resolveMediaUrl($item->product?->cart_image_1),
                     ];
                 })
                 ->values()
@@ -210,7 +210,7 @@ class CustomerAccountService
         $items = OrderItem::query()
             ->with([
                 'order:id,order_number,status,payment_status,delivery_date,user_id,created_at,updated_at',
-                'product:id,name,slug,image_1',
+                'product:id,name,slug,image_1,cart_image_1',
                 'variant',
                 'review' => fn ($query) => $query->where('user_id', $user->id),
             ])
@@ -351,7 +351,7 @@ class CustomerAccountService
             'product_name' => $item->product_name,
             'variant_name' => $item->variant_name,
             'image' => $item->variant?->primary_image['image_url']
-                ?? $item->product?->resolveMediaUrl($item->product?->image_1),
+                ?? $item->product?->resolveMediaUrl($item->product?->cart_image_1),
             'delivered_date' => optional($item->order?->delivery_date ?? $item->order?->updated_at ?? $item->order?->created_at)->toDateString(),
             'can_review' => $review === null,
             'already_reviewed' => $review !== null,

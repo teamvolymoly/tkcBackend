@@ -31,6 +31,8 @@ class UpdateProductRequest extends FormRequest
             'image_3' => 'nullable|image|max:5120',
             'image_4' => 'nullable|image|max:5120',
             'image_5' => 'nullable|image|max:5120',
+            'cart_image_1' => 'nullable|image|max:5120',
+            'cart_image_2' => 'nullable|image|max:5120',
             'ingredients' => 'nullable|string',
             'faqs' => 'nullable|array',
             'faqs.*.question' => 'nullable|string',

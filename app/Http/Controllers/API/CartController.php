@@ -178,7 +178,7 @@ class CartController extends Controller
             'quantity' => (int) $item->quantity,
             'product_name' => $product?->name,
             'variant_name' => $variant?->name,
-            'product_image' => $product?->resolveMediaUrl($product?->image_1),
+            'product_image' => $product?->resolveMediaUrl($product?->cart_image_1),
             'price' => (float) $unitPrice,
             'subtotal' => (float) $subtotal,
             'shipping' => (float) $shipping,

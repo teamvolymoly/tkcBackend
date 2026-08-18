@@ -97,6 +97,25 @@
         </section>
 
         <section class="rounded-lg border border-white/70 bg-white/85 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80">
+            <div>
+                <h2 class="text-lg font-semibold">Cart Images</h2>
+                <p class="mt-1 text-sm text-slate-500">These two images are used in the product listing and cart.</p>
+            </div>
+            <div class="mt-6 grid gap-4 md:grid-cols-2">
+                @foreach (range(1, 2) as $index)
+                    @php($cartImagePath = $product['cart_image_'.$index] ?? null)
+                    <div class="space-y-3 rounded-lg border border-slate-200 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-950/60">
+                        <label class="block text-sm font-medium">Cart Image {{ $index }}</label>
+                        @if ($cartImagePath)
+                            <img src="{{ preg_match('/^https?:\/\//', $cartImagePath) ? $cartImagePath : route('media.public', ['path' => ltrim($cartImagePath, '/')]) }}" alt="Cart image {{ $index }}" class="h-32 w-full rounded-lg object-cover">
+                        @endif
+                        <input type="file" name="cart_image_{{ $index }}" accept="image/*" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-900">
+                    </div>
+                @endforeach
+            </div>
+        </section>
+
+        <section class="rounded-lg border border-white/70 bg-white/85 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80">
             <h2 class="text-lg font-semibold">Ingredients</h2>
             <div class="mt-6">
                 <label class="mb-2 block text-sm font-medium">Ingredients</label>

@@ -129,6 +129,8 @@ class ProductController extends BaseAdminController
             'image_3' => ['nullable', 'file', 'image', 'max:5120'],
             'image_4' => ['nullable', 'file', 'image', 'max:5120'],
             'image_5' => ['nullable', 'file', 'image', 'max:5120'],
+            'cart_image_1' => ['nullable', 'file', 'image', 'max:5120'],
+            'cart_image_2' => ['nullable', 'file', 'image', 'max:5120'],
             'ingredients' => ['nullable', 'string'],
             'faqs' => ['nullable', 'array'],
             'faqs.*.question' => ['nullable', 'string'],

@@ -25,6 +25,8 @@ class Product extends Model
         'image_3',
         'image_4',
         'image_5',
+        'cart_image_1',
+        'cart_image_2',
         'ingredients',
         'faqs',
         'brewing_rituals',

@@ -354,8 +354,8 @@ class ProductService
             'caffeine' => $product->caffeine,
             'collection' => $this->splitCollectionValues($product->collection),
             'images' => [
-                'image_1' => $product->resolveMediaUrl($product->image_1),
-                'image_2' => $product->resolveMediaUrl($product->image_2),
+                'image_1' => $product->resolveMediaUrl($product->cart_image_1),
+                'image_2' => $product->resolveMediaUrl($product->cart_image_2),
             ],
         ];
 
@@ -672,6 +672,16 @@ class ProductService
             }
         }
 
+        foreach (range(1, 2) as $index) {
+            $column = 'cart_image_'.$index;
+
+            if (array_key_exists($column, $payload)) {
+                $data[$column] = $this->storeOptionalFile($payload[$column], 'products/cart', $product?->{$column});
+            } elseif ($product !== null) {
+                $data[$column] = $product->{$column};
+            }
+        }
+
         return $data;
     }
 
@@ -897,6 +907,14 @@ class ProductService
     {
         foreach (range(1, 5) as $index) {
             $path = $product->{'image_'.$index};
+
+            if ($path && ! preg_match('/^https?:\/\//i', $path)) {
+                Storage::disk('public')->delete($path);
+            }
+        }
+
+        foreach (range(1, 2) as $index) {
+            $path = $product->{'cart_image_'.$index};
 
             if ($path && ! preg_match('/^https?:\/\//i', $path)) {
                 Storage::disk('public')->delete($path);

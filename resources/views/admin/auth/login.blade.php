@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login | {{ config('app.name') }}</title>
+    <title>Admin Login | {{ config('app.brand_name') }}</title>
     <script>
         window.__adminDark = localStorage.getItem('admin-dark-mode') === 'true';
         if (window.__adminDark) document.documentElement.classList.add('dark');
@@ -164,7 +164,6 @@
     </div>
 </body>
 </html>
-
 
 
 

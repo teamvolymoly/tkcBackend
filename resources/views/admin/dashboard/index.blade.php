@@ -19,7 +19,7 @@
     <section class="rounded-[12px] px-3 py-1 text-[#1d241d]">
         <div class="flex items-start justify-between gap-4">
             <div>
-                <h1 class="text-[22px] font-normal tracking-[0.03em] text-[#1e2620] md:text-[40px]">Good night, {{ $adminFirstName }} !</h1>
+                <h1 class="text-[22px] font-normal tracking-[0.02em] text-[#1e2620] md:text-[40px]">Good night, {{ $adminFirstName }}!</h1>
 
                 <p class="mt-1 text-[14px] text-black">Track and analyze your monthly online store's performance with detailed breakdown.</p>
             </div>
@@ -44,7 +44,7 @@
                         </p>
                         <div class="mt-4 flex items-start gap-1 flex-col">
                             <div class="rounded-full px-2 py-0.5 text-[12px] font-medium {{ str_starts_with($card['chip'], '+') ? 'bg-[#e1f2df] text-[#4e9b55]' : 'bg-[#fbe3e2] text-[#d66c67]' }}">{{ $card['chip'] }}</div>
-                            <p class="text-[10px] text-black/70">{{ $card['note'] }}</p>
+                            <p class="text-[12px] text-black/70">{{ $card['note'] }}</p>
                         </div>
                     </div>
                     <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-black/70">

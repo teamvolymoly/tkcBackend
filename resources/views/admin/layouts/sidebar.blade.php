@@ -1,6 +1,6 @@
 @php
     $current = request()->route()?->getName();
-    $sidebarLogoPath = route('media.public', ['path' => 'logo/LOGO_TKC-01.png']);
+    $sidebarLogoPath = route('media.public', ['path' => 'logo/LOGO_TKC-01.svg']);
     $permissionNames = collect($adminUser['permissions'] ?? [])->pluck('name')->all();
     $isAdmin = collect($adminUser['roles'] ?? [])->pluck('name')->contains('admin');
     $canAccess = fn (?string $permission = null) => $permission === null || $isAdmin || in_array($permission, $permissionNames, true);
@@ -11,8 +11,13 @@
 <aside x-data="{ cmsOpen: {{ $cmsOpen ? 'true' : 'false' }}, moreOpen: {{ $moreOpen ? 'true' : 'false' }}, settingsOpen: {{ $settingsOpen ? 'true' : 'false' }} }">
     <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 z-30 bg-[#5A6F61] lg:hidden" @click="sidebarOpen = false"></div>
     <div :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'" class="fixed inset-y-0 left-0 z-40 flex w-[15.8rem] flex-col rounded-[10px] bg-white px-3 py-3 shadow-2xl transition-all duration-300 lg:sticky lg:bottom-auto lg:top-2 lg:h-[calc(100vh-1rem)] lg:self-start lg:shadow-none">
-        <div class="flex h-[70px] items-center justify-center rounded-[10px] bg-white">
-            <img src="{{ $sidebarLogoPath }}" alt="The Kahwa Company logo" class="h-full w-auto object-contain">
+        <div class="flex h-[70px] items-center justify-center rounded-[10px]">
+            <img
+                src="{{ $sidebarLogoPath }}"
+                alt="The Kahwa Company logo"
+                class="h-[58px] w-auto object-contain transition duration-300"
+                :class="darkMode ? 'brightness-0 invert' : ''"
+            >
         </div>
 
         @php($primaryLinks = collect([
@@ -147,8 +152,8 @@
         </div>
 
         <div class="mt-3 overflow-hidden rounded-[10px] bg-[#5A6F61] text-white">
-            <div class="space-y-1 px-3 py-3">
-                <p class="text-[12px] uppercase tracking-[0.18em] text-white/75">Designed and developed by</p>
+            <div class="space-y-2 px-3 py-3">
+                <p class="text-[10px] tracking-[0.04em] text-white/75">Designed and developed by</p>
                 <img src="{{ asset('assects/admin/volymoly_logo.svg') }}" alt="Volymoly" class="h-auto w-32">
             </div>
         </div>

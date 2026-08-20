@@ -98,8 +98,8 @@
 
         <section class="rounded-lg border border-white/70 bg-white/85 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80">
             <div>
-                <h2 class="text-lg font-semibold">Cart Images</h2>
-                <p class="mt-1 text-sm text-slate-500">These two images are used in the product listing and cart.</p>
+                <h2 class="text-lg font-semibold">Product Card Images</h2>
+                <p class="mt-1 text-sm text-slate-500">These two images are used in the product listing and Card.</p>
             </div>
             <div class="mt-6 grid gap-4 md:grid-cols-2">
                 @foreach (range(1, 2) as $index)

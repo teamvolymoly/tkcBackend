@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\Session;
 
 class AdminApiService
 {
-    public function __construct(private readonly Request $request)
-    {
-    }
+    private const CONNECTION_FAILURE_MESSAGE = 'Something went wrong. Please try again.';
+
+    public function __construct(private readonly Request $request) {}
 
     public function login(array $credentials): array
     {
@@ -157,6 +157,7 @@ class AdminApiService
 
             if (is_array($value)) {
                 $flattened += $this->flattenMultipartPayload($value, $name);
+
                 continue;
             }
 
@@ -183,6 +184,7 @@ class AdminApiService
 
             if ($value instanceof UploadedFile) {
                 $flattened[$name] = $value;
+
                 continue;
             }
 
@@ -251,10 +253,10 @@ class AdminApiService
         return [
             'ok' => false,
             'status' => 503,
-            'message' => 'Admin panel API se connect nahi ho pa raha. XAMPP Apache start karke project ko localhost URL se kholiye, ya ADMIN_API_BASE_URL sahi set kijiye.',
+            'message' => self::CONNECTION_FAILURE_MESSAGE,
             'data' => null,
             'errors' => [],
-            'raw' => ['message' => $exception->getMessage()],
+            'raw' => ['message' => self::CONNECTION_FAILURE_MESSAGE],
         ];
     }
 
@@ -264,6 +266,17 @@ class AdminApiService
         $message = is_array($json) ? ($json['message'] ?? null) : null;
         $errors = is_array($json) ? ($json['errors'] ?? []) : [];
         $data = is_array($json) && array_key_exists('data', $json) ? $json['data'] : $json;
+
+        if ($response->serverError()) {
+            return [
+                'ok' => false,
+                'status' => $response->status(),
+                'message' => self::CONNECTION_FAILURE_MESSAGE,
+                'data' => null,
+                'errors' => [],
+                'raw' => ['message' => self::CONNECTION_FAILURE_MESSAGE],
+            ];
+        }
 
         return [
             'ok' => $response->successful(),
@@ -275,5 +288,3 @@ class AdminApiService
         ];
     }
 }
-
-

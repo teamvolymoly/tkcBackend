@@ -146,11 +146,10 @@
             @endif
         </div>
 
-        <div class="mt-3 overflow-hidden rounded-[10px] bg-[#a5b4a1] text-white">
+        <div class="mt-3 overflow-hidden rounded-[10px] bg-[#5A6F61] text-white">
             <div class="space-y-1 px-3 py-3">
-                <p class="text-[8px] uppercase tracking-[0.18em] text-white/75">Designed and developed by volymoly</p>
-                <p class="text-lg font-light leading-none">VOLYMOLY</p>
-                <p class="text-[18px] italic leading-none text-white/90">wm</p>
+                <p class="text-[8px] uppercase tracking-[0.18em] text-white/75">Designed and developed by</p>
+                <img src="{{ asset('assects/admin/volymoly_logo.svg') }}" alt="Volymoly" class="h-auto w-32">
             </div>
         </div>
     </div>

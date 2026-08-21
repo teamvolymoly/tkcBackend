@@ -6,22 +6,18 @@
 
 @section('content')
 <div class="space-y-8">
-    <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+    <div>
         <div>
             <p class="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600 dark:text-sky-300">Account</p>
             <h1 class="mt-2 text-3xl font-semibold tracking-tight">Admin profile settings</h1>
-            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Apna basic account information update kijiye. Changes directly API ke through save honge.</p>
-        </div>
-        <div class="rounded-sm border border-white/70 bg-white/80 px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
-            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400 dark:text-slate-500">Signed in as</p>
-            <p class="mt-2 text-base font-semibold text-slate-900 dark:text-white">{{ $profile['email'] ?? 'admin@example.com' }}</p>
+            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Update your basic account information. Changes are saved directly through the API.</p>
         </div>
     </div>
 
     <div class="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
         <section class="rounded-lg border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
             <div class="flex items-start gap-4">
-                <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-sky-500 via-cyan-400 to-emerald-400 text-xl font-black text-slate-950 shadow-lg shadow-cyan-500/25">
+                <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[#d8e2d8] bg-[#edf3ec] text-lg font-semibold text-[#52685a] dark:border-[#344538] dark:bg-[#243128] dark:text-[#dce7dc]">
                     {{ strtoupper(substr($profile['name'] ?? 'A', 0, 1)) }}
                 </div>
                 <div class="min-w-0">
@@ -51,20 +47,15 @@
                         @endforelse
                     </div>
                 </div>
-                <div class="rounded-lg bg-slate-50 p-4 dark:bg-slate-950/60">
-                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Security note</p>
-                    <p class="mt-2 text-slate-600 dark:text-slate-300">Ye panel API token ke through authenticated hai, isliye profile edits live backend par save honge.</p>
-                </div>
             </div>
         </section>
 
         <section class="rounded-lg border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
-            <div class="flex items-center justify-between gap-4">
+            <div>
                 <div>
                     <h2 class="text-xl font-semibold text-slate-900 dark:text-white">Edit profile</h2>
-                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Name, email aur phone ko yahin se update kijiye.</p>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Update your name, email address, and phone number here.</p>
                 </div>
-                <span class="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700 dark:bg-sky-500/10 dark:text-sky-300">API Driven</span>
             </div>
 
             <form method="POST" action="{{ route('admin.profile.update') }}" class="mt-8 space-y-6" data-loading-form>
@@ -120,9 +111,8 @@
                     @enderror
                 </div>
 
-                <div class="flex flex-col gap-3 border-t border-slate-200 pt-6 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Save karne ke baad topbar aur session profile bhi refresh ho jayega.</p>
-                    <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">
+                <div class="flex border-t border-slate-200 pt-6 dark:border-slate-800 sm:justify-end">
+                    <button type="submit" class="inline-flex h-12 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-[#607969] px-7 text-sm font-semibold text-white shadow-sm transition hover:bg-[#52695a] focus:outline-none focus:ring-2 focus:ring-[#9fb3a4] focus:ring-offset-2 dark:bg-[#a8bca9] dark:text-[#182019] dark:hover:bg-[#bacabb] dark:focus:ring-offset-[#171f18]">
                         Update profile
                     </button>
                 </div>
@@ -131,4 +121,3 @@
     </div>
 </div>
 @endsection
-

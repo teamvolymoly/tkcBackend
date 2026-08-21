@@ -24,7 +24,7 @@
             <div>
                 <label class="mb-2 block text-sm font-medium">Product slug</label>
                 <input type="text" name="product_slug" value="{{ old('product_slug', $heroSection['product_slug'] ?? '') }}" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm" placeholder="leave blank for auto slug">
-                <p class="mt-2 text-xs text-slate-500">Frontend is slug ko home hero CTA/product linking ke liye use karega.</p>
+                <p class="mt-2 text-xs text-slate-500">The frontend uses this slug to link the homepage hero call to action to a product.</p>
             </div>
         </div>
 

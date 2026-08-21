@@ -7,7 +7,7 @@
         <div>
             <p class="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600 dark:text-sky-300">Customers & Staff</p>
             <h1 class="mt-2 text-3xl font-semibold tracking-tight">Edit user</h1>
-            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Account details aur role ko admin panel se update kijiye.</p>
+            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Update the account details and assigned role from the admin panel.</p>
         </div>
         <div class="flex items-center gap-3">
             <a href="{{ route('admin.users.show', $user['id']) }}" class="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">Back</a>
@@ -36,7 +36,7 @@
                     <p class="mt-2 font-medium text-slate-900 dark:text-white">{{ $user['phone'] ?: 'Not added yet' }}</p>
                 </div>
                 <div class="rounded-lg bg-slate-50 p-4 text-slate-600 dark:bg-slate-950/60 dark:text-slate-300">
-                    Agar aap apne khud ke admin account ko edit kar rahe ho, system role ko aise role par shift nahi karega jisse admin panel access chala jaye.
+                    When editing your own administrator account, the system prevents role changes that would revoke your access to the admin panel.
                 </div>
             </div>
         </section>
@@ -44,7 +44,7 @@
         <section class="rounded-lg border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
             <div>
                 <h2 class="text-xl font-semibold text-slate-900 dark:text-white">Update account</h2>
-                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Changes save hote hi user record refresh ho jayega.</p>
+                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">The user record will refresh automatically after the changes are saved.</p>
             </div>
 
             <form method="POST" action="{{ route('admin.users.update', $user['id']) }}" class="mt-8 space-y-6" data-loading-form>

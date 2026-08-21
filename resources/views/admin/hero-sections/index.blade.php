@@ -9,7 +9,7 @@
             <div class="max-w-3xl">
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Settings</p>
                 <h1 class="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-3xl">Hero Section Manager</h1>
-                <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Homepage hero slides ko manage kijiye. Yahin se product image, name aur slug frontend home API me jayega.</p>
+                <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Manage homepage hero slides. Product images, names, and slugs configured here are published through the frontend home API.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
                 <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-800 dark:bg-slate-950"><span class="text-slate-500 dark:text-slate-400">Loaded</span><span class="ml-2 font-semibold text-slate-900 dark:text-white">{{ $totalHeroSections }}</span></div>

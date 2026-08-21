@@ -56,7 +56,7 @@
                         <svg x-show="darkMode" x-cloak class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0112 21c-5.385 0-9.75-4.365-9.75-9.75 0-4.264 2.737-7.89 6.548-9.213a.75.75 0 01.95.95A7.5 7.5 0 0019.013 14.25a.75.75 0 01.95.752z"/></svg>
                     </button>
                 </div>
-                <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">{{ $email }} par bheja gaya 6-digit OTP yahan enter karein. OTP {{ $expiresInMinutes }} minutes me expire ho jayega.</p>
+                <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">Enter the six-digit verification code sent to {{ $email }}. The code expires in {{ $expiresInMinutes }} minutes.</p>
                 <div class="mt-8">@include('admin.components.alerts')</div>
                 <form method="POST" action="{{ route('admin.password.otp.verify') }}" class="mt-6 space-y-5">
                     @csrf

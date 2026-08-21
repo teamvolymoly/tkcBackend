@@ -11,7 +11,7 @@
             <div class="max-w-3xl">
                 <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">System Control</p>
                 <h1 class="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-3xl">Roles & Permissions</h1>
-                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Roles create kijiye aur checkbox se decide kijiye ki admin panel ka kaunsa section visible aur manageable hoga.</p>
+                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Create roles and select which sections of the admin panel each role can view and manage.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">
                 <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-800 dark:bg-slate-950"><span class="text-slate-500 dark:text-slate-400">Roles</span><span class="ml-2 font-semibold text-slate-900 dark:text-white">{{ $totalRoles }}</span></div>

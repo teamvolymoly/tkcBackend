@@ -43,7 +43,7 @@
 </head>
 <body class="admin-auth-shell min-h-screen overflow-x-hidden bg-white font-sans text-slate-900 transition-colors duration-300 dark:bg-[#0f1510] dark:text-[#f5f7f2]">
     @php($loginImagePath = route('media.public', ['path' => 'login/login_img.png']))
-    @php($adminLogoPath = route('media.public', ['path' => 'logo/LOGO_TKC-01.png']))
+    @php($adminLogoPath = route('media.public', ['path' => 'logo/LOGO_TKC-01.svg']))
 
     <div class="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8 sm:px-6">
         <div class="absolute inset-0 bg-white dark:bg-[radial-gradient(circle_at_top,_rgba(143,163,140,0.16),_transparent_24%),linear-gradient(180deg,_#0f1510_0%,_#171f18_100%)]"></div>
@@ -66,8 +66,9 @@
                         <div class="inline-flex min-h-[44px] items-center">
                             <img 
                                 src="{{ $adminLogoPath }}" 
-                                alt="The Kahwa Co." 
-                                class="h-10 w-auto sm:h-16"
+                                alt="The Kahwa Company logo"
+                                class="h-9 w-auto object-contain transition duration-300 sm:h-14"
+                                :class="darkMode ? 'brightness-0 invert' : ''"
                             >
                         </div>
 
@@ -166,4 +167,3 @@
     </div>
 </body>
 </html>
-

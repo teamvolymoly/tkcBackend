@@ -16,7 +16,6 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Admin\WishlistController as AdminWishlistController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/media/public/{path}', [MediaController::class, 'public'])
@@ -77,9 +76,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
             Route::get('/carts', [AdminCartController::class, 'index'])->middleware('admin.permission:carts.view')->name('carts.index');
             Route::get('/carts/{cart}', [AdminCartController::class, 'show'])->middleware('admin.permission:carts.view')->name('carts.show');
-
-            Route::get('/wishlists', [AdminWishlistController::class, 'index'])->middleware('admin.permission:wishlists.view')->name('wishlists.index');
-            Route::delete('/wishlists/{wishlist}', [AdminWishlistController::class, 'destroy'])->middleware('admin.permission:wishlists.delete')->name('wishlists.destroy');
 
             Route::resource('blogs', AdminBlogPostController::class)->middleware('admin.permission:blogs.view');
             Route::get('/hero-sections', [AdminHeroSectionController::class, 'index'])->middleware('admin.permission:hero_sections.view')->name('hero-sections.index');

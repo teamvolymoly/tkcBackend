@@ -3,8 +3,7 @@
 @section('content')
 <div class="space-y-6">
     <div>
-        <p class="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600 dark:text-sky-300">Carts</p>
-        <h1 class="mt-2 text-3xl font-semibold tracking-tight">Live cart visibility</h1>
+        <h1 class="text-3xl font-semibold tracking-tight">Cart</h1>
     </div>
     <form method="GET" class="grid gap-4 rounded-lg border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 md:grid-cols-[1fr_auto] dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
         <input type="text" name="q" value="{{ $filters['q'] ?? '' }}" placeholder="Search customer" class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950">
@@ -32,4 +31,3 @@
     @endif
 </div>
 @endsection
-

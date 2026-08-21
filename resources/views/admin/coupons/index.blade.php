@@ -4,8 +4,7 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between gap-4">
         <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600 dark:text-sky-300">Coupons</p>
-            <h1 class="mt-2 text-3xl font-semibold tracking-tight">Discount control room</h1>
+            <h1 class="text-3xl font-semibold tracking-tight">Coupons</h1>
         </div>
         <a href="{{ route('admin.coupons.create') }}" class="rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Add Coupon</a>
     </div>
@@ -49,4 +48,3 @@
     @endif
 </div>
 @endsection
-

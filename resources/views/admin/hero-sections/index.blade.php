@@ -5,16 +5,12 @@
 @php($activeHeroSections = collect($heroSections['data'] ?? [])->where('status', true)->count())
 <div class="space-y-6">
     <section class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-            <div class="max-w-3xl">
-                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">Settings</p>
-                <h1 class="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-3xl">Hero Section Manager</h1>
-                <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Manage homepage hero slides. Product images, names, and slugs configured here are published through the frontend home API.</p>
-            </div>
-            <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <h1 class="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-3xl">Hero Section</h1>
+            <div class="flex flex-wrap items-center gap-3 sm:flex-nowrap">
                 <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-800 dark:bg-slate-950"><span class="text-slate-500 dark:text-slate-400">Loaded</span><span class="ml-2 font-semibold text-slate-900 dark:text-white">{{ $totalHeroSections }}</span></div>
                 <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300"><span>Active</span><span class="ml-2 font-semibold">{{ $activeHeroSections }}</span></div>
-                <a href="{{ route('admin.hero-sections.create') }}" class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Add Hero Section</a>
+                <a href="{{ route('admin.hero-sections.create') }}" class="inline-flex items-center justify-center whitespace-nowrap rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Add Hero Section</a>
             </div>
         </div>
     </section>

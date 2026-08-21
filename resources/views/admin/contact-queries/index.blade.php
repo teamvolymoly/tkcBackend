@@ -5,7 +5,6 @@
 @section('content')
 <div class="space-y-6">
     <div>
-        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Frontend submissions</p>
         <h1 class="mt-1 text-2xl font-semibold">Contact Queries</h1>
     </div>
 

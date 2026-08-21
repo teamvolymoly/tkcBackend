@@ -18,7 +18,6 @@ use App\Http\Controllers\API\HomeHeroSectionController;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\ReviewController;
-use App\Http\Controllers\API\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -133,8 +132,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/admin/payments/{id}', [PaymentController::class, 'adminUpdate'])->middleware('admin.api_permission:payments.update');
     Route::get('/admin/carts', [CartController::class, 'adminIndex'])->middleware('admin.api_permission:carts.view');
     Route::get('/admin/carts/{id}', [CartController::class, 'adminShow'])->middleware('admin.api_permission:carts.view');
-    Route::get('/admin/wishlists', [WishlistController::class, 'adminIndex'])->middleware('admin.api_permission:wishlists.view');
-    Route::delete('/admin/wishlists/{id}', [WishlistController::class, 'adminDestroy'])->middleware('admin.api_permission:wishlists.delete');
 });
-
 

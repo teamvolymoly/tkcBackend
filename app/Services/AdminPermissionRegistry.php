@@ -103,14 +103,6 @@ class AdminPermissionRegistry
                 ],
             ],
             [
-                'key' => 'wishlists',
-                'label' => 'Wishlists',
-                'permissions' => [
-                    ['name' => 'wishlists.view', 'label' => 'View wishlists', 'description' => 'Can inspect customer wishlists.'],
-                    ['name' => 'wishlists.delete', 'label' => 'Delete wishlist items', 'description' => 'Can remove wishlist records from admin.'],
-                ],
-            ],
-            [
                 'key' => 'blogs',
                 'label' => 'Blogs',
                 'permissions' => [
@@ -176,14 +168,14 @@ class AdminPermissionRegistry
                 'admin.access', 'dashboard.view', 'orders.view', 'orders.update', 'payments.view', 'payments.update',
                 'products.view', 'products.create', 'products.update', 'categories.view', 'categories.create', 'categories.update',
                 'coupons.view', 'coupons.create', 'coupons.update',
-                'users.view', 'reviews.view', 'reviews.update', 'reviews.delete', 'carts.view', 'wishlists.view',
+                'users.view', 'reviews.view', 'reviews.update', 'reviews.delete', 'carts.view',
                 'blogs.view', 'blogs.create', 'blogs.update', 'hero_sections.view', 'hero_sections.create', 'hero_sections.update',
                 'profile.view', 'profile.update', 'roles.view',
             ],
             'staff' => [
                 'admin.access', 'dashboard.view', 'orders.view', 'payments.view', 'products.view',
                 'categories.view', 'coupons.view', 'users.view', 'reviews.view',
-                'carts.view', 'wishlists.view', 'blogs.view', 'hero_sections.view', 'profile.view', 'profile.update',
+                'carts.view', 'blogs.view', 'hero_sections.view', 'profile.view', 'profile.update',
             ],
             'customer' => [],
         ];

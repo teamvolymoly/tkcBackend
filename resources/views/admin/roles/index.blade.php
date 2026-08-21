@@ -7,16 +7,12 @@
 @section('content')
 <div class="space-y-6" x-data="roleManager()">
     <section class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-            <div class="max-w-3xl">
-                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400 dark:text-slate-500">System Control</p>
-                <h1 class="mt-2 text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-3xl">Roles & Permissions</h1>
-                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Create roles and select which sections of the admin panel each role can view and manage.</p>
-            </div>
-            <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <h1 class="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-3xl">Roles & Permissions</h1>
+            <div class="flex flex-wrap items-center gap-3 sm:flex-nowrap">
                 <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-800 dark:bg-slate-950"><span class="text-slate-500 dark:text-slate-400">Roles</span><span class="ml-2 font-semibold text-slate-900 dark:text-white">{{ $totalRoles }}</span></div>
                 <div class="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-700 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-300"><span>Assignments</span><span class="ml-2 font-semibold">{{ $totalAssignments }}</span></div>
-                <button type="button" @click="createOpen = true" class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Create Role</button>
+                <button type="button" @click="createOpen = true" class="inline-flex items-center justify-center whitespace-nowrap rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Create Role</button>
             </div>
         </div>
     </section>

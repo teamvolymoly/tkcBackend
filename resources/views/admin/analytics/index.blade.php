@@ -23,19 +23,6 @@
 
 @section('content')
 <div class="flex h-full flex-col gap-4">
-    <section class="rounded-[12px] px-3 py-1 text-[#1d241d]">
-        <div class="flex items-start justify-between gap-4">
-            <div>
-                <h1 class="text-[22px] font-normal tracking-[-0.03em] text-[#1e2620] md:text-[40px]">Good morning, {{ $adminFirstName }}!</h1>
-                <p class="mt-1 text-[14px] text-[#52604f]">Track and analyze your mostly online store's performance with detailed breakdown.</p>
-            </div>
-            <div class="flex items-center gap-2 rounded-full bg-white px-3 py-2 shadow-sm">
-                <span class="h-2 w-2 rounded-full bg-[#4cc58a]"></span>
-                <span class="text-xs font-medium text-[#556053]">Live analytics</span>
-            </div>
-        </div>
-    </section>
-
     <section class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         @foreach ($cards as $card)
             <div class="rounded-[8px] bg-white p-4 shadow-sm">
@@ -312,7 +299,5 @@
         })();
     </script>
 @endpush
-
-
 
 

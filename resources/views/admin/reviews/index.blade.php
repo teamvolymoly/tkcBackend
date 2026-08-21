@@ -9,7 +9,7 @@
 @endphp
 <div class="space-y-6">
     <div>
-        <h1 class="text-3xl font-semibold tracking-tight">Customer review</h1>
+        <h1 class="text-3xl font-semibold tracking-tight">Customer Reviews</h1>
     </div>
 
     <form method="GET" class="grid gap-4 rounded-lg border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 lg:grid-cols-[1fr_170px_170px_auto] dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">

@@ -23,6 +23,8 @@
 
 @section('content')
 <div class="flex h-full flex-col gap-4">
+    <h1 class="px-1 text-2xl font-semibold tracking-tight text-[#1e2620] dark:text-white sm:text-3xl">Analytics</h1>
+
     <section class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         @foreach ($cards as $card)
             <div class="rounded-[8px] bg-white p-4 shadow-sm">
@@ -299,5 +301,4 @@
         })();
     </script>
 @endpush
-
 

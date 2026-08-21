@@ -5,7 +5,7 @@
 @section('content')
 <div class="space-y-6">
     <div>
-        <h1 class="mt-1 text-2xl font-semibold">Contact Queries</h1>
+        <h1 class="text-3xl font-semibold tracking-tight">Contact Queries</h1>
     </div>
 
     <form method="GET" class="rounded-lg border border-white/70 bg-white/85 p-4 shadow-lg shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900/80">

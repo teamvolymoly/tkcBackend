@@ -3,7 +3,7 @@
 @section('content')
 <div class="space-y-6">
     <div>
-        <h1 class="mt-2 text-3xl font-semibold tracking-tight">Payment operations</h1>
+        <h1 class="text-3xl font-semibold tracking-tight">Payments</h1>
     </div>
 
     <form method="GET" class="grid gap-4 rounded-lg border border-white/70 bg-white/80 p-6 shadow-lg shadow-slate-200/40 md:grid-cols-[1fr_180px_180px_auto] dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">

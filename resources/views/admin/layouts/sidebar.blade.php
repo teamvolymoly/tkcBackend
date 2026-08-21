@@ -29,7 +29,7 @@
             ['route' => 'admin.coupons.index', 'label' => 'Coupons', 'hint' => 'Coupons management', 'permission' => 'coupons.view'],
         ])->filter(fn ($link) => $canAccess($link['permission'])))
         @php($cmsLinks = collect([
-            ['route' => 'admin.blogs.index', 'label' => 'Blog', 'hint' => 'Blog CMS', 'permission' => 'blogs.view'],
+            ['route' => 'admin.blogs.index', 'label' => 'Blogs', 'hint' => 'Blog CMS', 'permission' => 'blogs.view'],
         ])->filter(fn ($link) => $canAccess($link['permission'])))
         @php($moreLinks = collect([
             ['route' => 'admin.users.index', 'label' => 'Users', 'hint' => 'Users management', 'permission' => 'users.view'],

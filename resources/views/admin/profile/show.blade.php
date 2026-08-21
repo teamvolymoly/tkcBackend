@@ -8,8 +8,7 @@
 <div class="space-y-8">
     <div>
         <div>
-            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600 dark:text-sky-300">Account</p>
-            <h1 class="mt-2 text-3xl font-semibold tracking-tight">Admin profile settings</h1>
+            <h1 class="text-3xl font-semibold tracking-tight">Profile</h1>
             <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Update your basic account information. Changes are saved directly through the API.</p>
         </div>
     </div>

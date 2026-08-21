@@ -7,7 +7,7 @@
     <section class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div class="max-w-3xl">
-                <h1 class="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-3xl">Blog</h1>
+                <h1 class="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-3xl">Blogs</h1>
                 <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Create, schedule, and maintain blog content from the CMS dropdown.</p>
             </div>
             <div class="flex flex-wrap items-center gap-3">

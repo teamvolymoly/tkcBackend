@@ -4,7 +4,15 @@
         <nav class="flex flex-wrap items-center gap-2">
             @foreach ($paginator['links'] as $link)
                 @continue($loop->first || $loop->last)
-                <a href="{{ $link['url'] ?? '#' }}" class="inline-flex min-w-10 items-center justify-center rounded-xl border px-3 py-2 text-sm font-medium transition {{ $link['active'] ? 'border-transparent bg-gradient-to-r from-[#5f715f] to-[#a9c5b0] text-white shadow-[0_12px_24px_rgba(115,140,118,0.22)]' : 'border-[#ddd6ca] bg-white text-[#6d665e] hover:border-[#cfc5b8] hover:text-[#27231f] dark:border-[#354335] dark:bg-[#202a21] dark:text-[#b8c3b4] dark:hover:border-[#4d5f4d] dark:hover:text-white' }} {{ $link['url'] ? '' : 'pointer-events-none opacity-50' }}">{!! $link['label'] !!}</a>
+                @php
+                    $paginationUrl = null;
+
+                    if (! empty($link['url'])) {
+                        parse_str(parse_url($link['url'], PHP_URL_QUERY) ?: '', $paginationQuery);
+                        $paginationUrl = request()->fullUrlWithQuery($paginationQuery);
+                    }
+                @endphp
+                <a href="{{ $paginationUrl ?? '#' }}" class="inline-flex min-w-10 items-center justify-center rounded-xl border px-3 py-2 text-sm font-medium transition {{ $link['active'] ? 'border-transparent bg-gradient-to-r from-[#5f715f] to-[#a9c5b0] text-white shadow-[0_12px_24px_rgba(115,140,118,0.22)]' : 'border-[#ddd6ca] bg-white text-[#6d665e] hover:border-[#cfc5b8] hover:text-[#27231f] dark:border-[#354335] dark:bg-[#202a21] dark:text-[#b8c3b4] dark:hover:border-[#4d5f4d] dark:hover:text-white' }} {{ $paginationUrl ? '' : 'pointer-events-none opacity-50' }}">{!! $link['label'] !!}</a>
             @endforeach
         </nav>
     </div>

@@ -128,7 +128,7 @@
                                 <span class="flex h-6 w-6 items-center justify-center">
                                     <img src="{{ $settingIcon }}" alt="" class="h-5 w-5 object-contain transition {{ $settingsOpen ? 'brightness-0 invert' : '' }}" :class="darkMode ? 'brightness-0 invert' : ''">
                                 </span>
-                                <span>Setting</span>
+                                <span>Settings</span>
                             </span>
                             <svg class="h-4 w-4 transition" :class="settingsOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
                         </button>

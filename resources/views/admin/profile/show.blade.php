@@ -9,7 +9,6 @@
     <div>
         <div>
             <h1 class="text-3xl font-semibold tracking-tight">Profile</h1>
-            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Update your basic account information. Changes are saved directly through the API.</p>
         </div>
     </div>
 

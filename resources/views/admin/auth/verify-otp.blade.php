@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify OTP | {{ config('app.brand_name') }}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('assects/admin/Favicontkc.svg') }}">
     <script>
         window.__adminDark = localStorage.getItem('admin-dark-mode') === 'true';
         if (window.__adminDark) document.documentElement.classList.add('dark');
@@ -37,8 +38,9 @@
         }
         html, body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
     </style>
+    @include('admin.auth.partials.subtle-surfaces')
 </head>
-<body class="min-h-screen bg-white text-slate-900 dark:bg-[#0f1510] dark:text-[#f5f7f2]">
+<body class="admin-auth-shell min-h-screen bg-white text-slate-900 dark:bg-[#0f1510] dark:text-[#f5f7f2]">
     <div class="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10">
         <div class="absolute inset-0 bg-white dark:bg-[radial-gradient(circle_at_top,_rgba(143,163,140,0.14),_transparent_24%),linear-gradient(180deg,_#0f1510_0%,_#171f18_100%)]"></div>
         <div class="absolute inset-0 opacity-0 dark:opacity-30" style="background-image:radial-gradient(circle at 1px 1px, rgba(184,195,180,.2) 1px, transparent 0);background-size:24px 24px"></div>

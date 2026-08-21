@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin') | {{ config('app.brand_name') }}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('assects/admin/Favicontkc.svg') }}">
     <script>
         window.__adminDark = localStorage.getItem('admin-dark-mode') === 'true';
         if (window.__adminDark) document.documentElement.classList.add('dark');
@@ -41,12 +42,12 @@
         .scrollbar-hide::-webkit-scrollbar{display:none}
         html,body{font-family:'Inter',ui-sans-serif,system-ui,sans-serif}
         :root{
-            --admin-shell:#ffffff;
+            --admin-shell:#f2f6f1;
             --admin-surface:#ffffff;
-            --admin-surface-soft:#ffffff;
-            --admin-surface-muted:#ffffff;
-            --admin-stroke:#ddd6ca;
-            --admin-stroke-strong:#cfc5b8;
+            --admin-surface-soft:#edf3ec;
+            --admin-surface-muted:#e5ede4;
+            --admin-stroke:#dfe8dc;
+            --admin-stroke-strong:#d3dfd0;
             --admin-text:#27231f;
             --admin-text-soft:#6d665e;
             --admin-olive:#708271;
@@ -58,15 +59,16 @@
             --admin-danger-text:#c76b68;
             --admin-warning-bg:#f8ecd6;
             --admin-warning-text:#a4732d;
-            --admin-shadow:0 24px 50px rgba(114,130,115,.12);
+            --admin-shadow:0 3px 12px rgba(92,110,94,.075);
+            --admin-header-shadow:0 2px 9px rgba(92,110,94,.065);
         }
         .dark{
-            --admin-shell:#0f1510;
+            --admin-shell:#0d130e;
             --admin-surface:#171f18;
-            --admin-surface-soft:#202a21;
-            --admin-surface-muted:#1c261d;
-            --admin-stroke:#354335;
-            --admin-stroke-strong:#4d5f4d;
+            --admin-surface-soft:#202b22;
+            --admin-surface-muted:#131c15;
+            --admin-stroke:#263229;
+            --admin-stroke-strong:#303e33;
             --admin-text:#f5f7f2;
             --admin-text-soft:#b8c3b4;
             --admin-olive:#8fa38c;
@@ -78,7 +80,8 @@
             --admin-danger-text:#fca5a5;
             --admin-warning-bg:#3a2c16;
             --admin-warning-text:#facc15;
-            --admin-shadow:0 22px 45px rgba(0,0,0,.26);
+            --admin-shadow:0 2px 12px rgba(0,0,0,.14);
+            --admin-header-shadow:0 2px 10px rgba(0,0,0,.12);
         }
         body.admin-panel-shell{background:var(--admin-shell);color:var(--admin-text)}
         .admin-panel-shell .admin-shell-bg{background:var(--admin-shell)!important}
@@ -101,6 +104,7 @@
         .admin-panel-shell .text-black,
         .admin-panel-shell .text-\[\#1e2620\],
         .admin-panel-shell .text-\[\#1d241d\],
+        .admin-panel-shell .text-\[\#1f2a44\],
         .admin-panel-shell .text-\[\#2b322c\],
         .admin-panel-shell .text-\[\#2d342e\],
         .admin-panel-shell .text-\[\#4e5650\]{color:var(--admin-text)!important}
@@ -112,15 +116,46 @@
         .admin-panel-shell .dark\:text-slate-400,
         .admin-panel-shell .dark\:text-slate-500,
         .admin-panel-shell .text-black\/70,
+        .admin-panel-shell .text-\[\#1f1d1a\],
+        .admin-panel-shell .text-\[\#22201d\],
+        .admin-panel-shell .text-\[\#27231f\],
+        .admin-panel-shell .text-\[\#2d2925\],
+        .admin-panel-shell .text-\[\#4e4a44\],
+        .admin-panel-shell .text-\[\#4f4942\],
+        .admin-panel-shell .text-\[\#4f584d\],
         .admin-panel-shell .text-\[\#52604f\],
         .admin-panel-shell .text-\[\#556053\],
+        .admin-panel-shell .text-\[\#586056\],
+        .admin-panel-shell .text-\[\#5b6459\],
+        .admin-panel-shell .text-\[\#5d6b5f\],
+        .admin-panel-shell .text-\[\#5f574f\],
+        .admin-panel-shell .text-\[\#5f665e\],
+        .admin-panel-shell .text-\[\#5f675d\],
+        .admin-panel-shell .text-\[\#625b53\],
+        .admin-panel-shell .text-\[\#625b54\],
+        .admin-panel-shell .text-\[\#62695e\],
+        .admin-panel-shell .text-\[\#657062\],
+        .admin-panel-shell .text-\[\#6d665e\],
+        .admin-panel-shell .text-\[\#6f7d6b\],
         .admin-panel-shell .text-\[\#6f766f\],
+        .admin-panel-shell .text-\[\#6f675f\],
+        .admin-panel-shell .text-\[\#73695d\],
+        .admin-panel-shell .text-\[\#7a746d\],
+        .admin-panel-shell .text-\[\#7a9680\],
+        .admin-panel-shell .text-\[\#7c837b\],
         .admin-panel-shell .text-\[\#6b7368\],
         .admin-panel-shell .text-\[\#7d8579\],
+        .admin-panel-shell .text-\[\#8d857a\],
+        .admin-panel-shell .text-\[\#8e877e\],
         .admin-panel-shell .text-\[\#889084\],
         .admin-panel-shell .text-\[\#8b9388\],
         .admin-panel-shell .text-\[\#8f988d\],
-        .admin-panel-shell .text-\[\#9aa298\]{color:var(--admin-text-soft)!important}
+        .admin-panel-shell .text-\[\#91877b\],
+        .admin-panel-shell .text-\[\#9aa298\],
+        .admin-panel-shell .text-\[\#9b9389\],
+        .admin-panel-shell .text-\[\#b8c3b4\],
+        .admin-panel-shell .text-\[\#c0b9b0\],
+        .admin-panel-shell .text-\[\#d7ded2\]{color:var(--admin-text-soft)!important}
         .admin-panel-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
         .admin-panel-shell select,
         .admin-panel-shell textarea{
@@ -136,7 +171,7 @@
         .admin-panel-shell select:focus,
         .admin-panel-shell textarea:focus{
             border-color:var(--admin-olive-soft)!important;
-            box-shadow:0 0 0 4px rgba(169,197,176,.28)!important;
+            box-shadow:0 0 0 3px rgba(169,197,176,.14)!important;
             outline:none!important;
         }
         .admin-panel-shell input[type="checkbox"],
@@ -157,6 +192,12 @@
         .admin-panel-shell .bg-\[\#f1f2ef\],
         .admin-panel-shell .bg-\[\#f1f3ef\],
         .admin-panel-shell .bg-\[\#eef3ec\],
+        .admin-panel-shell .bg-\[\#eef1ec\],
+        .admin-panel-shell .bg-\[\#e9ebe6\],
+        .admin-panel-shell .bg-\[\#e6eee4\],
+        .admin-panel-shell .bg-\[\#ece8df\],
+        .admin-panel-shell .bg-\[\#ece8e1\],
+        .admin-panel-shell .bg-\[\#f2ede6\],
         .admin-panel-shell .bg-gray-200{background:var(--admin-surface-soft)!important}
         .admin-panel-shell table,
         .admin-panel-shell tbody,
@@ -175,13 +216,13 @@
             background:linear-gradient(90deg, var(--admin-olive-deep), var(--admin-olive-soft))!important;
             color:#fff!important;
             border-color:transparent!important;
-            box-shadow:0 12px 24px rgba(115,140,118,.22)!important;
+            box-shadow:0 2px 8px rgba(115,140,118,.10)!important;
         }
         .admin-panel-shell .btn-primary:hover,
         .admin-panel-shell a[href*="create"]:hover,
         .admin-panel-shell button[type="submit"].bg-slate-900:hover{
             transform:translateY(-1px);
-            box-shadow:0 16px 28px rgba(115,140,118,.28)!important;
+            box-shadow:0 3px 10px rgba(115,140,118,.13)!important;
         }
         .admin-panel-shell .rounded-xl.border,
         .admin-panel-shell .rounded-lg.border,
@@ -253,9 +294,27 @@
         .dark .admin-panel-shell .dark\:bg-slate-700\/40{background:var(--admin-surface-soft)!important}
         .admin-panel-shell .bg-\[\#fbfbfa\],
         .admin-panel-shell .bg-\[\#fbfcfa\],
-        .admin-panel-shell .bg-\[\#f8faf7\]{background:var(--admin-surface-muted)!important}
-        .admin-panel-shell .shadow-sm,
-        .admin-panel-shell .shadow-lg{box-shadow:var(--admin-shadow)!important}
+        .admin-panel-shell .bg-\[\#f8faf7\],
+        .admin-panel-shell .bg-gray-50,
+        .admin-panel-shell .bg-gray-100,
+        .admin-panel-shell .bg-slate-100,
+        .admin-panel-shell .bg-slate-200{background:var(--admin-surface-muted)!important}
+        .admin-panel-shell [class*="shadow-"]{box-shadow:var(--admin-shadow)!important}
+        .admin-panel-shell .border,
+        .admin-panel-shell [class*="border-"]{border-color:var(--admin-stroke)!important}
+        .admin-panel-shell [class*="ring-"]{--tw-ring-color:var(--admin-stroke)!important}
+        .admin-panel-shell .admin-header-control{
+            background:var(--admin-surface)!important;
+            border:1px solid var(--admin-stroke)!important;
+            box-shadow:var(--admin-header-shadow)!important;
+        }
+        .admin-panel-shell .admin-header-search{
+            background:var(--admin-surface)!important;
+            border:1px solid var(--admin-stroke)!important;
+            color:var(--admin-text)!important;
+            box-shadow:var(--admin-header-shadow)!important;
+        }
+        .admin-panel-shell .admin-header-search::placeholder{color:var(--admin-text-soft)!important}
         .admin-panel-shell .ring-slate-200,
         .admin-panel-shell .ring-\[\#edf0ea\]{--tw-ring-color:var(--admin-stroke)!important}
         .admin-panel-shell .border-white\/70{border-color:rgba(255,255,255,.65)!important}

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login | {{ config('app.brand_name') }}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('assects/admin/Favicontkc.svg') }}">
     <script>
         window.__adminDark = localStorage.getItem('admin-dark-mode') === 'true';
         if (window.__adminDark) document.documentElement.classList.add('dark');
@@ -38,8 +39,9 @@
         [x-cloak] { display: none !important; }
         html, body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
     </style>
+    @include('admin.auth.partials.subtle-surfaces')
 </head>
-<body class="min-h-screen overflow-x-hidden bg-white font-sans text-slate-900 transition-colors duration-300 dark:bg-[#0f1510] dark:text-[#f5f7f2]">
+<body class="admin-auth-shell min-h-screen overflow-x-hidden bg-white font-sans text-slate-900 transition-colors duration-300 dark:bg-[#0f1510] dark:text-[#f5f7f2]">
     @php($loginImagePath = route('media.public', ['path' => 'login/login_img.png']))
     @php($adminLogoPath = route('media.public', ['path' => 'logo/LOGO_TKC-01.png']))
 
@@ -164,6 +166,4 @@
     </div>
 </body>
 </html>
-
-
 

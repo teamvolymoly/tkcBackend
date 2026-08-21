@@ -44,22 +44,19 @@
             ['route' => 'admin.roles.index', 'label' => 'Roles & Permissions', 'hint' => 'Role access management', 'permission' => 'roles.view'],
         ])->filter(fn ($link) => $canAccess($link['permission'])))
         @php($icons = [
-            'Dashboard' => 'Widget_add_light.png',
-            'Analytics' => 'Chart_light.png',
-            'Orders' => 'Box_open_light.png',
-            'Payments' => 'Wallet_light.png',
-            'Products' => 'Boxes_light.png',
-            'Coupons' => 'Gift_light.png',
-            'CMS' => 'desktop_light.png',
-            'More' => 'Shop_light.png',
-            'Setting' => 'Stat.png',
+            'Dashboard' => 'Widget_add_light.svg',
+            'Analytics' => 'Chart_light.svg',
+            'Orders' => 'Box_open_light.svg',
+            'Payments' => 'Wallet_light.svg',
+            'Products' => 'Boxes_light.svg',
+            'Coupons' => 'Gift_light.svg',
+            'CMS' => 'desktop_light.svg',
+            'More' => 'Shop_light.svg',
+            'Setting' => 'Stat.svg',
         ])
         @php($sidebarIcon = function (string $key) use ($icons) {
             $file = $icons[$key] ?? $icons['Dashboard'];
-            return [
-                'lightMode' => asset('assects/admin/dark/' . $file),
-                'darkMode' => asset('assects/admin/light/' . $file),
-            ];
+            return asset('assects/admin/' . $file);
         })
 
         <div class="mt-4 flex-1 overflow-y-auto pr-1 scrollbar-hide">
@@ -73,8 +70,7 @@
                     <a href="{{ route($link['route']) }}" title="{{ $link['hint'] }}" class="group flex items-center gap-2.5 rounded-full px-2.5 py-2 text-[14px] font-medium transition {{ $active ? 'bg-[#5A6F61] text-white' : 'text-[#2f3630] hover:bg-[#eef1ec]' }}">
                         @php($icon = $sidebarIcon($link['label']))
                         <span class="flex h-6 w-6 items-center justify-center">
-                            <img x-show="!darkMode" src="{{ $icon['lightMode'] }}" alt="" class="h-5 w-5 object-contain">
-                            <img x-show="darkMode" src="{{ $icon['darkMode'] }}" alt="" class="h-5 w-5 object-contain">
+                            <img src="{{ $icon }}" alt="" class="h-5 w-5 object-contain transition {{ $active ? 'brightness-0 invert' : '' }}" :class="darkMode ? 'brightness-0 invert' : ''">
                         </span>
                         <span>{{ $link['label'] }}</span>
                     </a>
@@ -86,8 +82,7 @@
                             <span class="flex items-center gap-2.5">
                                 @php($cmsIcon = $sidebarIcon('CMS'))
                                 <span class="flex h-6 w-6 items-center justify-center">
-                                    <img x-show="!darkMode" src="{{ $cmsIcon['lightMode'] }}" alt="" class="h-5 w-5 object-contain">
-                                    <img x-show="darkMode" src="{{ $cmsIcon['darkMode'] }}" alt="" class="h-5 w-5 object-contain">
+                                    <img src="{{ $cmsIcon }}" alt="" class="h-5 w-5 object-contain transition {{ $cmsOpen ? 'brightness-0 invert' : '' }}" :class="darkMode ? 'brightness-0 invert' : ''">
                                 </span>
                                 <span>CMS</span>
                             </span>
@@ -108,8 +103,7 @@
                             <span class="flex items-center gap-2.5">
                                 @php($moreIcon = $sidebarIcon('More'))
                                 <span class="flex h-6 w-6 items-center justify-center">
-                                    <img x-show="!darkMode" src="{{ $moreIcon['lightMode'] }}" alt="" class="h-5 w-5 object-contain">
-                                    <img x-show="darkMode" src="{{ $moreIcon['darkMode'] }}" alt="" class="h-5 w-5 object-contain">
+                                    <img src="{{ $moreIcon }}" alt="" class="h-5 w-5 object-contain transition {{ $moreOpen ? 'brightness-0 invert' : '' }}" :class="darkMode ? 'brightness-0 invert' : ''">
                                 </span>
                                 <span>More</span>
                             </span>
@@ -133,8 +127,7 @@
                             <span class="flex items-center gap-2.5">
                                 @php($settingIcon = $sidebarIcon('Setting'))
                                 <span class="flex h-6 w-6 items-center justify-center">
-                                    <img x-show="!darkMode" src="{{ $settingIcon['lightMode'] }}" alt="" class="h-5 w-5 object-contain">
-                                    <img x-show="darkMode" src="{{ $settingIcon['darkMode'] }}" alt="" class="h-5 w-5 object-contain">
+                                    <img src="{{ $settingIcon }}" alt="" class="h-5 w-5 object-contain transition {{ $settingsOpen ? 'brightness-0 invert' : '' }}" :class="darkMode ? 'brightness-0 invert' : ''">
                                 </span>
                                 <span>Setting</span>
                             </span>

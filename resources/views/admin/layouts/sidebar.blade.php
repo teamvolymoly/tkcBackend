@@ -144,11 +144,17 @@
             @endif
         </div>
 
-        <div class="mt-3 overflow-hidden rounded-[10px] bg-[#5A6F61] text-white">
+        <a
+            href="https://volymoly.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visit Volymoly website"
+            class="mt-3 block overflow-hidden rounded-[10px] bg-[#5A6F61] text-white transition hover:bg-[#506457] focus:outline-none focus:ring-2 focus:ring-[#9fb3a4] focus:ring-offset-2"
+        >
             <div class="space-y-2 px-3 py-3">
                 <p class="text-[10px] tracking-[0.04em] text-white/75">Designed and developed by</p>
                 <img src="{{ asset('assects/admin/volymoly_logo.svg') }}" alt="Volymoly" class="h-auto w-32">
             </div>
-        </div>
+        </a>
     </div>
 </aside>

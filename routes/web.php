@@ -1,21 +1,22 @@
 <?php
 
-use App\Http\Controllers\MediaController;
+use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\BlogPostController as AdminBlogPostController;
 use App\Http\Controllers\Admin\CartController as AdminCartController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
-use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\ContactQueryController as AdminContactQueryController;
+use App\Http\Controllers\Admin\CouponController as AdminCouponController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\HeroSectionController as AdminHeroSectionController;
-use App\Http\Controllers\Admin\AnalyticsController as AdminAnalyticsController;
+use App\Http\Controllers\Admin\NewsletterSubscriberController as AdminNewsletterSubscriberController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 use App\Http\Controllers\Admin\RoleController as AdminRoleController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\MediaController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/media/public/{path}', [MediaController::class, 'public'])
@@ -40,6 +41,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
             Route::get('/', AdminDashboardController::class)->middleware('admin.permission:dashboard.view')->name('dashboard');
             Route::get('/analytics', AdminAnalyticsController::class)->middleware('admin.permission:dashboard.view')->name('analytics');
+            Route::get('/newsletter-subscribers', [AdminNewsletterSubscriberController::class, 'index'])->middleware('admin.permission:dashboard.view')->name('newsletter-subscribers.index');
+            Route::delete('/newsletter-subscribers/{newsletterSubscriber}', [AdminNewsletterSubscriberController::class, 'destroy'])->middleware('admin.permission:dashboard.view')->name('newsletter-subscribers.destroy');
             Route::get('/contact-queries', [AdminContactQueryController::class, 'index'])->middleware('admin.permission:contact_queries.view')->name('contact-queries.index');
             Route::get('/contact-queries/{contactQuery}', [AdminContactQueryController::class, 'show'])->middleware('admin.permission:contact_queries.view')->name('contact-queries.show');
             Route::get('/profile', [AdminAuthController::class, 'profile'])->middleware('admin.permission:profile.view')->name('profile.show');

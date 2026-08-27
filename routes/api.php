@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\API\AddressController;
 use App\Http\Controllers\API\Admin\RoleController as AdminRoleController;
-use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\API\Admin\UserManagementController;
+use App\Http\Controllers\API\AdminController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogPostController;
 use App\Http\Controllers\API\CartController;
@@ -15,6 +15,7 @@ use App\Http\Controllers\API\CustomerAccountController;
 use App\Http\Controllers\API\HeroSectionController;
 use App\Http\Controllers\API\HomeBlogPostController;
 use App\Http\Controllers\API\HomeHeroSectionController;
+use App\Http\Controllers\API\NewsletterSubscriberController;
 use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\ProductController;
 use App\Http\Controllers\API\ReviewController;
@@ -51,6 +52,7 @@ Route::post('/payments/webhook', [PaymentController::class, 'webhook']);
 Route::get('/blog-posts', [BlogPostController::class, 'index']);
 Route::get('/blog-posts/{blogPost}', [BlogPostController::class, 'show']);
 Route::post('/contact-queries', [ContactQueryController::class, 'store']);
+Route::post('/newsletter/subscribe', [NewsletterSubscriberController::class, 'store']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/dashboard', [CustomerAccountController::class, 'dashboard']);
@@ -132,5 +134,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/admin/payments/{id}', [PaymentController::class, 'adminUpdate'])->middleware('admin.api_permission:payments.update');
     Route::get('/admin/carts', [CartController::class, 'adminIndex'])->middleware('admin.api_permission:carts.view');
     Route::get('/admin/carts/{id}', [CartController::class, 'adminShow'])->middleware('admin.api_permission:carts.view');
+    Route::get('/admin/newsletter-subscribers', [NewsletterSubscriberController::class, 'adminIndex'])->middleware('admin.api_permission:dashboard.view');
+    Route::get('/admin/newsletter-subscribers/{newsletterSubscriber}', [NewsletterSubscriberController::class, 'adminShow'])->middleware('admin.api_permission:dashboard.view');
+    Route::delete('/admin/newsletter-subscribers/{newsletterSubscriber}', [NewsletterSubscriberController::class, 'adminDestroy'])->middleware('admin.api_permission:dashboard.view');
 });
-

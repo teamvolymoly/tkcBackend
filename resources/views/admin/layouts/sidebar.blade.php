@@ -23,6 +23,7 @@
         @php($primaryLinks = collect([
             ['route' => 'admin.dashboard', 'label' => 'Dashboard', 'hint' => 'Dashboard overview', 'permission' => 'dashboard.view'],
             ['route' => 'admin.analytics', 'label' => 'Analytics', 'hint' => 'Analytics and order insights', 'permission' => 'dashboard.view'],
+            ['route' => 'admin.newsletter-subscribers.index', 'label' => 'Newsletter Subscribers', 'hint' => 'Website email subscriptions', 'permission' => 'dashboard.view'],
             ['route' => 'admin.orders.index', 'label' => 'Orders', 'hint' => 'Orders management', 'permission' => 'orders.view'],
             ['route' => 'admin.payments.index', 'label' => 'Payments', 'hint' => 'Payments management', 'permission' => 'payments.view'],
             ['route' => 'admin.products.index', 'label' => 'Products', 'hint' => 'Products management', 'permission' => 'products.view'],
